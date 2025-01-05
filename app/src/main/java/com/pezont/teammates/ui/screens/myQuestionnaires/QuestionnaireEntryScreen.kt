@@ -75,7 +75,7 @@ fun QuestionnaireEntryScreen(
             TeammatesTopAppBar(
                 title = stringResource(QuestionnaireEntryDestination.titleRes),
                 canNavigateBack = canNavigateBack,
-                navigateUp = { viewModel.navigateToHome(teammatesUiState) }
+                navigateUp = onNavigateUp
             )
         }
     ) { innerPadding ->
@@ -157,7 +157,7 @@ fun QuestionnaireEntryScreen(
                         selectedGame = selectedGame,
                         image = imagePart
                     )
-                    viewModel.navigateToHome(teammatesUiState)
+                    //TODO end creating
                 },
                 enabled = header.isNotEmpty() && description.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth()
