@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Тиммейты</string>
+    <string name="authorization">Authorization</string>
+    <string name="authorization_error_incorrect_login_or_password">Authorization error : Incorrect login or password</string>
+    <string name="authorization_error_authorization_failed">Authorization error : Authorization failed</string>
+    <string name="logout">Logout</string>
+    <string name="error">Error : </string>
+    <string name="loading">Loading</string>
+    <string name="please_wait">Please Wait</string>
+    <string name="no_internet_connection">No Internet Connection</string>
+    <string name="retry">Retry</string>
+    <string name="welcome">Дарова, </string>
+    <string name="home">Home</string>
+    <string name="favorites">Favorites</string>
+    <string name="profile">Profile</string>
+    <string name="create_questionnaire">Create Questionnaire</string>
+    <string name="my_questionnaires">My Questionnaires</string>
+    <string name="back">Back</string>
+    <string name="entry_information">Entry Information</string>
+    <string name="create">Create</string>
+    <string name="description">Description</string>
+</resources>
