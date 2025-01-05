@@ -1,5 +1,7 @@
 package com.pezont.teammates.ui.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -8,23 +10,39 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
+import com.pezont.teammates.ui.screens.ProfileDestination
+import com.pezont.teammates.ui.screens.ProfileScreen
 import com.pezont.teammates.ui.screens.myQuestionnaires.MyQuestionnairesDestination
 import com.pezont.teammates.ui.screens.myQuestionnaires.MyQuestionnairesScreen
 import com.pezont.teammates.ui.screens.myQuestionnaires.QuestionnaireEntryDestination
 import com.pezont.teammates.ui.screens.myQuestionnaires.QuestionnaireEntryScreen
 
 @Composable
-fun MyQuestionnairesNavHost(
+fun ProfileNavHost(
     viewModel: TeammatesViewModel,
     teammatesUiState: TeammatesUiState.Home,
     navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier,
+    paddingValues: PaddingValues,
 ) {
     NavHost(
         navController = navController,
-        startDestination = MyQuestionnairesDestination.route,
-        modifier = modifier
+        startDestination = ProfileDestination.route,
+        modifier = modifier.padding(paddingValues)
     ) {
+
+        composable(route = ProfileDestination.route) {
+            ProfileScreen(
+                navigateToMyQuestionnaires = {
+                    navController.navigate(
+                        MyQuestionnairesDestination.route
+                    )
+                },
+                teammatesUiState,
+                viewModel,
+
+            )
+        }
 
         composable(route = MyQuestionnairesDestination.route) {
             MyQuestionnairesScreen(
@@ -33,8 +51,9 @@ fun MyQuestionnairesNavHost(
                         QuestionnaireEntryDestination.route
                     )
                 },
-                teammatesUiState,
-                viewModel,
+                onNavigateUp = { navController.navigateUp() },
+                teammatesUiState = teammatesUiState,
+                viewModel = viewModel,
             )
         }
         composable(route = QuestionnaireEntryDestination.route) {

@@ -1,9 +1,7 @@
 package com.pezont.teammates.ui.screens
 
 import android.content.Context
-import android.os.Build
 import android.widget.Toast
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 
 
@@ -18,7 +16,7 @@ import com.pezont.teammates.R
 import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
-import com.pezont.teammates.ui.navigation.MyQuestionnairesNavHost
+import com.pezont.teammates.ui.navigation.ProfileNavHost
 
 @Composable
 fun TeammatesApp(
@@ -47,8 +45,6 @@ fun TeammatesApp(
 
 
         }
-        is TeammatesUiState.MyQuestionnaires -> MyQuestionnairesNavHost(viewModel, teammatesUiState.teammatesUiStateHome)
-
         is TeammatesUiState.Error -> Text(
             "${stringResource(R.string.error)}${teammatesUiState.statusResponse}",
             textAlign = TextAlign.Center

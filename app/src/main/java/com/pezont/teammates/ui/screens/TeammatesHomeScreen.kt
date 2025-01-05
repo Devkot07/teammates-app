@@ -1,6 +1,7 @@
 package com.pezont.teammates.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.icons.Icons
@@ -32,6 +33,7 @@ import com.pezont.teammates.R
 import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
+import com.pezont.teammates.ui.navigation.ProfileNavHost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -48,34 +50,34 @@ fun TeammatesHomeScreen(
     viewModel: TeammatesViewModel,
     onTabPressed: (ContentType) -> Unit,
 ) {
-
-
     val navigationItemContentList = listOf(
+        NavigationItemContent(ContentType.Home, Icons.Default.Home, stringResource(R.string.home)),
         NavigationItemContent(
-            contentType = ContentType.Home,
-            icon = Icons.Default.Home,
-            text = stringResource(R.string.home)
+            ContentType.Favorites,
+            Icons.Default.Favorite,
+            stringResource(R.string.favorites)
         ),
         NavigationItemContent(
-            contentType = ContentType.Favorites,
-            icon = Icons.Default.Favorite,
-            text = stringResource(R.string.favorites)
-        ),
-        NavigationItemContent(
-            contentType = ContentType.Profile,
-            icon = Icons.Default.Drafts,
-            text = stringResource(R.string.profile)
+            ContentType.Profile,
+            Icons.Default.Drafts,
+            stringResource(R.string.profile)
         )
     )
 
-    val topAppBarTitle = when (teammatesUiState.currentContent) {
-        ContentType.Home -> stringResource(R.string.home)
-        ContentType.Favorites -> stringResource(R.string.favorites)
-        ContentType.Profile -> stringResource(R.string.profile)
-    }
+    val topAppBarTitle = stringResource(
+        when (teammatesUiState.currentContent) {
+            ContentType.Home -> R.string.home
+            ContentType.Favorites -> R.string.favorites
+            ContentType.Profile -> R.string.profile
+        }
+    )
 
     Scaffold(
-        topBar = { TeammatesTopAppBar(title = topAppBarTitle, canNavigateBack = false) },
+        topBar = {
+            if (teammatesUiState.currentContent != ContentType.Profile) {
+                TeammatesTopAppBar(title = topAppBarTitle, canNavigateBack = false)
+            }
+        },
         bottomBar = {
             BottomNavigationBar(
                 currentTab = teammatesUiState.currentContent,
@@ -84,92 +86,86 @@ fun TeammatesHomeScreen(
             )
         }
     ) { paddingValues ->
-        Log.i("LOGIC", "${teammatesUiState.currentContent}")
-
         when (teammatesUiState.currentContent) {
-            ContentType.Home -> {
-                val isRefreshing = remember { mutableStateOf(false) }
+            ContentType.Home -> HomeContent(
+                currentItem = currentItem,
+                viewModel = viewModel,
+                teammatesUiState = teammatesUiState,
+                paddingValues = paddingValues
+            )
 
-                val pageIndex = remember { mutableIntStateOf(1) }
-                val listState = remember(teammatesUiState.questionnaires) { LazyListState() }
-                val newCurrentItem = (pageIndex.intValue) * 10
+            ContentType.Favorites -> Text(text = stringResource(R.string.favorites))
+            ContentType.Profile -> ProfileNavHost(
+                viewModel = viewModel,
+                teammatesUiState = teammatesUiState,
+                paddingValues = paddingValues
+            )
+        }
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeContent(
+    viewModel: TeammatesViewModel,
+    teammatesUiState: TeammatesUiState.Home,
+    currentItem: Int,
+    paddingValues: PaddingValues
+) {
+    val isRefreshing = remember { mutableStateOf(false) }
+    val pageIndex = remember { mutableIntStateOf(1) }
+    val listState = remember(teammatesUiState.questionnaires) { LazyListState() }
+    val isLoadingMore = remember { mutableStateOf(false) }
+    val newCurrentItem = pageIndex.intValue * 10
 
-                val isLoadingMore = remember { mutableStateOf(false) }
-
-                PullToRefreshBox(
-                    modifier = Modifier.padding(paddingValues),
-                    isRefreshing = isRefreshing.value,
-                    onRefresh = {
-                        isRefreshing.value = true
-                        CoroutineScope(Dispatchers.IO).launch {
-                            try {
-                                delay(1000L)
-                                viewModel.tryGetQuestionnairesByGame()
-                            } finally {
-                                withContext(Dispatchers.Main) {
-                                    isRefreshing.value = false
-                                    pageIndex.intValue = 1
-                                }
-                            }
-                        }
+    PullToRefreshBox(
+        modifier = Modifier.padding(paddingValues),
+        isRefreshing = isRefreshing.value,
+        onRefresh = {
+            isRefreshing.value = true
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    delay(1000L)
+                    viewModel.tryGetQuestionnairesByGame()
+                } finally {
+                    withContext(Dispatchers.Main) {
+                        isRefreshing.value = false
+                        pageIndex.intValue = 1
                     }
-                ) {
-
-
-                    QuestionnairesGridScreen(
-                        viewModel = viewModel,
-                        teammatesUiState = teammatesUiState,
-                        questionnaires = teammatesUiState.questionnaires,
-                        listState = listState,
-                        contentPadding = paddingValues
-                    )
-
-                    LaunchedEffect(listState) {
-                        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-                            .collect { lastIndex ->
-                                if (isLoadingMore.value) {
-                                    isLoadingMore.value = false
-                                    listState.scrollToItem(currentItem)
-                                }
-
-                                if (lastIndex == teammatesUiState.questionnaires.size && !isLoadingMore.value) {
-                                    isLoadingMore.value = true
-
-                                    try {
-                                        Log.i("LOGIC", "$newCurrentItem")
-                                        viewModel.getNextFakeQuestionnaires(
-                                            teammatesUiState = teammatesUiState,
-                                            i = pageIndex.intValue,
-                                            newCurrentItem = newCurrentItem
-                                        )
-                                        Log.i("LOGIC", "--> $newCurrentItem")
-                                        pageIndex.intValue++
-
-                                    } finally {
-                                        Log.i("LOGIC", "-> $currentItem")
-                                    }
-
-                                }
-
-                            }
-                    }
-
-
                 }
             }
+        }
+    ) {
+        QuestionnairesGridScreen(
+            viewModel = viewModel,
+            teammatesUiState = teammatesUiState,
+            questionnaires = teammatesUiState.questionnaires,
+            listState = listState,
+            contentPadding = paddingValues
+        )
 
-            ContentType.Favorites -> {
-                Text("Favorites Screen")
-            }
+        LaunchedEffect(listState) {
+            snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+                .collect { lastIndex ->
+                    if (isLoadingMore.value) {
+                        isLoadingMore.value = false
+                        listState.scrollToItem(currentItem)
+                    }
 
-            ContentType.Profile -> {
-                ProfileScreen(
-                    teammatesUiState = teammatesUiState,
-                    viewModel = viewModel,
-                    paddingValues = paddingValues
-                )
-            }
+                    if (lastIndex == teammatesUiState.questionnaires.size && !isLoadingMore.value) {
+                        isLoadingMore.value = true
+                        try {
+                            viewModel.getNextFakeQuestionnaires(
+                                teammatesUiState = teammatesUiState,
+                                i = pageIndex.intValue,
+                                newCurrentItem = newCurrentItem
+                            )
+                            pageIndex.intValue++
+                        } finally {
+                            Log.i("LOGIC", "Loading more items")
+                        }
+                    }
+                }
         }
     }
 }

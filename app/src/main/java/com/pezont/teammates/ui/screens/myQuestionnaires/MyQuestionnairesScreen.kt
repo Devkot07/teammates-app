@@ -24,14 +24,14 @@ import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.screens.TeammatesTopAppBar
 
 object MyQuestionnairesDestination : NavigationDestination {
-    override val route = "home"
+    override val route = "my_questionnaires"
     override val titleRes = R.string.my_questionnaires
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyQuestionnairesScreen(
-
+    onNavigateUp: () -> Unit,
     navigateToQuestionnaireEntry: () -> Unit,
     teammatesUiState: TeammatesUiState.Home,
     viewModel: TeammatesViewModel
@@ -41,7 +41,7 @@ fun MyQuestionnairesScreen(
             TeammatesTopAppBar(
                 title = stringResource(MyQuestionnairesDestination.titleRes),
                 canNavigateBack = true,
-                navigateUp = { viewModel.navigateToHome(teammatesUiState) }
+                navigateUp = onNavigateUp
             )
         },
         floatingActionButton = {

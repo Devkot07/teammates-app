@@ -15,9 +15,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,62 +33,85 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.pezont.teammates.R
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.pezont.teammates.ui.navigation.NavigationDestination
+import com.pezont.teammates.ui.screens.myQuestionnaires.MyQuestionnairesDestination
 
+object ProfileDestination : NavigationDestination {
+    override val route = "profile"
+    override val titleRes = R.string.profile
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    navigateToMyQuestionnaires: () -> Unit,
     teammatesUiState: TeammatesUiState.Home,
     viewModel: TeammatesViewModel,
-    paddingValues: PaddingValues
+
 ) {
-    Column(
-        modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Spacer(modifier = Modifier.height(4.dp))
-        ProfileSection(image = painterResource(id = R.drawable.ic_launcher_foreground))
-        Text(
-            text = "User Profile",
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary
-        )
+    Scaffold(
+        topBar = {
+            TeammatesTopAppBar(
+                title = stringResource(ProfileDestination.titleRes),
+                canNavigateBack = false,
+            )
+        }){paddingValues ->
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Spacer(modifier = Modifier.height(4.dp))
+            ProfileSection(image = painterResource(id = R.drawable.ic_launcher_foreground))
+            Text(
+                text = "User Profile",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
 
-        Text(text = "Nickname: ${teammatesUiState.user.nickname}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Description: ${teammatesUiState.user.description}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Email: ${teammatesUiState.user.email}", style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Nickname: ${teammatesUiState.user.nickname}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "Description: ${teammatesUiState.user.description}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "Email: ${teammatesUiState.user.email}",
+                style = MaterialTheme.typography.bodyMedium
+            )
 
 
 
 
 
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
 
                 viewModel.clearUserData()
 
-        } ) {
-            Text(text = stringResource(id = R.string.logout))
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { viewModel.navigateToMyQuestionnaires(teammatesUiState) }
+            }) {
+                Text(text = stringResource(id = R.string.logout))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = navigateToMyQuestionnaires
 
-        ) {
-            Text(text = "My questionnaires")
+            ) {
+                Text(text = "My questionnaires")
+            }
         }
+
     }
+
 
 }
 
@@ -178,7 +202,7 @@ fun ProfileDescription(
             letterSpacing = letterSpacing,
             lineHeight = lineHeight
         )
-        if(followedBy.isNotEmpty()) {
+        if (followedBy.isNotEmpty()) {
             Text(
                 text = buildAnnotatedString {
                     val boldStyle = SpanStyle(
@@ -190,11 +214,11 @@ fun ProfileDescription(
                         pushStyle(boldStyle)
                         append(name)
                         pop()
-                        if(index < followedBy.size - 1) {
+                        if (index < followedBy.size - 1) {
                             append(", ")
                         }
                     }
-                    if(otherCount > 2) {
+                    if (otherCount > 2) {
                         append(" and ")
                         pushStyle(boldStyle)
                         append("$otherCount others")

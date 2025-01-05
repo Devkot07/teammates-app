@@ -353,14 +353,6 @@ class TeammatesViewModel(
         }
     }
 
-    fun navigateToMyQuestionnaires(teammatesUiState: TeammatesUiState.Home) {
-        _teammatesUiState.value = TeammatesUiState.MyQuestionnaires(teammatesUiState)
-    }
-
-    fun navigateToHome(teammatesUiState: TeammatesUiState.Home) {
-        _teammatesUiState.value = teammatesUiState
-    }
-
 
     companion object {
         const val TAG: String = "ViewModel"
@@ -400,10 +392,6 @@ sealed interface TeammatesUiState {
         val user: User,
         val currentItem: Int = 0,
         var questionnaires: List<Questionnaire>
-    ) : TeammatesUiState
-
-    data class MyQuestionnaires(
-        val teammatesUiStateHome: Home
     ) : TeammatesUiState
 
     data object ErrorNetwork : TeammatesUiState
