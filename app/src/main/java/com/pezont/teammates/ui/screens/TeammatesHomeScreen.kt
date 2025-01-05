@@ -166,7 +166,8 @@ fun TeammatesHomeScreen(
             ContentType.Profile -> {
                 ProfileScreen(
                     teammatesUiState = teammatesUiState,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    paddingValues = paddingValues
                 )
             }
         }

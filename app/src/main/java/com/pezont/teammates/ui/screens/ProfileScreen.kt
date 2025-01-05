@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -43,11 +44,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileScreen(
     teammatesUiState: TeammatesUiState.Home,
-    viewModel: TeammatesViewModel
+    viewModel: TeammatesViewModel,
+    paddingValues: PaddingValues
 ) {
     Column(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(paddingValues)
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -68,13 +70,6 @@ fun ProfileScreen(
         Text(text = "Email: ${teammatesUiState.user.email}", style = MaterialTheme.typography.bodyMedium)
 
 
-        AsyncImage(
-            model = teammatesUiState.user.imagePath,
-            contentDescription = "User Image",
-            modifier = Modifier
-                .size(100.dp)
-                .clip(RoundedCornerShape(50.dp))
-        )
 
 
 
