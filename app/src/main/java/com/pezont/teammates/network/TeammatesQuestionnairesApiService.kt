@@ -14,11 +14,11 @@ import retrofit2.http.Query
 interface TeammatesQuestionnairesApiService {
 
 
-    @GET("questionnaires/{game}")
+    @GET("questionnaires")
     suspend fun getQuestionnairesByGame(
         @Header("accept") accept: String = "application/json",
         @Header("Authorization") token: String,
-        @Path("game") gameName: String,
+        @Query("game") gameName: String?,
         @Query("user_id") userId: Int?,
         @Query("page") page: Int,
         @Query("limit") limit: Int
