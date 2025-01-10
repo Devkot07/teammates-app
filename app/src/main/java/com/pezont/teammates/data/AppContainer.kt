@@ -16,6 +16,7 @@
 package com.pezont.teammates.data
 
 import android.content.Context
+import android.util.Log
 import com.pezont.teammates.dummy.AuthDummyApiService
 import com.pezont.teammates.dummy.NetworkUserDummyRepository
 import com.pezont.teammates.dummy.UserDummyRepository
@@ -38,6 +39,7 @@ interface AppContainer {
 class DefaultAppContainer(private val context: Context) : AppContainer {
     private val dummyUrl = "https://dummyjson.com/"
     private val ip = "192.168.139.235"
+    private val appIp = "obscure-space-carnival-7vrqpvv7jqwr275-"
     // TODO  ip
 
 
@@ -61,13 +63,20 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val authRepository: AuthRepository by lazy {
         val retrofitService =
-            createRetrofit("http://$ip:8100/").create(TeammatesAuthApiService::class.java)
+            createRetrofit(
+                //"http://$ip:8100/"
+                "https://${appIp}8100.app.github.dev"
+            ).create(TeammatesAuthApiService::class.java)
+        Log.i("LOGIC", "http://${appIp}8100.app.github.dev")
         NetworkAuthRepository(retrofitService, context)
     }
 
     override val questionnairesRepository: QuestionnairesRepository by lazy {
         val retrofitService =
-            createRetrofit("http://$ip:8000/").create(TeammatesQuestionnairesApiService::class.java)
+            createRetrofit(
+                //"http://$ip:8000/"
+                "https://${appIp}8000.app.github.dev"
+            ).create(TeammatesQuestionnairesApiService::class.java)
         NetworkQuestionnairesRepository(retrofitService, context)
     }
 
