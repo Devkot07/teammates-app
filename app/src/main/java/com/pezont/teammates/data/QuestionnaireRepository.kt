@@ -14,10 +14,10 @@ import java.io.IOException
 
 interface QuestionnairesRepository {
 
-    suspend fun getQuestionnairesByGame(
-        game: Games,
+    suspend fun getQuestionnaires(
+        game: Games?,
         token: String,
-        userId: Int? = -1,
+        userId: Int,
         page: Int,
         limit: Int
     ): Result<List<Questionnaire>>
@@ -48,20 +48,21 @@ class NetworkQuestionnairesRepository(
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    override suspend fun getQuestionnairesByGame(
-        game: Games,
+    override suspend fun getQuestionnaires(
+        game: Games?,
         token: String,
-        userId: Int?,
+        userId: Int,
         page: Int,
         limit: Int
 
     ): Result<List<Questionnaire>> {
         if (!isNetworkAvailable()) return Result.failure(IOException("No internet connection"))
         return try {
+
             Result.success(
                 teammatesQuestionnairesApiService.getQuestionnairesByGame(
                     token = "Bearer $token",
-                    gameName = game.name,
+                    gameName = game?.name,
                     userId = userId,
                     page = page,
                     limit = limit
@@ -87,7 +88,6 @@ class NetworkQuestionnairesRepository(
         return try {
             Result.success(
                 teammatesQuestionnairesApiService.createQuestionnaire(
-
                     token = "Bearer $token",
                     userId = authorId,
                     questionnaire = CreateQuestionnaireRequest(
