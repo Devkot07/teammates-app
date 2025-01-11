@@ -61,7 +61,6 @@ class TeammatesViewModel(
                         if (!isInitialized) {
                             _teammatesUiState.value =
                                 TeammatesUiState.Home(user = user, questionnaires = listOf())
-                            tryGetQuestionnairesByGame()
                             isInitialized = true
                         } else {
                             _teammatesUiState.value = TeammatesUiState.Login(false)
@@ -82,7 +81,6 @@ class TeammatesViewModel(
                         if (!isInitialized) {
                             _teammatesUiState.value =
                                 TeammatesUiState.Home(user = user, questionnaires = listOf())
-                            tryGetQuestionnairesByGame()
                             isInitialized = true
                         } else {
                             _teammatesUiState.value = TeammatesUiState.Login(false)
@@ -94,18 +92,18 @@ class TeammatesViewModel(
     }
 
     // TODO clear
-    fun tryGetQuestionnairesByGame(
+    suspend fun tryGetQuestionnaires(
         //  isLoggedOut: Boolean,
-        game: Games = Games.CS2,
+        game: Games? = null,
         page: Int = 1,
         limit: Int = 10
     ) {
 
         viewModelScope.launch {
-            val questionnairesResult = questionnairesRepository.getQuestionnairesByGame(
+            val questionnairesResult = questionnairesRepository.getQuestionnaires(
                 game,
                 token = userDataRepository.accessToken.first(),
-                userId = userDataRepository.user.first().publicId,
+                userId = userDataRepository.user.first().publicId!!,
                 page,
                 limit
             )
@@ -144,6 +142,23 @@ class TeammatesViewModel(
         }
 
     }
+
+//    suspend fun getNextQuestionnaires(
+//        teammatesUiState: TeammatesUiState.Home,
+//        page: Int,
+//        newCurrentItem: Int
+//    ) {
+//        delay(2000L)
+//        val newQuestionnaires = fakeQuestionnairesRepository.getNextRecommendedQuestionnaires(i)
+//        Log.d(TAG, "Fetched new questionnaires: $newQuestionnaires")
+//        Log.d(TAG, "===================: $i")
+//        _teammatesUiState.value = TeammatesUiState.Home(
+//            currentContent = teammatesUiState.currentContent,
+//            questionnaires = teammatesUiState.questionnaires + newQuestionnaires,
+//            user = teammatesUiState.user,
+//            currentItem = newCurrentItem
+//        )
+//    }
 
 //    fun tryLoginWithDummyAccessToken(isLoggedOut: Boolean, token: String) {
 //        viewModelScope.launch {
@@ -263,7 +278,7 @@ class TeammatesViewModel(
 
 
                 }
-                tryGetQuestionnairesByGame()
+                tryGetQuestionnaires()
             } else {
                 val error = result.exceptionOrNull()
                 Log.e(TAG, "Login failed: $error")

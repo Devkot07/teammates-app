@@ -3,7 +3,7 @@ package com.pezont.teammates.ui.screens
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Drafts
@@ -22,10 +22,8 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -104,6 +102,7 @@ fun TeammatesHomeScreen(
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(
@@ -113,10 +112,11 @@ fun HomeContent(
     paddingValues: PaddingValues
 ) {
     val isRefreshing = remember { mutableStateOf(false) }
-    val pageIndex = remember { mutableIntStateOf(1) }
-    val listState = remember(teammatesUiState.questionnaires) { LazyListState() }
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { teammatesUiState.questionnaires.size + 1 })
     val isLoadingMore = remember { mutableStateOf(false) }
-    val newCurrentItem = pageIndex.intValue * 10
+    val newCurrentItem = pagerState.currentPage * 10
 
     PullToRefreshBox(
         modifier = Modifier.padding(paddingValues),
@@ -126,11 +126,11 @@ fun HomeContent(
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     delay(1000L)
-                    viewModel.tryGetQuestionnairesByGame()
+                    viewModel.tryGetQuestionnaires()
                 } finally {
                     withContext(Dispatchers.Main) {
                         isRefreshing.value = false
-                        pageIndex.intValue = 1
+                        pagerState.scrollToPage(0)
                     }
                 }
             }
@@ -138,34 +138,30 @@ fun HomeContent(
     ) {
         QuestionnairesGridScreen(
             viewModel = viewModel,
-            teammatesUiState = teammatesUiState,
             questionnaires = teammatesUiState.questionnaires,
-            listState = listState,
-            contentPadding = paddingValues
-        )
+            pagerState = pagerState,
 
-        LaunchedEffect(listState) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-                .collect { lastIndex ->
-                    if (isLoadingMore.value) {
-                        isLoadingMore.value = false
-                        listState.scrollToItem(currentItem)
-                    }
+            )
 
-                    if (lastIndex == teammatesUiState.questionnaires.size && !isLoadingMore.value) {
-                        isLoadingMore.value = true
-                        try {
-                            viewModel.getNextFakeQuestionnaires(
-                                teammatesUiState = teammatesUiState,
-                                i = pageIndex.intValue,
-                                newCurrentItem = newCurrentItem
-                            )
-                            pageIndex.intValue++
-                        } finally {
-                            Log.i("LOGIC", "Loading more items")
-                        }
-                    }
+
+
+        LaunchedEffect(pagerState.currentPage) {
+            if (!isLoadingMore.value && pagerState.currentPage == teammatesUiState.questionnaires.size) {
+                isLoadingMore.value = true
+                try {
+//                    viewModel.tryGetQuestionnaires(
+//                        page = pagerState.currentPage/10 + 1,
+//                    )
+                    viewModel.getNextFakeQuestionnaires(
+                        teammatesUiState = teammatesUiState,
+                        i = pagerState.currentPage / 10 + 1,
+                        newCurrentItem = newCurrentItem
+                    )
+                } finally {
+                    Log.i("LOGIC", "Loading more items")
+                    isLoadingMore.value = false
                 }
+            }
         }
     }
 }
