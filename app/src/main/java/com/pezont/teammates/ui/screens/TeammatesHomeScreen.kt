@@ -2,6 +2,7 @@ package com.pezont.teammates.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -26,7 +27,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.ui.TeammatesUiState
@@ -48,6 +51,8 @@ fun TeammatesHomeScreen(
     viewModel: TeammatesViewModel,
     onTabPressed: (ContentType) -> Unit,
 ) {
+    val context = LocalContext.current
+
     val navigationItemContentList = listOf(
         NavigationItemContent(ContentType.Home, Icons.Default.Home, stringResource(R.string.home)),
         NavigationItemContent(
@@ -80,7 +85,8 @@ fun TeammatesHomeScreen(
             BottomNavigationBar(
                 currentTab = teammatesUiState.currentContent,
                 onTabPressed = onTabPressed,
-                navigationItemContentList = navigationItemContentList
+                navigationItemContentList = navigationItemContentList,
+                modifier = Modifier.height(60.dp)
             )
         }
     ) { paddingValues ->

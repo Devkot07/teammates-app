@@ -17,6 +17,7 @@ import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.navigation.ProfileNavHost
+import com.pezont.teammates.ui.screens.sendToasts.SendNetworkErrorToast
 
 @Composable
 fun TeammatesApp(
@@ -59,20 +60,6 @@ fun TeammatesApp(
 
 
 
-// TODO: make general
-@Composable
-fun SendNetworkErrorToast(status: Int, context: Context) {
-    when (status){
-        400 -> {
-            Toast.makeText(context,
-                stringResource(R.string.authorization_error_incorrect_login_or_password), Toast.LENGTH_SHORT).show()}
-        401 ->{ Toast.makeText(context,
-            stringResource(R.string.authorization_error_authorization_failed), Toast.LENGTH_SHORT).show()}
-        1 -> { Toast.makeText(context, stringResource(R.string.logout), Toast.LENGTH_SHORT).show()}
-        else -> {}
-    }
-
-}
 
 
 

@@ -16,9 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,84 +34,65 @@ import androidx.compose.ui.unit.sp
 import com.pezont.teammates.R
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
-import com.pezont.teammates.ui.navigation.NavigationDestination
-import com.pezont.teammates.ui.screens.myQuestionnaires.MyQuestionnairesDestination
 
-object ProfileDestination : NavigationDestination {
-    override val route = "profile"
-    override val titleRes = R.string.profile
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(
+fun Profile(
     navigateToMyQuestionnaires: () -> Unit,
     teammatesUiState: TeammatesUiState.Home,
     viewModel: TeammatesViewModel,
+    paddingValues: PaddingValues
+){
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Spacer(modifier = Modifier.height(4.dp))
+        ProfileSection(image = painterResource(id = R.drawable.ic_launcher_foreground))
+        Text(
+            text = "User Profile",
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.primary
+        )
 
-) {
-    Scaffold(
-        topBar = {
-            TeammatesTopAppBar(
-                title = stringResource(ProfileDestination.titleRes),
-                canNavigateBack = false,
-            )
-        }){paddingValues ->
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Spacer(modifier = Modifier.height(4.dp))
-            ProfileSection(image = painterResource(id = R.drawable.ic_launcher_foreground))
-            Text(
-                text = "User Profile",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Nickname: ${teammatesUiState.user.nickname}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "Description: ${teammatesUiState.user.description}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "Email: ${teammatesUiState.user.email}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+        Text(
+            text = "Nickname: ${teammatesUiState.user.nickname}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = "Description: ${teammatesUiState.user.description}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = "Email: ${teammatesUiState.user.email}",
+            style = MaterialTheme.typography.bodyMedium
+        )
 
 
 
 
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = {
 
-                viewModel.clearUserData()
+            viewModel.clearUserData()
 
-            }) {
-                Text(text = stringResource(id = R.string.logout))
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = navigateToMyQuestionnaires
-
-            ) {
-                Text(text = "My questionnaires")
-            }
+        }) {
+            Text(text = stringResource(id = R.string.logout))
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = navigateToMyQuestionnaires
 
+        ) {
+            Text(text = "My questionnaires")
+        }
     }
-
-
 }
+
 
 
 @Composable
