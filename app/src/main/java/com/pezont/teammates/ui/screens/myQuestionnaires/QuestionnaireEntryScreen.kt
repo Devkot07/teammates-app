@@ -52,9 +52,11 @@ object QuestionnaireEntryDestination : NavigationDestination {
 fun QuestionnaireEntryScreen(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
-    teammatesUiState: TeammatesUiState.Home,
+    createNewQuestionnaireAction: (header: String,
+                                   description: String,
+                                   selectedGame: Games,
+                                   image: MultipartBody.Part?)  -> Unit,
     canNavigateBack: Boolean = true,
-    viewModel: TeammatesViewModel,
     modifier: Modifier = Modifier
 ) {
     var header by remember { mutableStateOf("") }
@@ -150,16 +152,13 @@ fun QuestionnaireEntryScreen(
                 onClick = {
 
                     val imagePart = selectedImageUri?.asMultipart("image", context)
-
-                    viewModel.createNewQuestionnaire(
-                        header = header,
-                        description = description,
-                        selectedGame = selectedGame,
-                        image = imagePart
+                    createNewQuestionnaireAction(
+                        header,
+                        description,
+                        selectedGame,
+                        imagePart
                     )
-                    //TODO end creating
                 },
-                enabled = header.isNotEmpty() && description.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(R.string.create))

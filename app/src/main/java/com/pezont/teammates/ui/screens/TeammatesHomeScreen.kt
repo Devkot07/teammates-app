@@ -2,6 +2,7 @@ package com.pezont.teammates.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
@@ -102,7 +103,8 @@ fun TeammatesHomeScreen(
             ContentType.Profile -> ProfileNavHost(
                 viewModel = viewModel,
                 teammatesUiState = teammatesUiState,
-                paddingValues = paddingValues
+                paddingValues = paddingValues,
+                modifier = Modifier
             )
         }
     }
@@ -142,11 +144,10 @@ fun HomeContent(
             }
         }
     ) {
-        QuestionnairesGridScreen(
-            viewModel = viewModel,
+        QuestionnairesPager(
             questionnaires = teammatesUiState.questionnaires,
             pagerState = pagerState,
-
+            modifier = Modifier.fillMaxSize()
             )
 
 

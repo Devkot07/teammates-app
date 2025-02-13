@@ -314,7 +314,7 @@ class TeammatesViewModel(
                 description = description,
                 authorId = 1,
                 image = image,
-            )
+            ) //TODO end creating, navigate
             Log.d(TAG, "$questionnaireResult")
         }
     }

@@ -52,15 +52,13 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.pezont.teammates.R
 import com.pezont.teammates.models.Questionnaire
-import com.pezont.teammates.ui.TeammatesViewModel
 
 
 @Composable
-fun QuestionnairesGridScreen(
-    viewModel: TeammatesViewModel,
+fun QuestionnairesPager(
     pagerState: PagerState,
     questionnaires: List<Questionnaire>,
-    modifier: Modifier = Modifier.fillMaxSize(),
+    modifier: Modifier = Modifier,
 ) {
 
 
@@ -105,10 +103,7 @@ fun QuestionnairesGridScreen(
 fun QuestionnaireCard(
     questionnaire: Questionnaire,
     modifier: Modifier = Modifier
-        .widthIn(max = 150.dp)
-        .heightIn(max = 150.dp)
-        .padding(32.dp)
-        .fillMaxSize()
+
 ) {
     Card(
         modifier = modifier,
