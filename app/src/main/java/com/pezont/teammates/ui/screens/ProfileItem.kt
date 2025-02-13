@@ -3,6 +3,7 @@ package com.pezont.teammates.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -29,91 +30,129 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pezont.teammates.R
-import com.pezont.teammates.ui.TeammatesUiState
-import com.pezont.teammates.ui.TeammatesViewModel
+import com.pezont.teammates.models.User
+import com.pezont.teammates.ui.theme.TeammatesTheme
 
 @Composable
-fun Profile(
+fun TeammatesProfile(
     navigateToMyQuestionnaires: () -> Unit,
-    teammatesUiState: TeammatesUiState.Home,
-    viewModel: TeammatesViewModel,
+
+    logout: () -> Unit,
+
+    user: User,
+
+
     paddingValues: PaddingValues
-){
-    Column(
+) {
+
+    val nickname: String = user.nickname ?: ""
+    val description: String = user.description ?: ""
+    val email: String = user.email ?: ""
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(4.dp))
-        ProfileSection(image = painterResource(id = R.drawable.ic_launcher_foreground))
-        Text(
-            text = "User Profile",
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Nickname: ${teammatesUiState.user.nickname}",
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Text(
-            text = "Description: ${teammatesUiState.user.description}",
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Text(
-            text = "Email: ${teammatesUiState.user.email}",
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-
-
-
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-
-            viewModel.clearUserData()
-
-        }) {
-            Text(text = stringResource(id = R.string.logout))
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = navigateToMyQuestionnaires
-
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Text(text = "My questionnaires")
+            Spacer(modifier = Modifier.height(10.dp))
+            ProfileSection(
+                nickname = nickname,
+                email = email,
+                image = painterResource(id = R.drawable.ic_launcher_foreground)
+            )
+            Text(
+                text = "User Profile",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Nickname: $nickname",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "Description: $description",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "Email: $email",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+
+
+
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = logout) {
+                Text(text = stringResource(id = R.string.logout))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = navigateToMyQuestionnaires
+
+            ) {
+                Text(text = "My questionnaires")
+            }
         }
     }
 }
 
 
-
 @Composable
 fun ProfileSection(
+    nickname: String,
+    email: String,
+
     modifier: Modifier = Modifier,
     image: Painter
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            //verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
+
         ) {
             RoundImage(
                 image = image,
                 modifier = Modifier
-                    .size(100.dp)
-                    .weight(3f)
+                    .size(150.dp)
+                //.weight()
             )
             Spacer(modifier = Modifier.width(16.dp))
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Top,
+            ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = nickname,
+                    style = MaterialTheme.typography.displaySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = email,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Gray
+                )
+            }
             //StatSection(modifier = Modifier.weight(7f))
         }
         ProfileDescription(
@@ -162,7 +201,7 @@ fun ProfileDescription(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+
     ) {
         Text(
             text = displayName,
@@ -185,7 +224,7 @@ fun ProfileDescription(
             Text(
                 text = buildAnnotatedString {
                     val boldStyle = SpanStyle(
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                     append("Followed by ")
@@ -209,3 +248,22 @@ fun ProfileDescription(
         }
     }
 }
+
+
+@Preview
+@Composable
+fun ProfilePreview() {
+    TeammatesTheme {
+        TeammatesProfile(
+            {}, {},
+            User(
+                "Bob",
+                1,
+                "bob@longcorp.com",
+            ),
+            PaddingValues()
+        )
+    }
+}
+
+

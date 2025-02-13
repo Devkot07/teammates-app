@@ -22,7 +22,7 @@ fun ProfileNavHost(
     viewModel: TeammatesViewModel,
     teammatesUiState: TeammatesUiState.Home,
     navController: NavHostController = rememberNavController(),
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     paddingValues: PaddingValues,
 ) {
     NavHost(
@@ -38,8 +38,8 @@ fun ProfileNavHost(
                         MyQuestionnairesDestination.route
                     )
                 },
-                teammatesUiState,
-                viewModel,
+                viewModel::clearUserData,
+                teammatesUiState.user,
 
             )
         }
@@ -60,8 +60,7 @@ fun ProfileNavHost(
             QuestionnaireEntryScreen(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
-                viewModel = viewModel,
-                teammatesUiState = teammatesUiState
+                createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
             )
         }
 

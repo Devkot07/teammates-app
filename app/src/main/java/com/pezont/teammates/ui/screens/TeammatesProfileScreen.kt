@@ -5,6 +5,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.pezont.teammates.R
+import com.pezont.teammates.models.User
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.navigation.NavigationDestination
@@ -18,10 +19,10 @@ object ProfileDestination : NavigationDestination {
 @Composable
 fun ProfileScreen(
     navigateToMyQuestionnaires: () -> Unit,
-    teammatesUiState: TeammatesUiState.Home,
-    viewModel: TeammatesViewModel,
+    logout: () -> Unit,
+    user: User,
 
-) {
+    ) {
     Scaffold(
         topBar = {
             TeammatesTopAppBar(
@@ -29,8 +30,11 @@ fun ProfileScreen(
                 canNavigateBack = false,
             )
         }){ paddingValues ->
-        Profile(
-            navigateToMyQuestionnaires, teammatesUiState, viewModel, paddingValues
+        TeammatesProfile(
+            navigateToMyQuestionnaires,
+            logout,
+            user,
+            paddingValues
         )
 
 
