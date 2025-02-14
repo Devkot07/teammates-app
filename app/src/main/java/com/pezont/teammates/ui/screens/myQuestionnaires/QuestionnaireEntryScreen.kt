@@ -32,8 +32,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.models.Games
-import com.pezont.teammates.ui.TeammatesUiState
-import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.screens.TeammatesTopAppBar
 import okhttp3.MediaType.Companion.toMediaTypeOrNull

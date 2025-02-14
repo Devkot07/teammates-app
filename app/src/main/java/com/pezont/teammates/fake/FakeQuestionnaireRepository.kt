@@ -1,6 +1,5 @@
 package com.pezont.teammates.fake
 
-import com.pezont.teammates.fake.FakeDataStore
 import com.pezont.teammates.models.Questionnaire
 
 class FakeQuestionnaireRepository {

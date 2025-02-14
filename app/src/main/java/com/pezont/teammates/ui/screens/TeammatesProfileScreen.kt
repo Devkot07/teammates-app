@@ -6,8 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.pezont.teammates.R
 import com.pezont.teammates.models.User
-import com.pezont.teammates.ui.TeammatesUiState
-import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.navigation.NavigationDestination
 
 object ProfileDestination : NavigationDestination {
