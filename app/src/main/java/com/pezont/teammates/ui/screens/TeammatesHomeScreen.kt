@@ -47,7 +47,6 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeammatesHomeScreen(
-    currentItem: Int,
     teammatesUiState: TeammatesUiState.Home,
     viewModel: TeammatesViewModel,
     onTabPressed: (ContentType) -> Unit,
@@ -93,7 +92,6 @@ fun TeammatesHomeScreen(
     ) { paddingValues ->
         when (teammatesUiState.currentContent) {
             ContentType.Home -> HomeContent(
-                currentItem = currentItem,
                 viewModel = viewModel,
                 teammatesUiState = teammatesUiState,
                 paddingValues = paddingValues
@@ -101,8 +99,9 @@ fun TeammatesHomeScreen(
 
             ContentType.Favorites -> Text(text = stringResource(R.string.favorites))
             ContentType.Profile -> ProfileNavHost(
-                viewModel = viewModel,
                 teammatesUiState = teammatesUiState,
+                logout = viewModel::clearUserData,
+                createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
                 paddingValues = paddingValues,
                 modifier = Modifier
             )
@@ -116,15 +115,15 @@ fun TeammatesHomeScreen(
 fun HomeContent(
     viewModel: TeammatesViewModel,
     teammatesUiState: TeammatesUiState.Home,
-    currentItem: Int,
     paddingValues: PaddingValues
 ) {
+
+
     val isRefreshing = remember { mutableStateOf(false) }
     val pagerState = rememberPagerState(
         initialPage = 0,
         pageCount = { teammatesUiState.questionnaires.size + 1 })
     val isLoadingMore = remember { mutableStateOf(false) }
-    val newCurrentItem = pagerState.currentPage * 10
 
     PullToRefreshBox(
         modifier = Modifier.padding(paddingValues),
@@ -134,7 +133,7 @@ fun HomeContent(
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     delay(1000L)
-                    viewModel.tryGetQuestionnaires()
+                    viewModel.tryGetQuestionnairesByPageAndGame(teammatesUiState = teammatesUiState)
                 } finally {
                     withContext(Dispatchers.Main) {
                         isRefreshing.value = false
@@ -155,15 +154,22 @@ fun HomeContent(
         LaunchedEffect(pagerState.currentPage) {
             if (!isLoadingMore.value && pagerState.currentPage == teammatesUiState.questionnaires.size) {
                 isLoadingMore.value = true
+
+                val newPage =  if (teammatesUiState.questionnaires.size % 10 == 0) pagerState.currentPage / 10 + 1 else pagerState.currentPage / 10 + 2
                 try {
+                    viewModel.tryGetQuestionnairesByPageAndGame(
+                        teammatesUiState = teammatesUiState,
+                        page = newPage
+
+                    )
+
 //                    viewModel.tryGetQuestionnaires(
 //                        page = pagerState.currentPage/10 + 1,
 //                    )
-                    viewModel.getNextFakeQuestionnaires(
-                        teammatesUiState = teammatesUiState,
-                        i = pagerState.currentPage / 10 + 1,
-                        newCurrentItem = newCurrentItem
-                    )
+//                    viewModel.getNextFakeQuestionnaires(
+//                        teammatesUiState = teammatesUiState,
+//                        i = pagerState.currentPage / 10 + 1,
+//                    )
                 } finally {
                     Log.i("LOGIC", "Loading more items")
                     isLoadingMore.value = false
@@ -205,6 +211,7 @@ fun TeammatesTopAppBar(
         }
     )
 }
+
 
 @Composable
 private fun BottomNavigationBar(
