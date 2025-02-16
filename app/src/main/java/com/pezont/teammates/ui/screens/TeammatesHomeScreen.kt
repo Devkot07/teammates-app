@@ -7,20 +7,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Drafts
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.models.ContentType
+import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.navigation.ProfileNavHost
@@ -44,7 +40,6 @@ import kotlinx.coroutines.withContext
 
 
 //TODO: Screen
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeammatesHomeScreen(
     teammatesUiState: TeammatesUiState.Home,
@@ -177,39 +172,6 @@ fun HomeContent(
             }
         }
     }
-}
-
-
-// TODO in file TeammatesTopAppBar
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TeammatesTopAppBar(
-    title: String,
-    canNavigateBack: Boolean,
-    modifier: Modifier = Modifier,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-    navigateUp: () -> Unit = {}
-) {
-    TopAppBar(
-        title = {
-            Text(
-                title,
-                color = MaterialTheme.colorScheme.primary
-            )
-        },
-        modifier = modifier,
-        scrollBehavior = scrollBehavior,
-        navigationIcon = {
-            if (canNavigateBack) {
-                IconButton(onClick = navigateUp) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
-                }
-            }
-        }
-    )
 }
 
 

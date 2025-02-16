@@ -32,8 +32,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.models.Games
+import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.navigation.NavigationDestination
-import com.pezont.teammates.ui.screens.TeammatesTopAppBar
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -45,9 +45,9 @@ object QuestionnaireEntryDestination : NavigationDestination {
 
 
 // TODO clear
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuestionnaireEntryScreen(
+    modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     createNewQuestionnaireAction: (header: String,
@@ -55,7 +55,6 @@ fun QuestionnaireEntryScreen(
                                    selectedGame: Games,
                                    image: MultipartBody.Part?)  -> Unit,
     canNavigateBack: Boolean = true,
-    modifier: Modifier = Modifier
 ) {
     var header by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
