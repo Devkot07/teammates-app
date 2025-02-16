@@ -20,7 +20,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -40,7 +39,6 @@ import com.pezont.teammates.ui.theme.TeammatesTheme
 @Composable
 fun TeammatesProfile(
     navigateToMyQuestionnaires: () -> Unit,
-
     logout: () -> Unit,
 
     user: User,
@@ -57,11 +55,13 @@ fun TeammatesProfile(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues),
+
+
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.Top,
+
         ) {
             Spacer(modifier = Modifier.height(10.dp))
             ProfileSection(
@@ -69,18 +69,18 @@ fun TeammatesProfile(
                 email = email,
                 image = painterResource(id = R.drawable.ic_launcher_foreground)
             )
-            Text(
-                text = "User Profile",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary
-            )
+//            Text(
+//                text = "User Profile",
+//                style = MaterialTheme.typography.headlineSmall,
+//                color = MaterialTheme.colorScheme.primary
+//            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Nickname: $nickname",
-                style = MaterialTheme.typography.bodyMedium
-            )
+//            Text(
+//                text = "Nickname: $nickname",
+//                style = MaterialTheme.typography.bodyMedium
+//            )
             Text(
                 text = "Description: $description",
                 style = MaterialTheme.typography.bodyMedium
@@ -124,7 +124,6 @@ fun ProfileSection(
             .fillMaxWidth()
     ) {
         Row(
-            //verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
 
@@ -155,15 +154,7 @@ fun ProfileSection(
             }
             //StatSection(modifier = Modifier.weight(7f))
         }
-        ProfileDescription(
-            displayName = "displayName",
-            description = "description\n" +
-                    "description!\n" +
-                    "description!",
-            url = "https://youtube.com/c/PhilippLackner",
-            followedBy = listOf("1", "2"),
-            otherCount = 10
-        )
+
     }
 }
 
