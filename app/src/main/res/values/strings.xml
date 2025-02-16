@@ -19,5 +19,5 @@
     <string name="entry_information">Entry Information</string>
     <string name="create">Create</string>
     <string name="description">Description</string>
-    <string name="header">Header</string>
+    <string name="header" translatable="false">Header</string>
 </resources>

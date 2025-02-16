@@ -10,16 +10,19 @@ import com.pezont.teammates.models.Questionnaire
 import com.pezont.teammates.network.TeammatesQuestionnairesApiService
 import okhttp3.MultipartBody
 import java.io.IOException
+import java.util.UUID
 
 
 interface QuestionnairesRepository {
 
-    suspend fun getQuestionnairesByGame(
-        game: Games,
+    suspend fun getQuestionnairesFromRepo(
         token: String,
-        userId: Int? = -1,
-        page: Int,
-        limit: Int
+        userId: Int,
+        page: Int?,
+        limit: Int?,
+        game: Games?,
+        authorId: Int?,
+        questionnaireId: UUID?,
     ): Result<List<Questionnaire>>
 
     suspend fun createQuestionnaire(
@@ -48,23 +51,27 @@ class NetworkQuestionnairesRepository(
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    override suspend fun getQuestionnairesByGame(
-        game: Games,
+    override suspend fun getQuestionnairesFromRepo(
         token: String,
-        userId: Int?,
-        page: Int,
-        limit: Int
-
+        userId: Int,
+        page: Int?,
+        limit: Int?,
+        game: Games?,
+        authorId: Int?,
+        questionnaireId: UUID?,
     ): Result<List<Questionnaire>> {
         if (!isNetworkAvailable()) return Result.failure(IOException("No internet connection"))
         return try {
+
             Result.success(
-                teammatesQuestionnairesApiService.getQuestionnairesByGame(
+                teammatesQuestionnairesApiService.getQuestionnaires(
                     token = "Bearer $token",
-                    gameName = game.name,
+                    gameName = game?.name,
                     userId = userId,
                     page = page,
-                    limit = limit
+                    limit = limit,
+                    authorId = authorId,
+                    questionnaireId = questionnaireId,
 
                 )
             )
@@ -87,7 +94,6 @@ class NetworkQuestionnairesRepository(
         return try {
             Result.success(
                 teammatesQuestionnairesApiService.createQuestionnaire(
-
                     token = "Bearer $token",
                     userId = authorId,
                     questionnaire = CreateQuestionnaireRequest(

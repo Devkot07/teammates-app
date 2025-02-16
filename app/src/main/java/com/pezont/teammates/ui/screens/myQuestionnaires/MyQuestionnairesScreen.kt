@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -18,23 +17,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import com.pezont.teammates.R
-import com.pezont.teammates.ui.TeammatesUiState
-import com.pezont.teammates.ui.TeammatesViewModel
+import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.navigation.NavigationDestination
-import com.pezont.teammates.ui.screens.TeammatesTopAppBar
 
 object MyQuestionnairesDestination : NavigationDestination {
     override val route = "my_questionnaires"
     override val titleRes = R.string.my_questionnaires
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyQuestionnairesScreen(
     onNavigateUp: () -> Unit,
     navigateToQuestionnaireEntry: () -> Unit,
-    teammatesUiState: TeammatesUiState.Home,
-    viewModel: TeammatesViewModel
 ) {
     Scaffold(
         topBar = {

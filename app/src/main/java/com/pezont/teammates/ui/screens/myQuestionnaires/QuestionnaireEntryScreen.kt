@@ -32,10 +32,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.models.Games
-import com.pezont.teammates.ui.TeammatesUiState
-import com.pezont.teammates.ui.TeammatesViewModel
+import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.navigation.NavigationDestination
-import com.pezont.teammates.ui.screens.TeammatesTopAppBar
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -47,15 +45,16 @@ object QuestionnaireEntryDestination : NavigationDestination {
 
 
 // TODO clear
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuestionnaireEntryScreen(
+    modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
-    teammatesUiState: TeammatesUiState.Home,
+    createNewQuestionnaireAction: (header: String,
+                                   description: String,
+                                   selectedGame: Games,
+                                   image: MultipartBody.Part?)  -> Unit,
     canNavigateBack: Boolean = true,
-    viewModel: TeammatesViewModel,
-    modifier: Modifier = Modifier
 ) {
     var header by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -150,16 +149,13 @@ fun QuestionnaireEntryScreen(
                 onClick = {
 
                     val imagePart = selectedImageUri?.asMultipart("image", context)
-
-                    viewModel.createNewQuestionnaire(
-                        header = header,
-                        description = description,
-                        selectedGame = selectedGame,
-                        image = imagePart
+                    createNewQuestionnaireAction(
+                        header,
+                        description,
+                        selectedGame,
+                        imagePart
                     )
-                    //TODO end creating
                 },
-                enabled = header.isNotEmpty() && description.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(R.string.create))

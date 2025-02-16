@@ -3,7 +3,7 @@ package com.pezont.teammates.fake
 import com.pezont.teammates.models.Questionnaire
 
 data class FakeDataStore(
-    var i:Int
+    var i: Int
 ) {
 
     val questionnaireList = listOf(
@@ -16,16 +16,16 @@ data class FakeDataStore(
             "qwe"
         ),
 
-                Questionnaire(
-                "k",
-        "Wanna find teammate Dota 3",
-        "zxcvb description",
-                    8,
-                    "3",
-                    "https://dummyjson.com/icon/emilys/128"
+        Questionnaire(
+            "k",
+            "Wanna find teammate Dota 3",
+            "zxcvb description",
+            8,
+            "3",
+            "https://dummyjson.com/icon/emilys/128"
 
 
-                ),
+        ),
         Questionnaire(
             "r",
             "Wanna find teammate Dota 4",
@@ -35,30 +35,29 @@ data class FakeDataStore(
             "https://dummyjson.com/icon/emilys/128"
 
 
-
         ),
         Questionnaire(
-        "r",
-        "Wanna find teammate Dota 5",
-        "zxcvb description",
+            "r",
+            "Wanna find teammate Dota 5",
+            "zxcvb description",
             8,
             "5",
             "https://dummyjson.com/icon/emilys/128"
 
 
         ),
-        )
+    )
 
 
     val questionnaireList2 = listOf(
-                Questionnaire(
-                    header = "Questionnaire ${i} - Team Finding",
-                    game = "Dota 2",
-                    description = "Looking for teammates for Dota 2. ID: ${i}001",
-                    authorId = 25,
-                    questionnaireId = "${i}001",
-                    imagePath = "https://dummyjson.com/icon/emilys/128"
-                ),
+        Questionnaire(
+            header = "Questionnaire ${i} - Team Finding",
+            game = "Dota 2",
+            description = "Looking for teammates for Dota 2. ID: ${i}001",
+            authorId = 25,
+            questionnaireId = "${i}001",
+            imagePath = "https://dummyjson.com/icon/emilys/128"
+        ),
         Questionnaire(
             header = "Questionnaire ${i} - Strategy Enthusiast",
             game = "Dota 3",
@@ -68,7 +67,7 @@ data class FakeDataStore(
             imagePath = "https://dummyjson.com/icon/michaelw/128"
         ),
         Questionnaire(
-            header = "Questionnaire ${i} - Competitive Play",
+            header = "Questionnaire $i - Competitive Play",
             game = "Dota 4",
             description = "Join my team for competitive Dota 4. ID: ${i}003",
             authorId = 20,
@@ -132,9 +131,6 @@ data class FakeDataStore(
             imagePath = "https://dummyjson.com/icon/isabellad/128"
         )
     )
-
-
-
 
 
 }

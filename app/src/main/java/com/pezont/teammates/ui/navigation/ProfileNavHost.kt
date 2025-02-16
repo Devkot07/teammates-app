@@ -8,21 +8,28 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.pezont.teammates.models.Games
 import com.pezont.teammates.ui.TeammatesUiState
-import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.screens.ProfileDestination
 import com.pezont.teammates.ui.screens.ProfileScreen
 import com.pezont.teammates.ui.screens.myQuestionnaires.MyQuestionnairesDestination
 import com.pezont.teammates.ui.screens.myQuestionnaires.MyQuestionnairesScreen
 import com.pezont.teammates.ui.screens.myQuestionnaires.QuestionnaireEntryDestination
 import com.pezont.teammates.ui.screens.myQuestionnaires.QuestionnaireEntryScreen
+import okhttp3.MultipartBody
 
 @Composable
 fun ProfileNavHost(
-    viewModel: TeammatesViewModel,
     teammatesUiState: TeammatesUiState.Home,
     navController: NavHostController = rememberNavController(),
-    modifier: Modifier = Modifier,
+
+    logout: () -> Unit,
+    createNewQuestionnaireAction: (header: String,
+                                   description: String,
+                                   selectedGame: Games,
+                                   image: MultipartBody.Part?)  -> Unit,
+
+    modifier: Modifier,
     paddingValues: PaddingValues,
 ) {
     NavHost(
@@ -38,8 +45,9 @@ fun ProfileNavHost(
                         MyQuestionnairesDestination.route
                     )
                 },
-                teammatesUiState,
-                viewModel,
+
+                logout,
+                teammatesUiState.user,
 
             )
         }
@@ -52,16 +60,13 @@ fun ProfileNavHost(
                     )
                 },
                 onNavigateUp = { navController.navigateUp() },
-                teammatesUiState = teammatesUiState,
-                viewModel = viewModel,
             )
         }
         composable(route = QuestionnaireEntryDestination.route) {
             QuestionnaireEntryScreen(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
-                viewModel = viewModel,
-                teammatesUiState = teammatesUiState
+                createNewQuestionnaireAction = createNewQuestionnaireAction,
             )
         }
 

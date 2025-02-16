@@ -2,35 +2,33 @@ package com.pezont.teammates.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Drafts
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.models.ContentType
+import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.navigation.ProfileNavHost
@@ -42,14 +40,14 @@ import kotlinx.coroutines.withContext
 
 
 //TODO: Screen
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeammatesHomeScreen(
-    currentItem: Int,
     teammatesUiState: TeammatesUiState.Home,
     viewModel: TeammatesViewModel,
     onTabPressed: (ContentType) -> Unit,
 ) {
+    val context = LocalContext.current
+
     val navigationItemContentList = listOf(
         NavigationItemContent(ContentType.Home, Icons.Default.Home, stringResource(R.string.home)),
         NavigationItemContent(
@@ -82,13 +80,13 @@ fun TeammatesHomeScreen(
             BottomNavigationBar(
                 currentTab = teammatesUiState.currentContent,
                 onTabPressed = onTabPressed,
-                navigationItemContentList = navigationItemContentList
+                navigationItemContentList = navigationItemContentList,
+                modifier = Modifier.height(60.dp)
             )
         }
     ) { paddingValues ->
         when (teammatesUiState.currentContent) {
             ContentType.Home -> HomeContent(
-                currentItem = currentItem,
                 viewModel = viewModel,
                 teammatesUiState = teammatesUiState,
                 paddingValues = paddingValues
@@ -96,27 +94,31 @@ fun TeammatesHomeScreen(
 
             ContentType.Favorites -> Text(text = stringResource(R.string.favorites))
             ContentType.Profile -> ProfileNavHost(
-                viewModel = viewModel,
                 teammatesUiState = teammatesUiState,
-                paddingValues = paddingValues
+                logout = viewModel::clearUserData,
+                createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
+                paddingValues = paddingValues,
+                modifier = Modifier
             )
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(
     viewModel: TeammatesViewModel,
     teammatesUiState: TeammatesUiState.Home,
-    currentItem: Int,
     paddingValues: PaddingValues
 ) {
+
+
     val isRefreshing = remember { mutableStateOf(false) }
-    val pageIndex = remember { mutableIntStateOf(1) }
-    val listState = remember(teammatesUiState.questionnaires) { LazyListState() }
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { teammatesUiState.questionnaires.size + 1 })
     val isLoadingMore = remember { mutableStateOf(false) }
-    val newCurrentItem = pageIndex.intValue * 10
 
     PullToRefreshBox(
         modifier = Modifier.padding(paddingValues),
@@ -126,82 +128,52 @@ fun HomeContent(
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     delay(1000L)
-                    viewModel.tryGetQuestionnairesByGame()
+                    viewModel.tryGetQuestionnairesByPageAndGame(teammatesUiState = teammatesUiState)
                 } finally {
                     withContext(Dispatchers.Main) {
                         isRefreshing.value = false
-                        pageIndex.intValue = 1
+                        pagerState.scrollToPage(0)
                     }
                 }
             }
         }
     ) {
-        QuestionnairesGridScreen(
-            viewModel = viewModel,
-            teammatesUiState = teammatesUiState,
+        QuestionnairesPager(
             questionnaires = teammatesUiState.questionnaires,
-            listState = listState,
-            contentPadding = paddingValues
-        )
+            pagerState = pagerState,
+            modifier = Modifier.fillMaxSize()
+            )
 
-        LaunchedEffect(listState) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-                .collect { lastIndex ->
-                    if (isLoadingMore.value) {
-                        isLoadingMore.value = false
-                        listState.scrollToItem(currentItem)
-                    }
 
-                    if (lastIndex == teammatesUiState.questionnaires.size && !isLoadingMore.value) {
-                        isLoadingMore.value = true
-                        try {
-                            viewModel.getNextFakeQuestionnaires(
-                                teammatesUiState = teammatesUiState,
-                                i = pageIndex.intValue,
-                                newCurrentItem = newCurrentItem
-                            )
-                            pageIndex.intValue++
-                        } finally {
-                            Log.i("LOGIC", "Loading more items")
-                        }
-                    }
+
+        LaunchedEffect(pagerState.currentPage) {
+            if (!isLoadingMore.value && pagerState.currentPage == teammatesUiState.questionnaires.size) {
+                isLoadingMore.value = true
+
+                val newPage =  if (teammatesUiState.questionnaires.size % 10 == 0) pagerState.currentPage / 10 + 1 else pagerState.currentPage / 10 + 2
+                try {
+                    viewModel.tryGetQuestionnairesByPageAndGame(
+                        teammatesUiState = teammatesUiState,
+                        page = newPage
+
+                    )
+
+//                    viewModel.tryGetQuestionnaires(
+//                        page = pagerState.currentPage/10 + 1,
+//                    )
+//                    viewModel.getNextFakeQuestionnaires(
+//                        teammatesUiState = teammatesUiState,
+//                        i = pagerState.currentPage / 10 + 1,
+//                    )
+                } finally {
+                    Log.i("LOGIC", "Loading more items")
+                    isLoadingMore.value = false
                 }
+            }
         }
     }
 }
 
-
-// TODO in file TeammatesTopAppBar
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TeammatesTopAppBar(
-    title: String,
-    canNavigateBack: Boolean,
-    modifier: Modifier = Modifier,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-    navigateUp: () -> Unit = {}
-) {
-    TopAppBar(
-        title = {
-            Text(
-                title,
-                color = MaterialTheme.colorScheme.primary
-            )
-        },
-        modifier = modifier,
-        scrollBehavior = scrollBehavior,
-        navigationIcon = {
-            if (canNavigateBack) {
-                IconButton(onClick = navigateUp) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
-                }
-            }
-        }
-    )
-}
 
 @Composable
 private fun BottomNavigationBar(

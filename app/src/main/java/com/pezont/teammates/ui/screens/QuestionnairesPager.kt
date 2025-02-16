@@ -7,11 +7,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.SnapPosition
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -24,10 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -43,57 +39,37 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.pezont.teammates.R
-import com.pezont.teammates.models.Games
 import com.pezont.teammates.models.Questionnaire
-import com.pezont.teammates.ui.TeammatesUiState
-import com.pezont.teammates.ui.TeammatesViewModel
-import com.pezont.teammates.ui.theme.TeammatesTheme
+
 
 @Composable
-fun QuestionnairesGridScreen(
-    viewModel: TeammatesViewModel,
-    teammatesUiState: TeammatesUiState.Home,
-    listState: LazyListState,
-
+fun QuestionnairesPager(
+    pagerState: PagerState,
     questionnaires: List<Questionnaire>,
-
-    modifier: Modifier = Modifier.fillMaxSize(),
-    contentPadding: PaddingValues ,
+    modifier: Modifier = Modifier,
 ) {
 
 
-
-    val snapFlingBehavior = rememberSnapFlingBehavior(
-        lazyListState = listState,
-        snapPosition = SnapPosition.Center
-    )
-
-    LazyColumn(
-        state = listState,
-        flingBehavior = snapFlingBehavior,
-        modifier = modifier.fillMaxSize(),
-    ) {
-        items(items = questionnaires, key = { questionnaire -> questionnaire.questionnaireId }) { questionnaire ->
+    VerticalPager(
+        snapPosition = SnapPosition.Center,
+        state = pagerState,
+    ) { pageIndex ->
+        if (pageIndex < questionnaires.size) {
+            val questionnaire = questionnaires[pageIndex]
             Box(
-                modifier = Modifier
-                    .fillParentMaxSize()
+                modifier = modifier
                     .padding(vertical = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -106,39 +82,28 @@ fun QuestionnairesGridScreen(
                         .fillMaxSize()
                 )
             }
-        }
-        item {
+        } else {
             Box(
-                modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Box(
+                CircularProgressIndicator(
                     modifier = Modifier
-                        .padding(start = 50.dp, end = 50.dp, bottom = 16.dp)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(100.dp)
-                    )
-                }
+                        .size(100.dp)
+                )
             }
         }
     }
 }
 
 
-
-
 @Composable
 fun QuestionnaireCard(
     questionnaire: Questionnaire,
     modifier: Modifier = Modifier
-        .widthIn(max = 150.dp)
-        .heightIn(max = 150.dp)
-        .padding(32.dp)
-        .fillMaxSize()
+
 ) {
     Card(
         modifier = modifier,
@@ -222,7 +187,7 @@ fun QuestionnaireCard(
                     .fillMaxWidth()
                     .padding(16.dp),
 
-            ) {
+                ) {
                 LikeButton(modifier = Modifier.wrapContentHeight())
                 Spacer(modifier = Modifier.weight(1f))
                 LikeButton(modifier = Modifier.wrapContentHeight())
@@ -230,8 +195,6 @@ fun QuestionnaireCard(
         }
     }
 }
-
-
 
 
 @Composable
