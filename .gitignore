@@ -25,3 +25,4 @@ output.json
 /captures
 .externalNativeBuild
 .cxx
+gradle.properties
