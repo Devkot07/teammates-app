@@ -39,7 +39,9 @@ interface AppContainer {
 class DefaultAppContainer(private val context: Context) : AppContainer {
     private val dummyUrl = "https://dummyjson.com/"
     private val ip = "192.168.139.235"
-    private val appIp = "obscure-space-carnival-7vrqpvv7jqwr275-"
+    // android.aapt2FromMavenOverride=/usr/bin/aapt2
+    // cuddly-robot-pjqxjwp7g59c6495
+    private val appIp = "cuddly-robot-pjqxjwp7g59c6495-"
     // TODO  ip
 
 

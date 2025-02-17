@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.pezont.teammates.R
 import com.pezont.teammates.models.Questionnaire
+import com.pezont.teammates.ui.items.QuestionnaireItem
 
 
 @Composable
@@ -68,20 +69,10 @@ fun QuestionnairesPager(
     ) { pageIndex ->
         if (pageIndex < questionnaires.size) {
             val questionnaire = questionnaires[pageIndex]
-            Box(
-                modifier = modifier
-                    .padding(vertical = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                QuestionnaireCard(
-                    questionnaire = questionnaire,
-                    modifier = Modifier
-                        .widthIn(max = 450.dp)
-                        .heightIn(max = 800.dp)
-                        .padding(32.dp)
-                        .fillMaxSize()
-                )
-            }
+            QuestionnaireItem(
+                questionnaire = questionnaire,
+                modifier = modifier,
+            )
         } else {
             Box(
                 modifier = modifier
@@ -99,102 +90,6 @@ fun QuestionnairesPager(
 }
 
 
-@Composable
-fun QuestionnaireCard(
-    questionnaire: Questionnaire,
-    modifier: Modifier = Modifier
-
-) {
-    Card(
-        modifier = modifier,
-        shape = ShapeDefaults.Large,
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding()
-                    .fillMaxWidth()
-                    .background(Color.White)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.Top
-                ) {
-                    AsyncImage(
-                        model = questionnaire.imagePath,
-                        placeholder = painterResource(id = R.drawable.ic_loading_image),
-                        error = painterResource(R.drawable.ic_broken_image),
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .weight(1f)
-                            .aspectRatio(1f)
-                            .clip(ShapeDefaults.Medium)
-                            .border(2.dp, Color.Gray, ShapeDefaults.Medium)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.Top,
-                    ) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = questionnaire.header,
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = Color.Black
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = questionnaire.game.toString(),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
-                        )
-                    }
-                }
-            }
-
-            HorizontalDivider(thickness = 1.dp, color = Color.Gray.copy(alpha = 0.2f))
-            Text(
-                text = questionnaire.imagePath,
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.Black,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            )
-            HorizontalDivider(thickness = 1.dp, color = Color.Gray.copy(alpha = 0.2f))
-            Text(
-                text = questionnaire.description,
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.Black,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            )
-            HorizontalDivider(thickness = 1.dp, color = Color.Gray.copy(alpha = 0.2f))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-
-                ) {
-                LikeButton(modifier = Modifier.wrapContentHeight())
-                Spacer(modifier = Modifier.weight(1f))
-                LikeButton(modifier = Modifier.wrapContentHeight())
-            }
-        }
-    }
-}
 
 
 @Composable

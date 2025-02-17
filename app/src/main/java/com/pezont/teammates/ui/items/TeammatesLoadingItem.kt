@@ -1,4 +1,4 @@
-package com.pezont.teammates.ui.screens
+package com.pezont.teammates.ui.items
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 
 @Composable
-fun TeammatesLoadingScreen() {
+fun TeammatesLoadingItem() {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,

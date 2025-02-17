@@ -12,6 +12,7 @@ import com.pezont.teammates.R
 import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
+import com.pezont.teammates.ui.items.TeammatesLoadingItem
 import com.pezont.teammates.ui.screens.sendToasts.sendLoginToast
 
 @Composable
@@ -33,7 +34,7 @@ fun TeammatesApp(
     }
 
     when (val teammatesUiState = viewModel.teammatesUiState.collectAsState().value) {
-        is TeammatesUiState.Loading -> TeammatesLoadingScreen()
+        is TeammatesUiState.Loading -> TeammatesLoadingItem()
         is TeammatesUiState.Login -> {
 
             //SendLoginErrorToast(code, context)

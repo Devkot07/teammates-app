@@ -9,6 +9,7 @@ import com.pezont.teammates.R
 import com.pezont.teammates.models.User
 import com.pezont.teammates.ui.Dots
 import com.pezont.teammates.ui.TeammatesTopAppBar
+import com.pezont.teammates.ui.items.TeammatesProfile
 import com.pezont.teammates.ui.navigation.NavigationDestination
 
 object ProfileDestination : NavigationDestination {

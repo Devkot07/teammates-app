@@ -1,4 +1,4 @@
-package com.pezont.teammates.ui.screens
+package com.pezont.teammates.ui.items
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
