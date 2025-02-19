@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.pezont.teammates.R
 import com.pezont.teammates.models.Questionnaire
-import com.pezont.teammates.ui.screens.LikeButton
+import com.pezont.teammates.ui.buttons.LikeButton
 
 @Composable
 fun QuestionnaireItem(

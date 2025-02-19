@@ -62,7 +62,7 @@ class TeammatesViewModel(
                     else -> {
                         if (!isInitialized) {
                             _teammatesUiState.value =
-                                TeammatesUiState.Home(user = user, questionnaires = listOf())
+                                TeammatesUiState.Home(user = user, questionnaires = listOf(), userQuestionnaires = listOf())
                             isInitialized = true
                         } else {
                             _teammatesUiState.value = TeammatesUiState.Login(false)
@@ -83,7 +83,7 @@ class TeammatesViewModel(
                     else -> {
                         if (!isInitialized) {
                             _teammatesUiState.value =
-                                TeammatesUiState.Home(user = user, questionnaires = listOf())
+                                TeammatesUiState.Home(user = user, questionnaires = listOf(), userQuestionnaires = listOf())
                             isInitialized = true
                         } else {
                             _teammatesUiState.value = TeammatesUiState.Login(false)
@@ -122,6 +122,7 @@ class TeammatesViewModel(
                     _teammatesUiState.value = TeammatesUiState.Home(
                         user = userDataRepository.user.first(),
                         questionnaires = teammatesUiState.questionnaires + response,
+                        userQuestionnaires = teammatesUiState.userQuestionnaires,
                     )
 
                 }
@@ -151,6 +152,63 @@ class TeammatesViewModel(
         }
 
     }
+
+
+    fun tryGetQuestionnairesByUserId(
+        teammatesUiState: TeammatesUiState.Home,
+    ) {
+
+        viewModelScope.launch {
+            val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
+                token = userDataRepository.accessToken.first(),
+                userId = userDataRepository.user.first().publicId!!,
+                page = null,
+                limit = 100,//TODO set const
+                game = null,
+                authorId = userDataRepository.user.first().publicId!!,
+                questionnaireId = null
+            )
+            if (questionnairesResult.isSuccess) {
+                val response = questionnairesResult.getOrNull()
+                Log.d(TAG, "Fetched questionnaires: $response")
+
+                response?.let {
+
+                    Log.d(TAG, "Count ${response.size}")
+                    _teammatesUiState.value = TeammatesUiState.Home(
+                        currentContent = ContentType.Profile,
+                        user = userDataRepository.user.first(),
+                        questionnaires = teammatesUiState.questionnaires ,
+                        userQuestionnaires = response,
+                    )
+
+                }
+            } else {
+                val error = questionnairesResult.exceptionOrNull()
+                Log.e(TAG, "Failed to fetch questionnaires: $error")
+                when (error) {
+                    is IOException -> {
+                        _teammatesUiState.value = TeammatesUiState.ErrorNetwork
+                    }
+
+                    is HttpException -> {
+                        val incorrectAccessToken = error.code() == 401
+                        Log.e(TAG, "incorrectAccessToken: $incorrectAccessToken")
+                        _teammatesUiState.value =
+                            TeammatesUiState.Login(false, error.code())
+                        _loginToastCode.tryEmit( error.code())
+
+                    }
+
+                    else -> _teammatesUiState.value = TeammatesUiState.Login(false, 0)
+                }
+            }
+
+
+        }
+
+    }
+
 
 
 
@@ -277,11 +335,15 @@ class TeammatesViewModel(
                 _teammatesUiState.value = TeammatesUiState.Home(
                     user = userDataRepository.user.first(),
                     questionnaires = listOf(),
+                    userQuestionnaires = listOf(),
+
                 )
                 tryGetQuestionnairesByPageAndGame(TeammatesUiState.Home(
                     user = userDataRepository.user.first(),
                     questionnaires = listOf(),
+                    userQuestionnaires = listOf(),
                 ))
+
 
             } else {
                 val error = result.exceptionOrNull()
@@ -411,7 +473,8 @@ sealed interface TeammatesUiState {
         val currentContent: ContentType = ContentType.Home,
         val userDummy: UserDummy = UserDummy(),
         val user: User,
-        var questionnaires: List<Questionnaire>
+        var questionnaires: List<Questionnaire>,
+        val userQuestionnaires: List<Questionnaire>,
     ) : TeammatesUiState
 
     data object ErrorNetwork : TeammatesUiState

@@ -32,6 +32,7 @@ import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.navigation.ProfileNavHost
+import com.pezont.teammates.ui.screens.questionnaires.QuestionnairesPager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -97,6 +98,7 @@ fun TeammatesHomeScreen(
                 teammatesUiState = teammatesUiState,
                 logout = viewModel::clearUserData,
                 createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
+                getUserQuestionnaires = viewModel::tryGetQuestionnairesByUserId,
                 paddingValues = paddingValues,
                 modifier = Modifier
             )

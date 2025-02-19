@@ -13,7 +13,7 @@ import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.items.TeammatesLoadingItem
-import com.pezont.teammates.ui.screens.sendToasts.sendLoginToast
+import com.pezont.teammates.ui.sendLoginToast
 
 @Composable
 fun TeammatesApp(

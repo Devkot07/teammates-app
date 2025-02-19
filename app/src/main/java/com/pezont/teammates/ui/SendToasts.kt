@@ -1,4 +1,4 @@
-package com.pezont.teammates.ui.screens.sendToasts
+package com.pezont.teammates.ui
 
 import android.content.Context
 import android.widget.Toast

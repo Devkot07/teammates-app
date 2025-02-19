@@ -1,4 +1,4 @@
-package com.pezont.teammates.ui.screens.myQuestionnaires
+package com.pezont.teammates.ui.screens.questionnaires
 
 import android.content.Context
 import android.net.Uri
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold

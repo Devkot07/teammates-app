@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -12,10 +13,10 @@ import com.pezont.teammates.models.Games
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.screens.ProfileDestination
 import com.pezont.teammates.ui.screens.ProfileScreen
-import com.pezont.teammates.ui.screens.myQuestionnaires.MyQuestionnairesDestination
-import com.pezont.teammates.ui.screens.myQuestionnaires.MyQuestionnairesScreen
-import com.pezont.teammates.ui.screens.myQuestionnaires.QuestionnaireEntryDestination
-import com.pezont.teammates.ui.screens.myQuestionnaires.QuestionnaireEntryScreen
+import com.pezont.teammates.ui.screens.questionnaires.MyQuestionnairesDestination
+import com.pezont.teammates.ui.screens.questionnaires.MyQuestionnairesScreen
+import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireEntryDestination
+import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireEntryScreen
 import okhttp3.MultipartBody
 
 @Composable
@@ -28,6 +29,8 @@ fun ProfileNavHost(
                                    description: String,
                                    selectedGame: Games,
                                    image: MultipartBody.Part?)  -> Unit,
+    getUserQuestionnaires: (teammatesUiState: TeammatesUiState.Home) -> Unit,
+
 
     modifier: Modifier,
     paddingValues: PaddingValues,
@@ -60,6 +63,8 @@ fun ProfileNavHost(
                     )
                 },
                 onNavigateUp = { navController.navigateUp() },
+                getUserQuestionnaires = getUserQuestionnaires,
+                teammatesUiState = teammatesUiState
             )
         }
         composable(route = QuestionnaireEntryDestination.route) {
