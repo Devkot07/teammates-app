@@ -13,7 +13,9 @@ import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.items.TeammatesLoadingItem
-import com.pezont.teammates.ui.sendLoginToast
+import com.pezont.teammates.ui.sendAuthToast
+import com.pezont.teammates.ui.sendQuestionnairesToast
+import kotlinx.coroutines.launch
 
 @Composable
 fun TeammatesApp(
@@ -25,19 +27,21 @@ fun TeammatesApp(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.loginToastCode.collect { code ->
-            sendLoginToast(code,context)
-            //Toast.makeText(context, "$code", Toast.LENGTH_SHORT).show()
+        launch {
+            viewModel.authToastCode.collect { code ->
+                sendAuthToast(code, context)
+            }
         }
-
-
+        launch {
+            viewModel.questionnairesToastCode.collect { code ->
+                sendQuestionnairesToast(code, context)
+            }
+        }
     }
 
     when (val teammatesUiState = viewModel.teammatesUiState.collectAsState().value) {
         is TeammatesUiState.Loading -> TeammatesLoadingItem()
         is TeammatesUiState.Login -> {
-
-            //SendLoginErrorToast(code, context)
             LoginScreen(viewModel, teammatesUiState)
         }
 

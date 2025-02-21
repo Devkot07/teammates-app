@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
@@ -51,7 +50,6 @@ fun TeammatesHomeScreen(
     viewModel: TeammatesViewModel,
     onTabPressed: (ContentType) -> Unit,
 ) {
-    val context = LocalContext.current        //TODO homeToast
 
     val navigationItemContentList = listOf(
         NavigationItemContent(ContentType.Home, Icons.Default.Home, stringResource(R.string.home)),

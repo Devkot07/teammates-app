@@ -46,8 +46,11 @@ class TeammatesViewModel(
     private val _teammatesUiState: MutableStateFlow<TeammatesUiState> = MutableStateFlow(TeammatesUiState.Loading)
     val teammatesUiState: StateFlow<TeammatesUiState> = _teammatesUiState.asStateFlow()
 
-    private val _loginToastCode = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
-    val loginToastCode: SharedFlow<Int?> = _loginToastCode
+    private val _authToastCode = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
+    val authToastCode: SharedFlow<Int?> = _authToastCode
+
+    private val _questionnairesToastCode = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
+    val questionnairesToastCode: SharedFlow<Int?> = _questionnairesToastCode
 
     private var isInitialized = false
 
@@ -139,7 +142,7 @@ class TeammatesViewModel(
                         Log.e(TAG, "incorrectAccessToken: $incorrectAccessToken")
                         _teammatesUiState.value =
                             TeammatesUiState.Login(false, error.code())
-                            _loginToastCode.tryEmit( error.code())
+                            _questionnairesToastCode.tryEmit( error.code())
                             //sendLoginErrorToast(error.code(), context)
 
                     }
@@ -196,7 +199,7 @@ class TeammatesViewModel(
                         Log.e(TAG, "incorrectAccessToken: $incorrectAccessToken")
                         _teammatesUiState.value =
                             TeammatesUiState.Login(false, error.code())
-                        _loginToastCode.tryEmit( error.code())
+                        _authToastCode.tryEmit( error.code())
 
                     }
 
@@ -355,7 +358,7 @@ class TeammatesViewModel(
 
                     is HttpException -> {
                         _teammatesUiState.value = TeammatesUiState.Login(false, error.code())
-                        _loginToastCode.tryEmit( error.code())
+                        _authToastCode.tryEmit( error.code())
 
                     }
 
@@ -420,7 +423,7 @@ class TeammatesViewModel(
                 userDataRepository.saveUser(User())
             }
             _teammatesUiState.value = TeammatesUiState.Login(true, 1)
-            _loginToastCode.tryEmit( 1)
+            _authToastCode.tryEmit( 1)
 
 
         }
