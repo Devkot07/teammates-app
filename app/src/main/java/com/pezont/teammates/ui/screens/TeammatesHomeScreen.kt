@@ -99,14 +99,16 @@ fun TeammatesHomeScreen(
             )
 
             ContentType.Favorites -> Text(text = stringResource(R.string.favorites))
-            ContentType.Profile -> ProfileNavHost(
-                teammatesUiState = teammatesUiState,
-                logout = viewModel::clearUserData,
-                createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
-                getUserQuestionnaires = viewModel::tryGetQuestionnairesByUserId,
-                onTabPressed = onTabPressed,
-                navigationItemContentList = navigationItemContentList
-            )
+            ContentType.Profile -> {
+                ProfileNavHost(
+                    teammatesUiState = teammatesUiState,
+                    logout = viewModel::clearUserData,
+                    createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
+                    getUserQuestionnaires = viewModel::tryGetQuestionnairesByUserId,
+                    onTabPressed = onTabPressed,
+                    navigationItemContentList = navigationItemContentList
+                )
+            }
         }
     }
 }

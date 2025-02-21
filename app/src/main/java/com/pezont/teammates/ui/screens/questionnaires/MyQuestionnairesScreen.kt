@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.TeammatesUiState
+import com.pezont.teammates.ui.items.TeammatesLoadingItem
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -106,25 +107,10 @@ fun MyQuestionnairesScreen(
                 questionnaires = teammatesUiState.userQuestionnaires,
                 pagerState = pagerState,
                 lastItem = {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(32.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Button(
-                            onClick = navigateToQuestionnaireEntry,
-                            shape = MaterialTheme.shapes.medium,
-                            modifier = Modifier
-                                .size(80.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Add"
-                            )
-                        }
-                        Text(text = ("Create new questionnaire"))
+                    if (teammatesUiState.userQuestionnaires.isEmpty()) {
+                        TeammatesLoadingItem()
+                    } else {
+                        CreateButton(navigateToQuestionnaireEntry)
                     }
                 },
                 modifier = Modifier.fillMaxSize()
@@ -134,4 +120,30 @@ fun MyQuestionnairesScreen(
     }
 
 
+}
+
+@Composable
+fun CreateButton(
+    navigateToQuestionnaireEntry: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(
+            onClick = navigateToQuestionnaireEntry,
+            shape = MaterialTheme.shapes.medium,
+            modifier = Modifier
+                .size(80.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add"
+            )
+        }
+        Text(text = ("Create new questionnaire"))
+    }
 }

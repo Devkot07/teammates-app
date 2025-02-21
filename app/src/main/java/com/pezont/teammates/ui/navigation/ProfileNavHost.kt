@@ -35,7 +35,7 @@ fun ProfileNavHost(
     onTabPressed: (ContentType) -> Unit,
     navigationItemContentList: List<NavigationItemContent>,
 
-) {
+    ) {
     NavHost(
         navController = navController,
         startDestination = ProfileDestination.route,
@@ -44,6 +44,7 @@ fun ProfileNavHost(
         composable(route = ProfileDestination.route) {
             ProfileScreen(
                 navigateToMyQuestionnaires = {
+                    getUserQuestionnaires(teammatesUiState)
                     navController.navigate(MyQuestionnairesDestination.route)
                 },
 
