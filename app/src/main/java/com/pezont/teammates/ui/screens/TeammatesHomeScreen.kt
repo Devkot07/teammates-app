@@ -1,15 +1,18 @@
 package com.pezont.teammates.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Drafts
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -21,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -47,7 +51,7 @@ fun TeammatesHomeScreen(
     viewModel: TeammatesViewModel,
     onTabPressed: (ContentType) -> Unit,
 ) {
-    val context = LocalContext.current
+    val context = LocalContext.current        //TODO homeToast
 
     val navigationItemContentList = listOf(
         NavigationItemContent(ContentType.Home, Icons.Default.Home, stringResource(R.string.home)),
@@ -78,12 +82,15 @@ fun TeammatesHomeScreen(
             }
         },
         bottomBar = {
-            BottomNavigationBar(
-                currentTab = teammatesUiState.currentContent,
-                onTabPressed = onTabPressed,
-                navigationItemContentList = navigationItemContentList,
-                modifier = Modifier.height(60.dp)
-            )
+            if (teammatesUiState.currentContent != ContentType.Profile) {
+
+                BottomNavigationBar(
+                    currentTab = teammatesUiState.currentContent,
+                    onTabPressed = onTabPressed,
+                    navigationItemContentList = navigationItemContentList,
+                    modifier = Modifier.height(60.dp)
+                )
+            }
         }
     ) { paddingValues ->
         when (teammatesUiState.currentContent) {
@@ -99,8 +106,8 @@ fun TeammatesHomeScreen(
                 logout = viewModel::clearUserData,
                 createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
                 getUserQuestionnaires = viewModel::tryGetQuestionnairesByUserId,
-                paddingValues = paddingValues,
-                modifier = Modifier
+                onTabPressed = onTabPressed,
+                navigationItemContentList = navigationItemContentList
             )
         }
     }
@@ -143,8 +150,21 @@ fun HomeContent(
         QuestionnairesPager(
             questionnaires = teammatesUiState.questionnaires,
             pagerState = pagerState,
+            lastItem = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(100.dp)
+                    )
+                }
+            },
             modifier = Modifier.fillMaxSize()
-            )
+        )
 
 
 
@@ -152,7 +172,8 @@ fun HomeContent(
             if (!isLoadingMore.value && pagerState.currentPage == teammatesUiState.questionnaires.size) {
                 isLoadingMore.value = true
 
-                val newPage =  if (teammatesUiState.questionnaires.size % 10 == 0) pagerState.currentPage / 10 + 1 else pagerState.currentPage / 10 + 2
+                val newPage =
+                    if (teammatesUiState.questionnaires.size % 10 == 0) pagerState.currentPage / 10 + 1 else pagerState.currentPage / 10 + 2
                 try {
                     viewModel.tryGetQuestionnairesByPageAndGame(
                         teammatesUiState = teammatesUiState,
@@ -178,7 +199,7 @@ fun HomeContent(
 
 
 @Composable
-private fun BottomNavigationBar(
+fun BottomNavigationBar(
     currentTab: ContentType,
     onTabPressed: ((ContentType) -> Unit),
     navigationItemContentList: List<NavigationItemContent>,
@@ -200,7 +221,7 @@ private fun BottomNavigationBar(
     }
 }
 
-private data class NavigationItemContent(
+data class NavigationItemContent(
     val contentType: ContentType,
     val icon: ImageVector,
     val text: String

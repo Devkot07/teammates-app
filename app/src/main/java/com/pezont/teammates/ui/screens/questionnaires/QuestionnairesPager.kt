@@ -20,6 +20,7 @@ import com.pezont.teammates.ui.items.QuestionnaireItem
 fun QuestionnairesPager(
     pagerState: PagerState,
     questionnaires: List<Questionnaire>,
+    lastItem: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -34,21 +35,7 @@ fun QuestionnairesPager(
                 questionnaire = questionnaire,
                 modifier = modifier,
             )
-        } else {
-
-            //TODO last item
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(100.dp)
-                )
-            }
-        }
+        } else lastItem()
     }
 }
 

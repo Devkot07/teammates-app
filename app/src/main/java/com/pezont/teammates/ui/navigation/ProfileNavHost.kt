@@ -1,16 +1,14 @@
 package com.pezont.teammates.ui.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.models.Games
 import com.pezont.teammates.ui.TeammatesUiState
+import com.pezont.teammates.ui.screens.NavigationItemContent
 import com.pezont.teammates.ui.screens.ProfileDestination
 import com.pezont.teammates.ui.screens.ProfileScreen
 import com.pezont.teammates.ui.screens.questionnaires.MyQuestionnairesDestination
@@ -25,33 +23,34 @@ fun ProfileNavHost(
     navController: NavHostController = rememberNavController(),
 
     logout: () -> Unit,
-    createNewQuestionnaireAction: (header: String,
-                                   description: String,
-                                   selectedGame: Games,
-                                   image: MultipartBody.Part?)  -> Unit,
+    createNewQuestionnaireAction: (
+        header: String,
+        description: String,
+        selectedGame: Games,
+        image: MultipartBody.Part?
+    ) -> Unit,
     getUserQuestionnaires: (teammatesUiState: TeammatesUiState.Home) -> Unit,
 
 
-    modifier: Modifier,
-    paddingValues: PaddingValues,
+    onTabPressed: (ContentType) -> Unit,
+    navigationItemContentList: List<NavigationItemContent>,
+
 ) {
     NavHost(
         navController = navController,
         startDestination = ProfileDestination.route,
-        modifier = modifier.padding(paddingValues)
     ) {
 
         composable(route = ProfileDestination.route) {
             ProfileScreen(
                 navigateToMyQuestionnaires = {
-                    navController.navigate(
-                        MyQuestionnairesDestination.route
-                    )
+                    navController.navigate(MyQuestionnairesDestination.route)
                 },
 
-                logout,
-                teammatesUiState.user,
-
+                logout = logout,
+                user = teammatesUiState.user,
+                onTabPressed = onTabPressed,
+                navigationItemContentList = navigationItemContentList,
             )
         }
 
@@ -64,7 +63,7 @@ fun ProfileNavHost(
                 },
                 onNavigateUp = { navController.navigateUp() },
                 getUserQuestionnaires = getUserQuestionnaires,
-                teammatesUiState = teammatesUiState
+                teammatesUiState = teammatesUiState,
             )
         }
         composable(route = QuestionnaireEntryDestination.route) {
@@ -86,5 +85,9 @@ fun ProfileNavHost(
 //                onNavigateUp = { navController.navigateUp() }
 //            )
 //        }
+
+
     }
+
+
 }
