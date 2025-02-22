@@ -52,7 +52,11 @@ fun TeammatesHomeScreen(
 ) {
 
     val navigationItemContentList = listOf(
-        NavigationItemContent(ContentType.Home, Icons.Default.Home, stringResource(R.string.home)),
+        NavigationItemContent(
+            ContentType.Home,
+            Icons.Default.Home,
+            stringResource(R.string.home)
+        ),
         NavigationItemContent(
             ContentType.Favorites,
             Icons.Default.Favorite,
@@ -102,6 +106,17 @@ fun TeammatesHomeScreen(
                 teammatesUiState = teammatesUiState,
                 paddingValues = paddingValues
             )
+
+            ContentType.Create -> QuestionnaireEntryScreen(
+                modifier = Modifier.padding(paddingValues),
+                createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
+                topBar = {
+                    TeammatesTopAppBar(
+                        title = stringResource(R.string.entry_information),
+                        canNavigateBack = false,
+                    )
+                },
+                bottomBar = bottomBar
 
             ContentType.Favorites -> Text(text = stringResource(R.string.favorites))
             ContentType.Profile -> {

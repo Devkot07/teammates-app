@@ -1,5 +1,5 @@
 package com.pezont.teammates.models
 
 enum class ContentType {
-    Home, Favorites, Profile
+    Home, Favorites, Create, Profile
 }

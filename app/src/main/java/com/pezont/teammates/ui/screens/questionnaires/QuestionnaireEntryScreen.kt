@@ -8,14 +8,18 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -55,7 +59,7 @@ object QuestionnaireEntryDestination : NavigationDestination {
 }
 
 
-// TODO add to HomeScreen
+// TODO checking for filled fields
 @Composable
 fun QuestionnaireEntryScreen(
     modifier: Modifier = Modifier,
@@ -65,7 +69,8 @@ fun QuestionnaireEntryScreen(
         selectedGame: Games,
         image: MultipartBody.Part?
     ) -> Unit,
-    topBar: @Composable () -> Unit = {}
+    topBar: @Composable () -> Unit = {},
+    bottomBar: @Composable () -> Unit = {}
 ) {
     var header by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -81,18 +86,21 @@ fun QuestionnaireEntryScreen(
     )
 
     Scaffold(
-        topBar = topBar
+        topBar = topBar,
+        bottomBar = bottomBar,
     ) { innerPadding ->
+
         Column(
             modifier = modifier
+                .verticalScroll(rememberScrollState())
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 32.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(20.dp))
-            Button(
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
+            OutlinedButton(
                 onClick = { imagePickerLauncher.launch("image/*") },
                 modifier = Modifier.wrapContentWidth()
             ) {
@@ -109,9 +117,10 @@ fun QuestionnaireEntryScreen(
                     error = painterResource(R.drawable.ic_broken_image),
                     contentDescription = "Profile Picture",
                     modifier = Modifier
+                        .padding(32.dp)
                         .aspectRatio(1f)
                         .clip(ShapeDefaults.Medium)
-                        .widthIn(480.dp)
+                        .widthIn(400.dp)
                         .border(2.dp, Color.Gray, ShapeDefaults.Medium),
                     contentScale = ContentScale.Crop
                 )
@@ -135,51 +144,58 @@ fun QuestionnaireEntryScreen(
             )
             Spacer(modifier = Modifier.height(20.dp))
 
-            Box(modifier = Modifier.wrapContentWidth()) {
-                OutlinedButton(
-                    onClick = { isDropdownExpanded = true },
-                    modifier = Modifier.wrapContentWidth()
-                ) {
-                    Text(text = selectedGame.name)
-                }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ){
+                Box(modifier = Modifier.wrapContentWidth()) {
+                    OutlinedButton(
+                        onClick = { isDropdownExpanded = true },
+                        modifier = Modifier.wrapContentWidth()
+                    ) {
+                        Text(text = selectedGame.name)
+                    }
 
-                DropdownMenu(
-                    expanded = isDropdownExpanded,
-                    onDismissRequest = { isDropdownExpanded = false },
-                    modifier = Modifier.wrapContentWidth()
-                ) {
-                    Games.entries.forEach { game ->
-                        DropdownMenuItem(
-                            onClick = {
-                                selectedGame = game
-                                isDropdownExpanded = false
-                            },
-                            text = { Text(text = game.name) }
-                        )
+                    DropdownMenu(
+                        expanded = isDropdownExpanded,
+                        onDismissRequest = { isDropdownExpanded = false },
+                        modifier = Modifier.wrapContentWidth()
+                    ) {
+                        Games.entries.forEach { game ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    selectedGame = game
+                                    isDropdownExpanded = false
+                                },
+                                text = { Text(text = game.name) }
+                            )
+                        }
                     }
                 }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+
+                val context = LocalContext.current
+
+                OutlinedButton(
+                    onClick = {
+                        val imagePart = selectedImageUri?.asMultipart("image", context)
+                        createNewQuestionnaireAction(
+                            header,
+                            description,
+                            selectedGame,
+                            imagePart
+                        )
+                    },
+                    modifier = Modifier.wrapContentWidth()
+                ) {
+                    Text(text = stringResource(R.string.create))
+                }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
 
-
-            val context = LocalContext.current
-
-            Button(
-                onClick = {
-
-                    val imagePart = selectedImageUri?.asMultipart("image", context)
-                    createNewQuestionnaireAction(
-                        header,
-                        description,
-                        selectedGame,
-                        imagePart
-                    )
-                },
-                modifier = Modifier.wrapContentWidth()
-            ) {
-                Text(text = stringResource(R.string.create))
-            }
+            Spacer(modifier = Modifier.height(20.dp))
 
 
         }
