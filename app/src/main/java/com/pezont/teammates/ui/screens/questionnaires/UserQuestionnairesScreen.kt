@@ -39,14 +39,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-object MyQuestionnairesDestination : NavigationDestination {
-    override val route = "my_questionnaires"
-    override val titleRes = R.string.my_questionnaires
+object UserQuestionnairesDestination : NavigationDestination {
+    override val route = "user_questionnaires"
+    override val titleRes = R.string.user_questionnaires
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyQuestionnairesScreen(
+fun UserQuestionnairesScreen(
     onNavigateUp: () -> Unit,
     navigateToQuestionnaireEntry: () -> Unit,
     getUserQuestionnaires: (teammatesUiState: TeammatesUiState.Home) -> Unit,
@@ -57,7 +57,7 @@ fun MyQuestionnairesScreen(
     Scaffold(
         topBar = {
             TeammatesTopAppBar(
-                title = stringResource(MyQuestionnairesDestination.titleRes),
+                title = stringResource(UserQuestionnairesDestination.titleRes),
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
