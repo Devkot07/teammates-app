@@ -44,7 +44,7 @@ fun QuestionnaireItem(
 
     Box(
         modifier = modifier
-            .padding(vertical = 8.dp),
+            .padding(bottom = 8.dp),
         contentAlignment = Alignment.Center
     ) {
         QuestionnaireCard(
@@ -52,7 +52,7 @@ fun QuestionnaireItem(
             modifier = Modifier
                 .widthIn(max = 450.dp)
                 .heightIn(max = 800.dp)
-                .padding(32.dp)
+                .padding(top = 16.dp, start = 32.dp, end = 32.dp, bottom = 24.dp)
                 .fillMaxSize()
         )
     }

@@ -69,6 +69,7 @@ class TeammatesViewModel(
                                 TeammatesUiState.Home(
                                     user = user,
                                     questionnaires = listOf(),
+                                    likedQuestionnaires = listOf(),
                                     userQuestionnaires = listOf()
                                 )
                             isInitialized = true
@@ -94,6 +95,7 @@ class TeammatesViewModel(
                                 TeammatesUiState.Home(
                                     user = user,
                                     questionnaires = listOf(),
+                                    likedQuestionnaires = listOf(),
                                     userQuestionnaires = listOf()
                                 )
                             isInitialized = true
@@ -355,6 +357,7 @@ class TeammatesViewModel(
                 _teammatesUiState.value = TeammatesUiState.Home(
                     user = userDataRepository.user.first(),
                     questionnaires = listOf(),
+                    likedQuestionnaires = listOf(),
                     userQuestionnaires = listOf(),
 
                     )
@@ -489,6 +492,7 @@ sealed interface TeammatesUiState {
         val userDummy: UserDummy = UserDummy(),
         val user: User,
         var questionnaires: List<Questionnaire>,
+        var likedQuestionnaires: List<Questionnaire>,
         val userQuestionnaires: List<Questionnaire>,
     ) : TeammatesUiState
 

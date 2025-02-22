@@ -59,6 +59,11 @@ fun TeammatesHomeScreen(
             stringResource(R.string.favorites)
         ),
         NavigationItemContent(
+            ContentType.Create,
+            Icons.Default.AddCircle,
+            stringResource(R.string.favorites)
+        ),
+        NavigationItemContent(
             ContentType.Profile,
             Icons.Default.Drafts,
             stringResource(R.string.profile)
