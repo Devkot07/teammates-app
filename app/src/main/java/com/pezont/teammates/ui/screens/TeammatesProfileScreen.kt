@@ -27,8 +27,7 @@ fun ProfileScreen(
     logout: () -> Unit,
     user: User,
 
-    onTabPressed: (ContentType) -> Unit,
-    navigationItemContentList: List<NavigationItemContent>,
+    bottomBar: @Composable () -> Unit = {}
     ) {
     Scaffold(
         topBar = {
@@ -49,15 +48,7 @@ fun ProfileScreen(
             )
         },
 
-        bottomBar = {
-            BottomNavigationBar(
-                currentTab = ContentType.Profile,
-                onTabPressed = onTabPressed,
-                navigationItemContentList = navigationItemContentList,
-                modifier = Modifier.height(60.dp)
-            )
-
-        }
+        bottomBar = bottomBar
 
 
 

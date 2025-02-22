@@ -10,11 +10,10 @@ import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.models.Games
 import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.TeammatesUiState
-import com.pezont.teammates.ui.screens.NavigationItemContent
 import com.pezont.teammates.ui.screens.ProfileDestination
 import com.pezont.teammates.ui.screens.ProfileScreen
-import com.pezont.teammates.ui.screens.questionnaires.MyQuestionnairesDestination
-import com.pezont.teammates.ui.screens.questionnaires.MyQuestionnairesScreen
+import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesDestination
+import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesScreen
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireEntryDestination
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireEntryScreen
 import okhttp3.MultipartBody
@@ -33,10 +32,7 @@ fun ProfileNavHost(
     ) -> Unit,
     getUserQuestionnaires: (teammatesUiState: TeammatesUiState.Home) -> Unit,
 
-
-    onTabPressed: (ContentType) -> Unit,
-    navigationItemContentList: List<NavigationItemContent>,
-
+    bottomBar: @Composable () -> Unit = {},
     ) {
     NavHost(
         navController = navController,
@@ -47,18 +43,17 @@ fun ProfileNavHost(
             ProfileScreen(
                 navigateToMyQuestionnaires = {
                     getUserQuestionnaires(teammatesUiState)
-                    navController.navigate(MyQuestionnairesDestination.route)
+                    navController.navigate(UserQuestionnairesDestination.route)
                 },
 
                 logout = logout,
                 user = teammatesUiState.user,
-                onTabPressed = onTabPressed,
-                navigationItemContentList = navigationItemContentList,
+                bottomBar = bottomBar,
             )
         }
 
-        composable(route = MyQuestionnairesDestination.route) {
-            MyQuestionnairesScreen(
+        composable(route = UserQuestionnairesDestination.route) {
+            UserQuestionnairesScreen(
                 navigateToQuestionnaireEntry = {
                     navController.navigate(
                         QuestionnaireEntryDestination.route
