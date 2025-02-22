@@ -1,12 +1,14 @@
 package com.pezont.teammates.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.models.Games
+import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.screens.NavigationItemContent
 import com.pezont.teammates.ui.screens.ProfileDestination
@@ -69,9 +71,14 @@ fun ProfileNavHost(
         }
         composable(route = QuestionnaireEntryDestination.route) {
             QuestionnaireEntryScreen(
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() },
                 createNewQuestionnaireAction = createNewQuestionnaireAction,
+                topBar = {
+                    TeammatesTopAppBar(
+                        title = stringResource(QuestionnaireEntryDestination.titleRes),
+                        canNavigateBack = true,
+                        navigateUp = { navController.navigateUp() }
+                    )
+                }
             )
         }
 
