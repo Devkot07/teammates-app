@@ -14,7 +14,7 @@
     <string name="favorites">Favorites</string>
     <string name="profile">Profile</string>
     <string name="create_questionnaire">Create Questionnaire</string>
-    <string name="my_questionnaires">My Questionnaires</string>
+    <string name="user_questionnaires">My Questionnaires</string>
     <string name="back">Back</string>
     <string name="entry_information">Entry Information</string>
     <string name="create">Create</string>

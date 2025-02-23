@@ -183,7 +183,7 @@ fun LoginScreen(
             value = credentials.pwd,
             onChange = { data -> credentials = credentials.copy(pwd = data) },
             submit = {
-                doo(
+                tryLogin(
                     teammatesUiState.isLoggedOut,
                     credentials,
                     context,
@@ -202,7 +202,7 @@ fun LoginScreen(
         Button(
             onClick = {
                 if (credentials.isNotEmpty()) {
-                    doo(
+                    tryLogin(
                         teammatesUiState.isLoggedOut,
                         credentials,
                         context,
@@ -221,7 +221,7 @@ fun LoginScreen(
     }
 }
 
-fun doo(
+fun tryLogin(
     isOutLog: Boolean,
     credentials: Credentials,
     context: Context,

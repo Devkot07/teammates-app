@@ -9,52 +9,58 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.pezont.teammates.R
-import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
-import com.pezont.teammates.ui.screens.sendToasts.sendLoginToast
+import com.pezont.teammates.ui.items.TeammatesLoadingItem
+import com.pezont.teammates.ui.sendAuthToast
+import com.pezont.teammates.ui.sendQuestionnairesToast
+import kotlinx.coroutines.launch
 
 @Composable
 fun TeammatesApp(
 
     viewModel: TeammatesViewModel,
 
-){
+    ) {
 
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.loginToastCode.collect { code ->
-            sendLoginToast(code,context)
-            //Toast.makeText(context, "$code", Toast.LENGTH_SHORT).show()
+        launch {
+            viewModel.authToastCode.collect { code ->
+                sendAuthToast(code, context)
+            }
         }
-
-
+        launch {
+            viewModel.questionnairesToastCode.collect { code ->
+                sendQuestionnairesToast(code, context)
+            }
+        }
     }
 
     when (val teammatesUiState = viewModel.teammatesUiState.collectAsState().value) {
-        is TeammatesUiState.Loading -> TeammatesLoadingScreen()
+        is TeammatesUiState.Loading -> TeammatesLoadingItem()
         is TeammatesUiState.Login -> {
-
-            //SendLoginErrorToast(code, context)
             LoginScreen(viewModel, teammatesUiState)
         }
 
         is TeammatesUiState.Home -> {
             TeammatesHomeScreen(
-                onTabPressed = { contentType: ContentType ->
-                    viewModel.updateCurrentContent(contentType)
-                },
+//                onTabPressed = { contentType: ContentType ->
+//                    viewModel.updateCurrentContent(contentType)
+//                },
                 teammatesUiState = teammatesUiState,
                 viewModel = viewModel
             )
 
 
         }
+
         is TeammatesUiState.Error -> Text(
             "${stringResource(R.string.error)}${teammatesUiState.statusResponse}",
             textAlign = TextAlign.Center
-            )
+        )
+
         is TeammatesUiState.ErrorNetwork -> ErrorNetworkScreen(viewModel::initState)
     }
 

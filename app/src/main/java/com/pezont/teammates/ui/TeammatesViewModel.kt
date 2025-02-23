@@ -43,11 +43,15 @@ class TeammatesViewModel(
     ) : ViewModel() {
 
 
-    private val _teammatesUiState: MutableStateFlow<TeammatesUiState> = MutableStateFlow(TeammatesUiState.Loading)
+    private val _teammatesUiState: MutableStateFlow<TeammatesUiState> =
+        MutableStateFlow(TeammatesUiState.Loading)
     val teammatesUiState: StateFlow<TeammatesUiState> = _teammatesUiState.asStateFlow()
 
-    private val _loginToastCode = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
-    val loginToastCode: SharedFlow<Int?> = _loginToastCode
+    private val _authToastCode = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
+    val authToastCode: SharedFlow<Int?> = _authToastCode
+
+    private val _questionnairesToastCode = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
+    val questionnairesToastCode: SharedFlow<Int?> = _questionnairesToastCode
 
     private var isInitialized = false
 
@@ -62,7 +66,12 @@ class TeammatesViewModel(
                     else -> {
                         if (!isInitialized) {
                             _teammatesUiState.value =
-                                TeammatesUiState.Home(user = user, questionnaires = listOf())
+                                TeammatesUiState.Home(
+                                    user = user,
+                                    questionnaires = listOf(),
+                                    likedQuestionnaires = listOf(),
+                                    userQuestionnaires = listOf()
+                                )
                             isInitialized = true
                         } else {
                             _teammatesUiState.value = TeammatesUiState.Login(false)
@@ -83,7 +92,12 @@ class TeammatesViewModel(
                     else -> {
                         if (!isInitialized) {
                             _teammatesUiState.value =
-                                TeammatesUiState.Home(user = user, questionnaires = listOf())
+                                TeammatesUiState.Home(
+                                    user = user,
+                                    questionnaires = listOf(),
+                                    likedQuestionnaires = listOf(),
+                                    userQuestionnaires = listOf()
+                                )
                             isInitialized = true
                         } else {
                             _teammatesUiState.value = TeammatesUiState.Login(false)
@@ -119,10 +133,17 @@ class TeammatesViewModel(
                 response?.let {
 
                     Log.d(TAG, "Count ${response.size}")
-                    _teammatesUiState.value = TeammatesUiState.Home(
-                        user = userDataRepository.user.first(),
-                        questionnaires = teammatesUiState.questionnaires + response,
-                    )
+                    _teammatesUiState.update { currentState ->
+                        when (currentState) {
+                            is TeammatesUiState.Home -> currentState.copy(
+                                user = userDataRepository.user.first(),
+                                questionnaires = teammatesUiState.questionnaires + response,
+                                userQuestionnaires = teammatesUiState.userQuestionnaires,
+                            )
+
+                            else -> currentState
+                        }
+                    }
 
                 }
             } else {
@@ -138,8 +159,8 @@ class TeammatesViewModel(
                         Log.e(TAG, "incorrectAccessToken: $incorrectAccessToken")
                         _teammatesUiState.value =
                             TeammatesUiState.Login(false, error.code())
-                            _loginToastCode.tryEmit( error.code())
-                            //sendLoginErrorToast(error.code(), context)
+                        _questionnairesToastCode.tryEmit(error.code())
+                        //sendLoginErrorToast(error.code(), context)
 
                     }
 
@@ -152,6 +173,66 @@ class TeammatesViewModel(
 
     }
 
+
+    fun tryGetQuestionnairesByUserId(
+        teammatesUiState: TeammatesUiState.Home,
+    ) {
+
+        viewModelScope.launch {
+
+            val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
+                token = userDataRepository.accessToken.first(),
+                userId = userDataRepository.user.first().publicId!!,
+                page = null,
+                limit = 100,//TODO set const
+                game = null,
+                authorId = userDataRepository.user.first().publicId!!,
+                questionnaireId = null
+            )
+            if (questionnairesResult.isSuccess) {
+                val response = questionnairesResult.getOrNull()
+                Log.d(TAG, "Fetched questionnaires: $response")
+
+                response?.let {
+
+                    Log.d(TAG, "Count ${response.size}")
+                    _teammatesUiState.update { currentState ->
+                        when (currentState) {
+                            is TeammatesUiState.Home -> currentState.copy(
+                                user = userDataRepository.user.first(),
+                                questionnaires = teammatesUiState.questionnaires,
+                                userQuestionnaires = response,
+                            )
+
+                            else -> currentState
+                        }
+                    }
+                }
+            } else {
+                val error = questionnairesResult.exceptionOrNull()
+                Log.e(TAG, "Failed to fetch questionnaires: $error")
+                when (error) {
+                    is IOException -> {
+                        _teammatesUiState.value = TeammatesUiState.ErrorNetwork
+                    }
+
+                    is HttpException -> {
+                        val incorrectAccessToken = error.code() == 401
+                        Log.e(TAG, "incorrectAccessToken: $incorrectAccessToken")
+                        _teammatesUiState.value =
+                            TeammatesUiState.Login(false, error.code())
+                        _authToastCode.tryEmit(error.code())
+
+                    }
+
+                    else -> _teammatesUiState.value = TeammatesUiState.Login(false, 0)
+                }
+            }
+
+
+        }
+
+    }
 
 
 //    fun tryLoginWithDummyAccessToken(isLoggedOut: Boolean, token: String) {
@@ -271,17 +352,16 @@ class TeammatesViewModel(
                     it.user.let { user -> userDataRepository.saveUser(user) }
 
 
-
                 }
 
                 _teammatesUiState.value = TeammatesUiState.Home(
                     user = userDataRepository.user.first(),
                     questionnaires = listOf(),
-                )
-                tryGetQuestionnairesByPageAndGame(TeammatesUiState.Home(
-                    user = userDataRepository.user.first(),
-                    questionnaires = listOf(),
-                ))
+                    likedQuestionnaires = listOf(),
+                    userQuestionnaires = listOf(),
+
+                    )
+
 
             } else {
                 val error = result.exceptionOrNull()
@@ -293,7 +373,7 @@ class TeammatesViewModel(
 
                     is HttpException -> {
                         _teammatesUiState.value = TeammatesUiState.Login(false, error.code())
-                        _loginToastCode.tryEmit( error.code())
+                        _authToastCode.tryEmit(error.code())
 
                     }
 
@@ -358,7 +438,7 @@ class TeammatesViewModel(
                 userDataRepository.saveUser(User())
             }
             _teammatesUiState.value = TeammatesUiState.Login(true, 1)
-            _loginToastCode.tryEmit( 1)
+            _authToastCode.tryEmit(1)
 
 
         }
@@ -411,7 +491,9 @@ sealed interface TeammatesUiState {
         val currentContent: ContentType = ContentType.Home,
         val userDummy: UserDummy = UserDummy(),
         val user: User,
-        var questionnaires: List<Questionnaire>
+        var questionnaires: List<Questionnaire>,
+        var likedQuestionnaires: List<Questionnaire>,
+        val userQuestionnaires: List<Questionnaire>,
     ) : TeammatesUiState
 
     data object ErrorNetwork : TeammatesUiState

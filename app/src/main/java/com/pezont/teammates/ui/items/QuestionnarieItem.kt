@@ -1,12 +1,7 @@
-package com.pezont.teammates.ui.screens
+package com.pezont.teammates.ui.items
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,31 +13,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,52 +34,29 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.pezont.teammates.R
 import com.pezont.teammates.models.Questionnaire
-
+import com.pezont.teammates.ui.buttons.LikeButton
 
 @Composable
-fun QuestionnairesPager(
-    pagerState: PagerState,
-    questionnaires: List<Questionnaire>,
-    modifier: Modifier = Modifier,
-) {
+fun QuestionnaireItem(
+    questionnaire: Questionnaire,
+    modifier: Modifier,
+){
 
-
-    VerticalPager(
-        snapPosition = SnapPosition.Center,
-        state = pagerState,
-    ) { pageIndex ->
-        if (pageIndex < questionnaires.size) {
-            val questionnaire = questionnaires[pageIndex]
-            Box(
-                modifier = modifier
-                    .padding(vertical = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                QuestionnaireCard(
-                    questionnaire = questionnaire,
-                    modifier = Modifier
-                        .widthIn(max = 450.dp)
-                        .heightIn(max = 800.dp)
-                        .padding(32.dp)
-                        .fillMaxSize()
-                )
-            }
-        } else {
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(100.dp)
-                )
-            }
-        }
+    Box(
+        modifier = modifier
+            .padding(bottom = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        QuestionnaireCard(
+            questionnaire = questionnaire,
+            modifier = Modifier
+                .widthIn(max = 450.dp)
+                .heightIn(max = 800.dp)
+                .padding(top = 16.dp, start = 32.dp, end = 32.dp, bottom = 24.dp)
+                .fillMaxSize()
+        )
     }
 }
-
 
 @Composable
 fun QuestionnaireCard(
@@ -195,42 +154,3 @@ fun QuestionnaireCard(
         }
     }
 }
-
-
-@Composable
-fun LikeButton(
-    modifier: Modifier = Modifier,
-) {
-    var isLiked by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        targetValue = if (isLiked) 1.2f else 1f,
-        animationSpec = tween(durationMillis = 300), label = ""
-    )
-    val iconColor by animateColorAsState(
-        targetValue = if (isLiked) Color.Red else Color.Gray,
-        animationSpec = tween(durationMillis = 300), label = ""
-    )
-
-    Box(
-        modifier = modifier
-            .background(Color.White, CircleShape)
-            .clickable { isLiked = !isLiked },
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        Icon(
-            imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-            contentDescription = null,
-            tint = iconColor,
-            modifier = Modifier.size((36 * scale).dp)
-        )
-    }
-}
-
-
-
-
-
-
-
-
-
