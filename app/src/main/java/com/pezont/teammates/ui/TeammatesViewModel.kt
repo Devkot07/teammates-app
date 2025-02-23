@@ -12,8 +12,6 @@ import com.pezont.teammates.data.AuthRepository
 import com.pezont.teammates.data.QuestionnairesRepository
 import com.pezont.teammates.data.UserDataRepository
 import com.pezont.teammates.dummy.UserDummy
-import com.pezont.teammates.fake.FakeQuestionnaireRepository
-import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.models.Games
 import com.pezont.teammates.models.Questionnaire
 import com.pezont.teammates.models.User
@@ -34,7 +32,7 @@ import java.io.IOException
 
 class TeammatesViewModel(
 
-    private val fakeQuestionnairesRepository: FakeQuestionnaireRepository,
+    //private val fakeQuestionnairesRepository: FakeQuestionnaireRepository,
     private val questionnairesRepository: QuestionnairesRepository,
     private val userDataRepository: UserDataRepository,
     //private val userDummyRepository: UserDummyRepository,
@@ -144,7 +142,6 @@ class TeammatesViewModel(
                             else -> currentState
                         }
                     }
-
                 }
             } else {
                 val error = questionnairesResult.exceptionOrNull()
@@ -167,10 +164,7 @@ class TeammatesViewModel(
                     else -> _teammatesUiState.value = TeammatesUiState.Login(false, 0)
                 }
             }
-
-
         }
-
     }
 
 
@@ -179,7 +173,6 @@ class TeammatesViewModel(
     ) {
 
         viewModelScope.launch {
-
             val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
                 token = userDataRepository.accessToken.first(),
                 userId = userDataRepository.user.first().publicId!!,
@@ -228,10 +221,7 @@ class TeammatesViewModel(
                     else -> _teammatesUiState.value = TeammatesUiState.Login(false, 0)
                 }
             }
-
-
         }
-
     }
 
 
@@ -340,7 +330,6 @@ class TeammatesViewModel(
                 Log.d(TAG, "user: ${response?.user}")
 
                 response?.let {
-
                     it.accessToken.let { accessToken ->
                         Log.i(TAG, accessToken)
                         userDataRepository.saveAccessToken(accessToken)
@@ -350,8 +339,6 @@ class TeammatesViewModel(
                         userDataRepository.saveRefreshToken(refreshToken)
                     }
                     it.user.let { user -> userDataRepository.saveUser(user) }
-
-
                 }
 
                 _teammatesUiState.value = TeammatesUiState.Home(
@@ -374,13 +361,11 @@ class TeammatesViewModel(
                     is HttpException -> {
                         _teammatesUiState.value = TeammatesUiState.Login(false, error.code())
                         _authToastCode.tryEmit(error.code())
-
                     }
 
                     else -> _teammatesUiState.value = TeammatesUiState.Login(false, 0)
                 }
             }
-
         }
     }
 
@@ -390,7 +375,6 @@ class TeammatesViewModel(
         selectedGame: Games,
         image: MultipartBody.Part?
     ) {
-
         viewModelScope.launch {
             Log.d(TAG, userDataRepository.accessToken.first())
             val questionnaireResult = questionnairesRepository.createQuestionnaire(
@@ -406,13 +390,13 @@ class TeammatesViewModel(
     }
 
 
-    fun getFakeQuestionnaires() {
-        viewModelScope.launch {
-            fakeQuestionnairesRepository.getRecommendedQuestionnaires()
-
-        }
-    }
-
+//    fun getFakeQuestionnaires() {
+//        viewModelScope.launch {
+//            fakeQuestionnairesRepository.getRecommendedQuestionnaires()
+//
+//        }
+//    }
+//
 //    suspend fun getNextFakeQuestionnaires(
 //        teammatesUiState: TeammatesUiState.Home,
 //        i: Int,
@@ -439,18 +423,6 @@ class TeammatesViewModel(
             }
             _teammatesUiState.value = TeammatesUiState.Login(true, 1)
             _authToastCode.tryEmit(1)
-
-
-        }
-
-    }
-
-    fun updateCurrentContent(contentType: ContentType) {
-        _teammatesUiState.update { currentState ->
-            when (currentState) {
-                is TeammatesUiState.Home -> currentState.copy(currentContent = contentType)
-                else -> currentState
-            }
         }
     }
 
@@ -461,7 +433,7 @@ class TeammatesViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as TeammatesApplication)
                 TeammatesViewModel(
-                    FakeQuestionnaireRepository(),
+                    //FakeQuestionnaireRepository(),
                     application.container.questionnairesRepository,
                     application.userDataRepository,
                     //application.container.userDummyRepository,
@@ -488,7 +460,6 @@ sealed interface TeammatesUiState {
     ) : TeammatesUiState
 
     data class Home(
-        val currentContent: ContentType = ContentType.Home,
         val userDummy: UserDummy = UserDummy(),
         val user: User,
         var questionnaires: List<Questionnaire>,
