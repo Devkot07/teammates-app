@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedButton
@@ -53,15 +52,15 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
-object QuestionnaireEntryDestination : NavigationDestination {
-    override val route = "item_entry"
+object QuestionnaireCreateDestination : NavigationDestination {
+    override val route = "item_create"
     override val titleRes = R.string.entry_information
 }
 
 
 // TODO checking for filled fields
 @Composable
-fun QuestionnaireEntryScreen(
+fun QuestionnaireCreateScreen(
     modifier: Modifier = Modifier,
     createNewQuestionnaireAction: (
         header: String,
@@ -217,7 +216,7 @@ fun Uri.asMultipart(name: String, context: Context): MultipartBody.Part? {
 fun PreviewQuestionnaireEntryScreen() {
 
     TeammatesTheme(darkTheme = true) {
-        QuestionnaireEntryScreen(Modifier, { _, _, _, _ -> }, {})
+        QuestionnaireCreateScreen(Modifier, { _, _, _, _ -> }, {})
     }
 
 }

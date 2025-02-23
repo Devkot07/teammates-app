@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.pezont.teammates.R
-import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.items.TeammatesLoadingItem
@@ -22,7 +21,7 @@ fun TeammatesApp(
 
     viewModel: TeammatesViewModel,
 
-){
+    ) {
 
     val context = LocalContext.current
 
@@ -47,19 +46,21 @@ fun TeammatesApp(
 
         is TeammatesUiState.Home -> {
             TeammatesHomeScreen(
-                onTabPressed = { contentType: ContentType ->
-                    viewModel.updateCurrentContent(contentType)
-                },
+//                onTabPressed = { contentType: ContentType ->
+//                    viewModel.updateCurrentContent(contentType)
+//                },
                 teammatesUiState = teammatesUiState,
                 viewModel = viewModel
             )
 
 
         }
+
         is TeammatesUiState.Error -> Text(
             "${stringResource(R.string.error)}${teammatesUiState.statusResponse}",
             textAlign = TextAlign.Center
-            )
+        )
+
         is TeammatesUiState.ErrorNetwork -> ErrorNetworkScreen(viewModel::initState)
     }
 
