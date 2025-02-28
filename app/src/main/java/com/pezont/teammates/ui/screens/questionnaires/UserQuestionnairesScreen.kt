@@ -2,19 +2,16 @@ package com.pezont.teammates.ui.screens.questionnaires
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -25,11 +22,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
-import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.items.TeammatesLoadingItem
 import com.pezont.teammates.ui.navigation.NavigationDestination
@@ -47,37 +41,15 @@ object UserQuestionnairesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserQuestionnairesScreen(
-    onNavigateUp: () -> Unit,
-    navigateToQuestionnaireEntry: () -> Unit,
+    navigateToQuestionnaireCreate: () -> Unit,
     getUserQuestionnaires: (teammatesUiState: TeammatesUiState.Home) -> Unit,
+    topBar: @Composable () -> Unit = {},
 
     teammatesUiState: TeammatesUiState.Home,
 ) {
 
     Scaffold(
-        topBar = {
-            TeammatesTopAppBar(
-                title = stringResource(UserQuestionnairesDestination.titleRes),
-                canNavigateBack = true,
-                navigateUp = onNavigateUp
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = navigateToQuestionnaireEntry,
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier
-                    .padding(
-                        end = WindowInsets.safeDrawing.asPaddingValues()
-                            .calculateEndPadding(LocalLayoutDirection.current)
-                    )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add"
-                )
-            }
-        },
+        topBar = topBar
     ) { innerPadding ->
 
         val isRefreshing = remember { mutableStateOf(false) }
@@ -110,7 +82,7 @@ fun UserQuestionnairesScreen(
                     if (teammatesUiState.userQuestionnaires.isEmpty()) {
                         TeammatesLoadingItem()
                     } else {
-                        CreateButton(navigateToQuestionnaireEntry)
+                        CreateButton(navigateToQuestionnaireCreate)
                     }
                 },
                 modifier = Modifier.fillMaxSize()
@@ -144,6 +116,7 @@ fun CreateButton(
                 contentDescription = "Add"
             )
         }
+        Spacer(Modifier.height(10.dp))
         Text(text = ("Create new questionnaire"))
     }
 }

@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
 data class LoginAuthRequest(
-    val login: String,
+    val nickname: String,
     val password: String,
 )
 @Serializable
@@ -25,7 +25,7 @@ data class CreateQuestionnaireRequest(
     val game: String,
     val description: String,
     @SerializedName("author_id")
-    val authorId: Int
+    val authorId: String
 )
 
 @Serializable
@@ -34,10 +34,10 @@ data class Questionnaire(
     val game: String,
     val description: String,
     @SerializedName("author_id")
-    val authorId: Int,
-    @SerializedName("questionnaire_id")
-    val questionnaireId: String,
-    @SerializedName("photo_path")
+    val authorId: String,
+    @SerializedName("id")
+    val questionnaireId: String = "",
+    @SerializedName("image_path")
     val imagePath: String = "",
 
     )
@@ -46,7 +46,7 @@ data class Questionnaire(
 data class User(
     val nickname: String? = null,
     @SerializedName("public_id")
-    val publicId: Int? = null,
+    val publicId: String? = null,
     val email: String? = null,
     val description: String? = null,
     @SerializedName("image_path")

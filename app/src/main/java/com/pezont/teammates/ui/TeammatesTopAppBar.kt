@@ -11,7 +11,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import com.pezont.teammates.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,10 +30,11 @@ fun TeammatesTopAppBar(
     TopAppBar(
         title = {
             Text(
-                title,
+                text = title,
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.headlineLarge
             )
+
         },
         modifier = modifier,
         navigationIcon = {

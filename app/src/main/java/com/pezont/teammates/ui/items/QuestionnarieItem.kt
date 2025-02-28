@@ -13,15 +13,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,18 +30,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.pezont.teammates.R
+import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.models.Questionnaire
 import com.pezont.teammates.ui.buttons.LikeButton
+import com.pezont.teammates.ui.theme.TeammatesTheme
 
 @Composable
 fun QuestionnaireItem(
     questionnaire: Questionnaire,
     modifier: Modifier,
-){
+) {
 
     Box(
         modifier = modifier
@@ -64,40 +66,69 @@ fun QuestionnaireCard(
     modifier: Modifier = Modifier
 
 ) {
+    val baseUrl = "https://potential-robot-4jg4wjjqp5vv2qx7w-8000.app.github.dev"
+    val fixedImagePath = questionnaire.imagePath.replace("http:localhost:8000", baseUrl)
+
     Card(
         modifier = modifier,
         shape = ShapeDefaults.Large,
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-        ) {
-            Box(
+        Scaffold(
+            floatingActionButton = {
+                LikeButton(modifier = Modifier
+                    .wrapContentHeight()
+                    .background(Color.Transparent))
+            }
+
+        ) { paddingValues ->
+            Column(
                 modifier = Modifier
-                    .padding()
-                    .fillMaxWidth()
-                    .background(Color.White)
+                    .padding(paddingValues = paddingValues)
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.secondary)
+                    .padding(16.dp)
             ) {
-                Row(
+
+
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.Top
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    AsyncImage(
-                        model = questionnaire.imagePath,
-                        placeholder = painterResource(id = R.drawable.ic_loading_image),
-                        error = painterResource(R.drawable.ic_broken_image),
+
+                    SubcomposeAsyncImage(
+                        model = fixedImagePath,
+                        loading = {
+                            CircularProgressIndicator(
+                                color = Color.Black,
+                                modifier = Modifier
+                                    .padding(100.dp)
+                            )
+                        },
+                        error = {
+                            Icon(
+                                imageVector = Icons.Default.Error,
+                                contentDescription = "Error"
+                            )
+                        },
                         contentDescription = "Profile Picture",
                         modifier = Modifier
-                            .weight(1f)
                             .aspectRatio(1f)
                             .clip(ShapeDefaults.Medium)
-                            .border(2.dp, Color.Gray, ShapeDefaults.Medium)
+                            .border(2.dp, Color.Gray, ShapeDefaults.Medium),
+                        contentScale = ContentScale.Crop
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
+
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.Top
+                ) {
+
+
                     Column(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.Top,
@@ -110,47 +141,36 @@ fun QuestionnaireCard(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = questionnaire.game.toString(),
+                            text = questionnaire.game,
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.Gray
                         )
                     }
                 }
-            }
 
-            HorizontalDivider(thickness = 1.dp, color = Color.Gray.copy(alpha = 0.2f))
-            Text(
-                text = questionnaire.imagePath,
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.Black,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            )
-            HorizontalDivider(thickness = 1.dp, color = Color.Gray.copy(alpha = 0.2f))
-            Text(
-                text = questionnaire.description,
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.Black,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            )
-            HorizontalDivider(thickness = 1.dp, color = Color.Gray.copy(alpha = 0.2f))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
                 ) {
-                LikeButton(modifier = Modifier.wrapContentHeight())
-                Spacer(modifier = Modifier.weight(1f))
-                LikeButton(modifier = Modifier.wrapContentHeight())
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
+    }
+
+}
+
+
+@Preview
+@Composable
+fun QuestionnaireCardPreview() {
+    TeammatesTheme(darkTheme = true) {
+        QuestionnaireCard(Questionnaire("Header", "Game", "", "1", "1", "https"))
     }
 }

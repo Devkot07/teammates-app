@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
 
     implementation("androidx.navigation:navigation-compose:2.7.4")
+    implementation(libs.androidx.ui.text.google.fonts)
 
 
     testImplementation(libs.junit)

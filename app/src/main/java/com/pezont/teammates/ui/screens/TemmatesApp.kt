@@ -46,14 +46,10 @@ fun TeammatesApp(
 
         is TeammatesUiState.Home -> {
             TeammatesHomeScreen(
-//                onTabPressed = { contentType: ContentType ->
-//                    viewModel.updateCurrentContent(contentType)
-//                },
                 teammatesUiState = teammatesUiState,
-                viewModel = viewModel
+                viewModel = viewModel,
+                context = context
             )
-
-
         }
 
         is TeammatesUiState.Error -> Text(

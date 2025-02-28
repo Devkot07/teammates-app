@@ -1,5 +1,6 @@
 package com.pezont.teammates.ui.screens
 
+import android.content.Context
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.height
@@ -9,9 +10,15 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Drafts
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -22,6 +29,8 @@ import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesBottomNavigationBar
 import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.models.NavigationItemContent
+import com.pezont.teammates.ui.Dots
+import com.pezont.teammates.ui.TeammatesBackHandler
 import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
@@ -38,6 +47,7 @@ import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesScreen
 fun TeammatesHomeScreen(
     teammatesUiState: TeammatesUiState.Home,
     viewModel: TeammatesViewModel,
+    context: Context
 ) {
     val navController = rememberNavController()
 
@@ -64,27 +74,44 @@ fun TeammatesHomeScreen(
         )
     )
 
-    val bottomBarDestinations = listOf(HomeDestination.route, LikedQuestionnairesDestination.route, QuestionnaireCreateDestination.route, ProfileDestination.route)
+    val bottomBarDestinations = listOf(
+        HomeDestination.route,
+        LikedQuestionnairesDestination.route,
+        QuestionnaireCreateDestination.route,
+        ProfileDestination.route
+    )
+
+    var currentTab by remember { mutableStateOf(ContentType.Home) }
 
     val currentRoute =
         navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry).value?.destination?.route
+
     val shouldShowBottomBar = currentRoute in bottomBarDestinations
 
     Scaffold(
         bottomBar = {
             if (shouldShowBottomBar) {
                 TeammatesBottomNavigationBar(
-                    currentTab = teammatesUiState.currentContent,
+                    currentTab = currentTab,
                     onTabPressed = { contentType ->
-                        viewModel.updateCurrentContent(contentType)
+                        currentTab = contentType
                         when (contentType) {
-                            ContentType.Home -> navController.navigate(HomeDestination.route)
-                            ContentType.Liked -> navController.navigate(LikedQuestionnairesDestination.route)
-                            ContentType.Create -> navController.navigate(QuestionnaireCreateDestination.route)
-                            ContentType.Profile -> navController.navigate(ProfileDestination.route)
+                            ContentType.Home -> navController.navigate(
+                                HomeDestination.route
+                            )
 
+                            ContentType.Liked -> navController.navigate(
+                                LikedQuestionnairesDestination.route
+                            )
+
+                            ContentType.Create -> navController.navigate(
+                                QuestionnaireCreateDestination.route
+                            )
+
+                            ContentType.Profile -> navController.navigate(
+                                ProfileDestination.route
+                            )
                         }
-
                     },
                     navigationItemContentList = navigationItemContentList,
                     modifier = Modifier.height(60.dp)
@@ -92,6 +119,8 @@ fun TeammatesHomeScreen(
             }
         }
     ) { paddingValues ->
+        TeammatesBackHandler(currentRoute, { currentTab = it }, navController, context)
+
         NavHost(
             navController = navController,
             startDestination = HomeDestination.route,
@@ -99,11 +128,11 @@ fun TeammatesHomeScreen(
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
 
-        ) {
+            ) {
             composable(HomeDestination.route) {
                 TeammatesHomeContent(
-                    viewModel,
-                    teammatesUiState,
+                    viewModel = viewModel,
+                    teammatesUiState = teammatesUiState,
                     topBar = {
                         TeammatesTopAppBar(
                             title = stringResource(HomeDestination.titleRes),
@@ -114,8 +143,8 @@ fun TeammatesHomeScreen(
             }
             composable(LikedQuestionnairesDestination.route) {
                 LikedQuestionnairesScreen(
-                    viewModel,
-                    teammatesUiState,
+                    viewModel = viewModel,
+                    teammatesUiState = teammatesUiState,
                     topBar = {
                         TeammatesTopAppBar(
                             title = stringResource(LikedQuestionnairesDestination.titleRes),
@@ -138,20 +167,43 @@ fun TeammatesHomeScreen(
                         )
                     },
                     logout = viewModel::clearUserData,
-                    user = teammatesUiState.user
+                    user = teammatesUiState.user,
+                    topBar = {
+                        TeammatesTopAppBar(
+                            title = stringResource(ProfileDestination.titleRes),
+                            canNavigateBack = false,
+                            action = {
+                                IconButton(
+                                    {}
+                                ) {
+                                    Icon(
+                                        imageVector = Dots,
+                                        contentDescription = "Localized description",
+                                    )
+                                }
+
+                            }
+                        )
+                    }
                 )
             }
             composable(UserQuestionnairesDestination.route) {
                 UserQuestionnairesScreen(
-                    navigateToQuestionnaireEntry = {
-                        viewModel.updateCurrentContent(ContentType.Create)
+                    navigateToQuestionnaireCreate = {
+                        currentTab = ContentType.Create
                         navController.navigate(
                             QuestionnaireCreateDestination.route
                         )
                     },
-                    onNavigateUp = { navController.navigateUp() },
                     getUserQuestionnaires = viewModel::tryGetQuestionnairesByUserId,
-                    teammatesUiState = teammatesUiState
+                    teammatesUiState = teammatesUiState,
+                    topBar = {
+                        TeammatesTopAppBar(
+                            title = stringResource(QuestionnaireCreateDestination.titleRes),
+                            canNavigateBack = true,
+                            navigateUp = { navController.navigateUp() },
+                        )
+                    }
                 )
             }
             composable(QuestionnaireCreateDestination.route) {
