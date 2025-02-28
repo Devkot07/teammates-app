@@ -152,7 +152,7 @@ fun QuestionnaireCreateScreen(
                         onClick = { isDropdownExpanded = true },
                         modifier = Modifier.wrapContentWidth()
                     ) {
-                        Text(text = selectedGame.name)
+                        Text(text = selectedGame.nameOfGame)
                     }
 
                     DropdownMenu(

@@ -98,7 +98,7 @@ class NetworkQuestionnairesRepository(
                     userId = authorId,
                     questionnaire = CreateQuestionnaireRequest(
                         header,
-                        game.name,
+                        game.nameOfGame,
                         description,
                         authorId
                     ),
