@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -38,15 +39,18 @@ fun LikeButton(
 
     Box(
         modifier = modifier
-            .background(Color.White, CircleShape)
-            .clickable { isLiked = !isLiked },
+            .background(Color.Transparent, CircleShape)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { isLiked = !isLiked },
         contentAlignment = Alignment.BottomEnd
     ) {
         Icon(
             imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
             contentDescription = null,
             tint = iconColor,
-            modifier = Modifier.size((36 * scale).dp)
+            modifier = modifier.size((36 * scale).dp)
         )
     }
 }
