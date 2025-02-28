@@ -32,7 +32,6 @@ import java.io.IOException
 
 class TeammatesViewModel(
 
-    //private val fakeQuestionnairesRepository: FakeQuestionnaireRepository,
     private val questionnairesRepository: QuestionnairesRepository,
     private val userDataRepository: UserDataRepository,
     //private val userDummyRepository: UserDummyRepository,
@@ -382,7 +381,7 @@ class TeammatesViewModel(
                 header = header,
                 game = selectedGame,
                 description = description,
-                authorId = 1,
+                authorId = userDataRepository.user.first().publicId!!,
                 image = image,
             ) //TODO end creating, navigate
             Log.d(TAG, "$questionnaireResult")
@@ -433,7 +432,6 @@ class TeammatesViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as TeammatesApplication)
                 TeammatesViewModel(
-                    //FakeQuestionnaireRepository(),
                     application.container.questionnairesRepository,
                     application.userDataRepository,
                     //application.container.userDummyRepository,

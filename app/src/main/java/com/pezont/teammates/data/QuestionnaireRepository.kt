@@ -10,19 +10,18 @@ import com.pezont.teammates.models.Questionnaire
 import com.pezont.teammates.network.TeammatesQuestionnairesApiService
 import okhttp3.MultipartBody
 import java.io.IOException
-import java.util.UUID
 
 
 interface QuestionnairesRepository {
 
     suspend fun getQuestionnairesFromRepo(
         token: String,
-        userId: Int,
+        userId: String,
         page: Int?,
         limit: Int?,
         game: Games?,
-        authorId: Int?,
-        questionnaireId: UUID?,
+        authorId: String?,
+        questionnaireId: String?,
     ): Result<List<Questionnaire>>
 
     suspend fun createQuestionnaire(
@@ -30,7 +29,7 @@ interface QuestionnairesRepository {
         header: String,
         game: Games,
         description: String,
-        authorId: Int,
+        authorId: String,
         image: MultipartBody.Part?
     ): Result<Questionnaire>
 
@@ -53,12 +52,12 @@ class NetworkQuestionnairesRepository(
 
     override suspend fun getQuestionnairesFromRepo(
         token: String,
-        userId: Int,
+        userId: String,
         page: Int?,
         limit: Int?,
         game: Games?,
-        authorId: Int?,
-        questionnaireId: UUID?,
+        authorId: String?,
+        questionnaireId: String?,
     ): Result<List<Questionnaire>> {
         if (!isNetworkAvailable()) return Result.failure(IOException("No internet connection"))
         return try {
@@ -85,7 +84,7 @@ class NetworkQuestionnairesRepository(
         header: String,
         game: Games,
         description: String,
-        authorId: Int,
+        authorId: String,
         image: MultipartBody.Part?
     ): Result<Questionnaire> {
 

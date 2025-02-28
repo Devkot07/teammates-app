@@ -18,12 +18,12 @@ interface TeammatesQuestionnairesApiService {
     suspend fun getQuestionnaires(
         @Header("accept") accept: String = "application/json",
         @Header("Authorization") token: String,
-        @Query("user_id") userId: Int,
+        @Query("user_id") userId: String,
         @Query("page") page: Int?,
         @Query("limit") limit: Int?,
         @Query("game") gameName: String?,
-        @Query("author_id") authorId: Int?,
-        @Query("questionnaire_id") questionnaireId: UUID?,
+        @Query("author_id") authorId: String?,
+        @Query("questionnaire_id") questionnaireId: String?,
 
         ): List<Questionnaire>
 
@@ -33,7 +33,7 @@ interface TeammatesQuestionnairesApiService {
     suspend fun createQuestionnaire(
         @Header("accept") accept: String = "application/json",
         @Header("Authorization") token: String,
-        @Query("user_id") userId: Int,
+        @Query("user_id") userId: String,
         @Part("questionnaire_in") questionnaire: CreateQuestionnaireRequest,
         @Part image: MultipartBody.Part? = null
     ): Questionnaire

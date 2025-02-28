@@ -41,7 +41,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
     private val ip = "192.168.139.235"
     // android.aapt2FromMavenOverride=/usr/bin/aapt2
     // cuddly-robot-pjqxjwp7g59c6495
-    private val appIp = "obscure-space-carnival-7vrqpvv7jqwr275-"
+    //obscure-space-carnival-7vrqpvv7jqwr275-
+    private val appIp = "potential-robot-4jg4wjjqp5vv2qx7w-"
+
     // TODO  ip
 
 
