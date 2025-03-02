@@ -1,7 +1,10 @@
 package com.pezont.teammates.ui.screens
 
 import android.content.Context
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Drafts
@@ -105,7 +108,8 @@ fun TeammatesHomeScreen(
                     modifier = Modifier.height(60.dp)
                 )
             }
-        }
+        },
+        modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars)
     ) { paddingValues ->
 
         TeammatesBackHandler(
