@@ -192,13 +192,7 @@ fun LoginScreen(
             },
             modifier = Modifier.wrapContentWidth(Alignment.CenterHorizontally)
         )
-        Spacer(modifier = Modifier.height(10.dp))
-        LabeledCheckbox(
-            label = "Remember Me",
-            isChecked = credentials.remember,
-            onCheckChanged = { }
-        )
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(30.dp))
         Button(
             onClick = {
                 if (credentials.isNotEmpty()) {
