@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.SignalWifiStatusbarConnectedNoInternet4
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 
 @Composable
-fun ErrorNetworkScreen(onClick: () -> Unit) {
+fun ErrorScreen(onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -32,12 +33,12 @@ fun ErrorNetworkScreen(onClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                Icons.Default.SignalWifiStatusbarConnectedNoInternet4,
+                Icons.Default.ErrorOutline,
                 contentDescription = "",
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = stringResource(R.string.no_internet_connection),
+                text = stringResource(R.string.error),
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.Red
             )

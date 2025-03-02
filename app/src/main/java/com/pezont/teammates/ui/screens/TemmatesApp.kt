@@ -57,7 +57,7 @@ fun TeammatesApp(
             textAlign = TextAlign.Center
         )
 
-        is TeammatesUiState.ErrorNetwork -> ErrorNetworkScreen(viewModel::initState)
+        is TeammatesUiState.ErrorNetwork -> ErrorScreen(viewModel::initState)
     }
 
 }

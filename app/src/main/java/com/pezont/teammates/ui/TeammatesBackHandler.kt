@@ -6,7 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.pezont.teammates.models.ContentType
-import com.pezont.teammates.ui.screens.HomeDestination
+import com.pezont.teammates.ui.items.HomeDestination
 import com.pezont.teammates.ui.screens.ProfileDestination
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesDestination
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateDestination

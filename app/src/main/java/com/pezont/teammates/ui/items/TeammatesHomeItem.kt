@@ -1,4 +1,4 @@
-package com.pezont.teammates.ui.screens
+package com.pezont.teammates.ui.items
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
@@ -35,7 +35,7 @@ object HomeDestination : NavigationDestination {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TeammatesHomeContent(
+fun TeammatesHomeItem(
     viewModel: TeammatesViewModel,
     teammatesUiState: TeammatesUiState.Home,
     topBar: @Composable () -> Unit = {},
