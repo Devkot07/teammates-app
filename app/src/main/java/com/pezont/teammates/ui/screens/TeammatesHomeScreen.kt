@@ -1,17 +1,12 @@
 package com.pezont.teammates.ui.screens
 
 import android.content.Context
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Drafts
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,29 +17,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesBottomNavigationBar
 import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.models.NavigationItemContent
-import com.pezont.teammates.ui.Dots
 import com.pezont.teammates.ui.TeammatesBackHandler
-import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.items.HomeDestination
 import com.pezont.teammates.ui.navigation.TeammatesNavHost
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesDestination
-import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesScreen
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateDestination
-import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateScreen
-import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesDestination
-import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesScreen
 
 
-//TODO: Screen
 @Composable
 fun TeammatesHomeScreen(
     teammatesUiState: TeammatesUiState.Home,
@@ -121,105 +107,26 @@ fun TeammatesHomeScreen(
             }
         }
     ) { paddingValues ->
-        TeammatesBackHandler(currentRoute, { currentTab = it }, navController, context)
 
-        NavHost(
+        TeammatesBackHandler(
+            currentRoute = currentRoute,
+            onTabChange = { currentTab = it },
             navController = navController,
-            startDestination = HomeDestination.route,
-            modifier = Modifier.padding(paddingValues),
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
+            context = context
+        )
 
-            ) {
-            composable(HomeDestination.route) {
-                TeammatesHomeContent(
-                    viewModel = viewModel,
-                    teammatesUiState = teammatesUiState,
-                    topBar = {
-                        TeammatesTopAppBar(
-                            title = stringResource(HomeDestination.titleRes),
-                            canNavigateBack = false,
-                        )
-                    }
+        TeammatesNavHost(
+            teammatesUiState = teammatesUiState,
+            viewModel = viewModel,
+            navController = navController,
+            paddingValues = paddingValues,
+            navigateToQuestionnaireCreate = {
+                currentTab = ContentType.Create
+                navController.navigate(
+                    QuestionnaireCreateDestination.route
                 )
             }
-            composable(LikedQuestionnairesDestination.route) {
-                LikedQuestionnairesScreen(
-                    viewModel = viewModel,
-                    teammatesUiState = teammatesUiState,
-                    topBar = {
-                        TeammatesTopAppBar(
-                            title = stringResource(LikedQuestionnairesDestination.titleRes),
-                            canNavigateBack = false,
-                        )
-                    }
-                )
-            }
-            composable(QuestionnaireCreateDestination.route) {
-                QuestionnaireCreateScreen(
-                    createNewQuestionnaireAction = viewModel::createNewQuestionnaire
-                )
-            }
-            composable(ProfileDestination.route) {
-                ProfileScreen(
-                    navigateToMyQuestionnaires = {
-                        viewModel.tryGetQuestionnairesByUserId(teammatesUiState)
-                        navController.navigate(
-                            UserQuestionnairesDestination.route
-                        )
-                    },
-                    logout = viewModel::clearUserData,
-                    user = teammatesUiState.user,
-                    topBar = {
-                        TeammatesTopAppBar(
-                            title = stringResource(ProfileDestination.titleRes),
-                            canNavigateBack = false,
-                            action = {
-                                IconButton(
-                                    {}
-                                ) {
-                                    Icon(
-                                        imageVector = Dots,
-                                        contentDescription = "Localized description",
-                                    )
-                                }
-
-                            }
-                        )
-                    }
-                )
-            }
-            composable(UserQuestionnairesDestination.route) {
-                UserQuestionnairesScreen(
-                    navigateToQuestionnaireCreate = {
-                        currentTab = ContentType.Create
-                        navController.navigate(
-                            QuestionnaireCreateDestination.route
-                        )
-                    },
-                    getUserQuestionnaires = viewModel::tryGetQuestionnairesByUserId,
-                    teammatesUiState = teammatesUiState,
-                    topBar = {
-                        TeammatesTopAppBar(
-                            title = stringResource(QuestionnaireCreateDestination.titleRes),
-                            canNavigateBack = true,
-                            navigateUp = { navController.navigateUp() },
-                        )
-                    }
-                )
-            }
-            composable(QuestionnaireCreateDestination.route) {
-                QuestionnaireCreateScreen(
-                    createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
-                    topBar = {
-                        TeammatesTopAppBar(
-                            title = stringResource(QuestionnaireCreateDestination.titleRes),
-                            canNavigateBack = false
-                        )
-                    }
-                )
-            }
-        }
+        )
     }
 }
 
