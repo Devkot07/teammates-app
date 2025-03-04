@@ -129,6 +129,12 @@ fun TeammatesHomeScreen(
                 navController.navigate(
                     QuestionnaireCreateDestination.route
                 )
+            },
+            navigateToHome = {
+                currentTab = ContentType.Home
+                navController.navigate(HomeDestination.route) {
+                    popUpTo(HomeDestination.route) { inclusive = false }
+                }
             }
         )
     }

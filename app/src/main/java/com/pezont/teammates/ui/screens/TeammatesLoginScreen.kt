@@ -224,6 +224,6 @@ fun tryLogin(
     if (credentials.isNotEmpty()) {
         viewModel.tryLoginWithInfoInTeammates(isOutLog, credentials.login, credentials.pwd)
     } else {
-        Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
     }
 }

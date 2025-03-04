@@ -35,6 +35,7 @@ fun TeammatesNavHost(
     navController: NavHostController,
     paddingValues: PaddingValues,
     navigateToQuestionnaireCreate:() -> Unit,
+    navigateToHome: () -> Unit
 ) {
 
     NavHost(
@@ -71,6 +72,7 @@ fun TeammatesNavHost(
         }
         composable(QuestionnaireCreateDestination.route) {
             QuestionnaireCreateScreen(
+                navigateToHome = navigateToHome,
                 createNewQuestionnaireAction = viewModel::createNewQuestionnaire
             )
         }
@@ -110,20 +112,9 @@ fun TeammatesNavHost(
                 teammatesUiState = teammatesUiState,
                 topBar = {
                     TeammatesTopAppBar(
-                        title = stringResource(QuestionnaireCreateDestination.titleRes),
+                        title = stringResource(UserQuestionnairesDestination.titleRes),
                         canNavigateBack = true,
                         navigateUp = { navController.navigateUp() },
-                    )
-                }
-            )
-        }
-        composable(QuestionnaireCreateDestination.route) {
-            QuestionnaireCreateScreen(
-                createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
-                topBar = {
-                    TeammatesTopAppBar(
-                        title = stringResource(QuestionnaireCreateDestination.titleRes),
-                        canNavigateBack = false
                     )
                 }
             )
