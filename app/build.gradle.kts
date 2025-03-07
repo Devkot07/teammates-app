@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.relay)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -90,6 +92,12 @@ dependencies {
     // JSON serialization
     implementation(libs.jetbrains.kotlinx.serialization.json)
 
+    // Dagger Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    implementation(libs.androidx.hilt.navigation.compose)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -100,5 +108,4 @@ dependencies {
     // Debug dependencies
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
 }

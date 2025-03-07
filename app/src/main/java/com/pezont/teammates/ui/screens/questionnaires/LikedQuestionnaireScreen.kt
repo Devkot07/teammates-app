@@ -2,40 +2,23 @@ package com.pezont.teammates.ui.screens.questionnaires
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
-import com.pezont.teammates.ui.TeammatesTopAppBar
-import com.pezont.teammates.ui.TeammatesUiState
-import com.pezont.teammates.ui.TeammatesViewModel
+import com.pezont.teammates.models.Questionnaire
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,8 +35,8 @@ object LikedQuestionnairesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LikedQuestionnairesScreen(
-    viewModel: TeammatesViewModel,
-    teammatesUiState: TeammatesUiState.Home,
+    likedQuestionnaires: List<Questionnaire>,
+    onRefresh: () -> Unit,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {}
 ) {
@@ -66,7 +49,7 @@ fun LikedQuestionnairesScreen(
         val isRefreshing = remember { mutableStateOf(false) }
         val pagerState = rememberPagerState(
             initialPage = 0,
-            pageCount = { teammatesUiState.likedQuestionnaires.size + 1 })
+            pageCount = { likedQuestionnaires.size + 1 })
         val isLoadingMore = remember { mutableStateOf(false) }
 
         PullToRefreshBox(
@@ -88,7 +71,7 @@ fun LikedQuestionnairesScreen(
             }
         ) {
             QuestionnairesPager(
-                questionnaires = teammatesUiState.likedQuestionnaires,
+                questionnaires = likedQuestionnaires,
                 pagerState = pagerState,
                 lastItem = {
                     Box(
@@ -109,11 +92,11 @@ fun LikedQuestionnairesScreen(
 
 
             LaunchedEffect(pagerState.currentPage) {
-                if (!isLoadingMore.value && pagerState.currentPage == teammatesUiState.likedQuestionnaires.size) {
+                if (!isLoadingMore.value && pagerState.currentPage == likedQuestionnaires.size) {
                     isLoadingMore.value = true
 
                     val newPage =
-                        if (teammatesUiState.likedQuestionnaires.size % 10 == 0) pagerState.currentPage / 10 + 1 else pagerState.currentPage / 10 + 2
+                        if (likedQuestionnaires.size % 10 == 0) pagerState.currentPage / 10 + 1 else pagerState.currentPage / 10 + 2
                     try {
                         //viewModel.tryGetLikedQuestionnaires()
                     } finally {

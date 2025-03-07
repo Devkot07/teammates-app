@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.screens.TeammatesApp
 import com.pezont.teammates.ui.theme.TeammatesTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,10 +28,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val teammatesViewModel: TeammatesViewModel =
-                        viewModel(factory = TeammatesViewModel.Factory)
                     TeammatesApp(
-                        viewModel = teammatesViewModel
                     )
                 }
             }

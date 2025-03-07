@@ -13,9 +13,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.IOException
+import javax.inject.Inject
 
 
-class UserDataRepository(
+class UserDataRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
     private companion object {

@@ -18,7 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
-import com.pezont.teammates.ui.TeammatesUiState
+import com.pezont.teammates.models.Questionnaire
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnairesPager
@@ -37,7 +37,8 @@ object HomeDestination : NavigationDestination {
 @Composable
 fun TeammatesHomeItem(
     viewModel: TeammatesViewModel,
-    teammatesUiState: TeammatesUiState.Home,
+    questionnaires: List<Questionnaire>,
+    onRefresh: () -> Unit,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {}
 ) {
@@ -49,7 +50,7 @@ fun TeammatesHomeItem(
         val isRefreshing = remember { mutableStateOf(false) }
         val pagerState = rememberPagerState(
             initialPage = 0,
-            pageCount = { teammatesUiState.questionnaires.size + 1 })
+            pageCount = { questionnaires.size + 1 })
         val isLoadingMore = remember { mutableStateOf(false) }
 
         PullToRefreshBox(
@@ -61,7 +62,7 @@ fun TeammatesHomeItem(
                     try {
                         delay(1000L)
                         //TODO clear teammatesUiState.questionnaires
-                        viewModel.tryGetQuestionnairesByPageAndGame(teammatesUiState = teammatesUiState)
+                        onRefresh()
                     } finally {
                         withContext(Dispatchers.Main) {
                             isRefreshing.value = false
@@ -72,7 +73,7 @@ fun TeammatesHomeItem(
             }
         ) {
             QuestionnairesPager(
-                questionnaires = teammatesUiState.questionnaires,
+                questionnaires = questionnaires,
                 pagerState = pagerState,
                 lastItem = {
                     Box(
@@ -93,14 +94,13 @@ fun TeammatesHomeItem(
 
 
             LaunchedEffect(pagerState.currentPage) {
-                if (!isLoadingMore.value && pagerState.currentPage == teammatesUiState.questionnaires.size) {
+                if (!isLoadingMore.value && pagerState.currentPage == questionnaires.size) {
                     isLoadingMore.value = true
 
                     val newPage =
-                        if (teammatesUiState.questionnaires.size % 10 == 0) pagerState.currentPage / 10 + 1 else pagerState.currentPage / 10 + 2
+                        if (questionnaires.size % 10 == 0) pagerState.currentPage / 10 + 1 else pagerState.currentPage / 10 + 2
                     try {
-                        viewModel.tryGetQuestionnairesByPageAndGame(
-                            teammatesUiState = teammatesUiState,
+                        viewModel.fetchQuestionnaires(
                             page = newPage
 
                         )

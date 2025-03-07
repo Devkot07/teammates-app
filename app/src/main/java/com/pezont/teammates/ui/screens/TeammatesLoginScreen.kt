@@ -45,7 +45,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.models.Credentials
-import com.pezont.teammates.ui.TeammatesUiState
 import com.pezont.teammates.ui.TeammatesViewModel
 
 @Composable
@@ -153,7 +152,6 @@ fun PasswordField(
 @Composable
 fun LoginScreen(
     viewModel: TeammatesViewModel,
-    teammatesUiState: TeammatesUiState.Login,
     modifier: Modifier = Modifier
 ) {
     var credentials by remember { mutableStateOf(Credentials()) }
@@ -184,7 +182,6 @@ fun LoginScreen(
             onChange = { data -> credentials = credentials.copy(pwd = data) },
             submit = {
                 tryLogin(
-                    teammatesUiState.isLoggedOut,
                     credentials,
                     context,
                     viewModel
@@ -197,7 +194,6 @@ fun LoginScreen(
             onClick = {
                 if (credentials.isNotEmpty()) {
                     tryLogin(
-                        teammatesUiState.isLoggedOut,
                         credentials,
                         context,
                         viewModel
@@ -216,13 +212,12 @@ fun LoginScreen(
 }
 
 fun tryLogin(
-    isOutLog: Boolean,
     credentials: Credentials,
     context: Context,
     viewModel: TeammatesViewModel
 ) {
     if (credentials.isNotEmpty()) {
-        viewModel.tryLoginWithInfoInTeammates(isOutLog, credentials.login, credentials.pwd)
+        viewModel.login( credentials.login, credentials.pwd)
     } else {
         Toast.makeText(context, context.getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
     }

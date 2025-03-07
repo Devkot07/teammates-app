@@ -3,8 +3,11 @@ package com.pezont.teammates.models
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
+@Serializable
 data class LoginAuthRequest(
+    @SerializedName("nickname")
     val nickname: String,
+    @SerializedName("password")
     val password: String,
 )
 @Serializable

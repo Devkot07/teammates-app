@@ -1,48 +1,50 @@
 package com.pezont.teammates.ui
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.pezont.teammates.TeammatesApplication
 import com.pezont.teammates.data.AuthRepository
 import com.pezont.teammates.data.QuestionnairesRepository
 import com.pezont.teammates.data.UserDataRepository
-import com.pezont.teammates.dummy.UserDummy
 import com.pezont.teammates.models.Games
 import com.pezont.teammates.models.Questionnaire
 import com.pezont.teammates.models.User
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.MultipartBody
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
-//TODO Destroy monolith
-class TeammatesViewModel(
-
+@HiltViewModel
+class TeammatesViewModel @Inject constructor(
     private val questionnairesRepository: QuestionnairesRepository,
     private val userDataRepository: UserDataRepository,
-    //private val userDummyRepository: UserDummyRepository,
     private val authRepository: AuthRepository,
+) : ViewModel() {
 
-    ) : ViewModel() {
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _isAuthenticated = MutableStateFlow(false)
+    val isAuthenticated: StateFlow<Boolean> = _isAuthenticated.asStateFlow()
 
-    private val _teammatesUiState: MutableStateFlow<TeammatesUiState> =
-        MutableStateFlow(TeammatesUiState.Loading)
-    val teammatesUiState: StateFlow<TeammatesUiState> = _teammatesUiState.asStateFlow()
+    private val _currentUser = MutableStateFlow(User())
+    val currentUser: StateFlow<User> = _currentUser.asStateFlow()
+
+    private val _questionnaires = MutableStateFlow<List<Questionnaire>>(emptyList())
+    val questionnaires: StateFlow<List<Questionnaire>> = _questionnaires.asStateFlow()
+
+    private val _likedQuestionnaires = MutableStateFlow<List<Questionnaire>>(emptyList())
+    val likedQuestionnaires: StateFlow<List<Questionnaire>> = _likedQuestionnaires.asStateFlow()
+
+    private val _userQuestionnaires = MutableStateFlow<List<Questionnaire>>(emptyList())
+    val userQuestionnaires: StateFlow<List<Questionnaire>> = _userQuestionnaires.asStateFlow()
 
     private val _authToastCode = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
     val authToastCode: SharedFlow<Int?> = _authToastCode
@@ -50,226 +52,135 @@ class TeammatesViewModel(
     private val _questionnairesToastCode = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
     val questionnairesToastCode: SharedFlow<Int?> = _questionnairesToastCode
 
-    private var isInitialized = false
+    private val _errorState = MutableStateFlow(ErrorState())
+    val errorState: StateFlow<ErrorState> = _errorState.asStateFlow()
+
+    data class ErrorState(
+        val isNetworkError: Boolean = false,
+        val errorCode: Int = 0,
+        val errorMessage: String = ""
+    )
 
     init {
         viewModelScope.launch {
-            userDataRepository.user.collect { user ->
+            checkAuthentication()
+        }
+    }
 
-                Log.d(TAG, "publicId: ${user.publicId}")
-                Log.d(TAG, ":====")
-                when (user.publicId) {
-                    null -> _teammatesUiState.value = TeammatesUiState.Login(true)
-                    else -> {
-                        if (!isInitialized) {
-                            _teammatesUiState.value =
-                                TeammatesUiState.Home(
-                                    user = user,
-                                    questionnaires = listOf(),
-                                    likedQuestionnaires = listOf(),
-                                    userQuestionnaires = listOf()
-                                )
-                            isInitialized = true
+    private suspend fun checkAuthentication() {
+        _isLoading.value = true
+        userDataRepository.user.collect { user ->
+            val isLoggedIn = user.publicId != null
+
+            if (isLoggedIn) {
+                _currentUser.value = user
+                _isAuthenticated.value = true
+                fetchQuestionnaires()
+            } else {
+                _isAuthenticated.value = false
+            }
+            _isLoading.value = false
+        }
+    }
+
+    fun login(nickname: String, password: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val authResult = authRepository.login(nickname, password)
+                if (authResult.isSuccess) {
+                    val response = authResult.getOrNull()
+                    response?.let {
+                        userDataRepository.saveAccessToken(it.accessToken)
+                        userDataRepository.saveRefreshToken(it.refreshToken)
+                        userDataRepository.saveUser(it.user)
+                        _currentUser.value = it.user
+                        _isAuthenticated.value = true
+                        _isLoading.value = false
+                    }
+                } else {
+                    handleError(authResult.exceptionOrNull())
+                }
+            } catch (e: Exception) {
+                handleError(e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun fetchQuestionnaires(game: Games? = null, page: Int = 1, limit: Int = 10) {
+        viewModelScope.launch {
+            try {
+                val user = userDataRepository.user.first()
+                if (user.publicId == null) {
+                    _isAuthenticated.value = false
+                    return@launch
+                }
+
+                val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
+                    token = userDataRepository.accessToken.first(),
+                    userId = user.publicId,
+                    page = page,
+                    limit = limit,
+                    game = game,
+                    authorId = null,
+                    questionnaireId = null
+                )
+
+                if (questionnairesResult.isSuccess) {
+                    val response = questionnairesResult.getOrNull()
+                    response?.let {
+                        if (page == 1) {
+                            _questionnaires.value = it
                         } else {
-                            _teammatesUiState.value = TeammatesUiState.Login(false)
-
+                            _questionnaires.value += it
                         }
                     }
+                } else {
+                    handleError(questionnairesResult.exceptionOrNull())
                 }
+            } catch (e: Exception) {
+                handleError(e)
             }
         }
     }
 
-    fun initState() {
-        viewModelScope.launch {
-            _teammatesUiState.value = TeammatesUiState.Loading
-            userDataRepository.user.collect { user ->
-                when (user.publicId) {
-                    null -> _teammatesUiState.value = TeammatesUiState.Login(true)
-                    else -> {
-                        if (!isInitialized) {
-                            _teammatesUiState.value =
-                                TeammatesUiState.Home(
-                                    user = user,
-                                    questionnaires = listOf(),
-                                    likedQuestionnaires = listOf(),
-                                    userQuestionnaires = listOf()
-                                )
-                            isInitialized = true
-                        } else {
-                            _teammatesUiState.value = TeammatesUiState.Login(false)
-                        }
-                    }
-                }
-            }
-        }
+    fun fetchLikedQuestionnaires() {
+        TODO()
     }
 
-    // TODO clear
-    fun tryGetQuestionnairesByPageAndGame(
-        teammatesUiState: TeammatesUiState.Home,
-        game: Games? = null,
-        page: Int = 1,
-        limit: Int = 10
-    ) {
-
+    fun loadUserQuestionnaires() {
         viewModelScope.launch {
-            val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
-                token = userDataRepository.accessToken.first(),
-                userId = userDataRepository.user.first().publicId!!,
-                page = page,
-                limit = limit,
-                game = game,
-                authorId = null,
-                questionnaireId = null
-            )
-            if (questionnairesResult.isSuccess) {
-                val response = questionnairesResult.getOrNull()
-                Log.d(TAG, "Fetched questionnaires: $response")
-
-                response?.let {
-
-                    Log.d(TAG, "Count ${response.size}")
-                    _teammatesUiState.update { currentState ->
-                        when (currentState) {
-                            is TeammatesUiState.Home -> currentState.copy(
-                                user = userDataRepository.user.first(),
-                                questionnaires = teammatesUiState.questionnaires + response,
-                                userQuestionnaires = teammatesUiState.userQuestionnaires,
-                            )
-
-                            else -> currentState
-                        }
-                    }
-                }
-            } else {
-                val error = questionnairesResult.exceptionOrNull()
-                Log.e(TAG, "Failed to fetch questionnaires: $error")
-                when (error) {
-                    is IOException -> {
-                        _teammatesUiState.value = TeammatesUiState.ErrorNetwork
-                    }
-
-                    is HttpException -> {
-                        val incorrectAccessToken = error.code() == 401
-                        Log.e(TAG, "incorrectAccessToken: $incorrectAccessToken")
-                        _teammatesUiState.value =
-                            TeammatesUiState.Login(false, error.code())
-                        _questionnairesToastCode.tryEmit(error.code())
-
-                    }
-
-                    else -> _teammatesUiState.value = TeammatesUiState.Login(false, 0)
-                }
-            }
-        }
-    }
-
-
-    fun tryGetQuestionnairesByUserId(
-        teammatesUiState: TeammatesUiState.Home,
-    ) {
-
-        viewModelScope.launch {
-            val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
-                token = userDataRepository.accessToken.first(),
-                userId = userDataRepository.user.first().publicId!!,
-                page = null,
-                limit = 100,//TODO set const
-                game = null,
-                authorId = userDataRepository.user.first().publicId!!,
-                questionnaireId = null
-            )
-            if (questionnairesResult.isSuccess) {
-                val response = questionnairesResult.getOrNull()
-                Log.d(TAG, "Fetched questionnaires: $response")
-
-                response?.let {
-
-                    Log.d(TAG, "Count ${response.size}")
-                    _teammatesUiState.update { currentState ->
-                        when (currentState) {
-                            is TeammatesUiState.Home -> currentState.copy(
-                                user = userDataRepository.user.first(),
-                                questionnaires = teammatesUiState.questionnaires,
-                                userQuestionnaires = response,
-                            )
-
-                            else -> currentState
-                        }
-                    }
-                }
-            } else {
-                val error = questionnairesResult.exceptionOrNull()
-                Log.e(TAG, "Failed to fetch questionnaires: $error")
-                when (error) {
-                    is IOException -> {
-                        _teammatesUiState.value = TeammatesUiState.ErrorNetwork
-                    }
-
-                    is HttpException -> {
-                        val incorrectAccessToken = error.code() == 401
-                        Log.e(TAG, "incorrectAccessToken: $incorrectAccessToken")
-                        _teammatesUiState.value =
-                            TeammatesUiState.Login(false, error.code())
-                        _authToastCode.tryEmit(error.code())
-
-                    }
-
-                    else -> _teammatesUiState.value = TeammatesUiState.Login(false, 0)
-                }
-            }
-        }
-    }
-
-
-    fun tryLoginWithInfoInTeammates(isLoggedOut: Boolean, nickname: String, password: String) {
-        viewModelScope.launch {
-            Log.d(TAG, "user: $isLoggedOut")
-            _teammatesUiState.value = TeammatesUiState.Loading
-            val authResult = authRepository.login(nickname, password)
-            if (authResult.isSuccess) {
-                val response = authResult.getOrNull()
-                Log.d(TAG, "accessToken: ${response?.accessToken}")
-                Log.d(TAG, "refreshToken: ${response?.refreshToken}")
-                Log.d(TAG, "user: ${response?.user}")
-
-                response?.let {
-                    it.accessToken.let { accessToken ->
-                        Log.i(TAG, accessToken)
-                        userDataRepository.saveAccessToken(accessToken)
-                    }
-                    it.refreshToken.let { refreshToken ->
-                        Log.i(TAG, refreshToken)
-                        userDataRepository.saveRefreshToken(refreshToken)
-                    }
-                    it.user.let { user -> userDataRepository.saveUser(user) }
+            try {
+                val user = userDataRepository.user.first()
+                if (user.publicId == null) {
+                    _isAuthenticated.value = false
+                    return@launch
                 }
 
-                _teammatesUiState.value = TeammatesUiState.Home(
-                    user = userDataRepository.user.first(),
-                    questionnaires = listOf(),
-                    likedQuestionnaires = listOf(),
-                    userQuestionnaires = listOf(),
+                val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
+                    token = userDataRepository.accessToken.first(),
+                    userId = user.publicId,
+                    page = null,
+                    limit = 100,
+                    game = null,
+                    authorId = user.publicId,
+                    questionnaireId = null
+                )
 
-                    )
-
-
-            } else {
-                val error = authResult.exceptionOrNull()
-                Log.e(TAG, "Login failed: $error")
-                when (error) {
-                    is IOException -> {
-                        _teammatesUiState.value = TeammatesUiState.ErrorNetwork
+                if (questionnairesResult.isSuccess) {
+                    val response = questionnairesResult.getOrNull()
+                    response?.let {
+                        _userQuestionnaires.value = it
                     }
-
-                    is HttpException -> {
-                        _teammatesUiState.value = TeammatesUiState.Login(false, error.code())
-                        _authToastCode.tryEmit(error.code())
-                    }
-
-                    else -> _teammatesUiState.value = TeammatesUiState.Login(false, 0)
+                } else {
+                    handleError(questionnairesResult.exceptionOrNull())
                 }
+            } catch (e: Exception) {
+                handleError(e)
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -281,80 +192,87 @@ class TeammatesViewModel(
         image: MultipartBody.Part?
     ) {
         viewModelScope.launch {
-            Log.d(TAG, userDataRepository.accessToken.first())
-            val createQuestionnaireResult = questionnairesRepository.createQuestionnaire(
-                token = userDataRepository.accessToken.first(),
-                header = header,
-                game = selectedGame,
-                description = description,
-                authorId = userDataRepository.user.first().publicId!!,
-                image = image,
-            )
-            Log.d(TAG, "$createQuestionnaireResult")
-            if (createQuestionnaireResult.isSuccess) {
-                TODO("Send Toast")
+            _isLoading.value = true
+            try {
+                val user = userDataRepository.user.first()
+                if (user.publicId == null) {
+                    _isAuthenticated.value = false
+                    return@launch
+                }
 
+                val createQuestionnaireResult = questionnairesRepository.createQuestionnaire(
+                    token = userDataRepository.accessToken.first(),
+                    header = header,
+                    game = selectedGame,
+                    description = description,
+                    authorId = user.publicId,
+                    image = image,
+                )
+
+                if (createQuestionnaireResult.isSuccess) {
+                    // Implement success handling
+                    // Refresh user questionnaires
+                    loadUserQuestionnaires()
+                    _questionnairesToastCode.tryEmit(200) // Success toast
+                } else {
+                    handleError(createQuestionnaireResult.exceptionOrNull())
+                }
+            } catch (e: Exception) {
+                handleError(e)
+            } finally {
+                _isLoading.value = false
             }
-
         }
     }
 
-
-
-    fun clearUserData() {
+    fun logout() {
         viewModelScope.launch {
-            Log.e(TAG, "cleaning")
-            withContext(Dispatchers.IO) {
-                userDataRepository.saveAccessToken("-1")
-                userDataRepository.saveRefreshToken("-1")
-                userDataRepository.saveUser(User())
-            }
-            _teammatesUiState.value = TeammatesUiState.Login(true, 1)
-            _authToastCode.tryEmit(1)
+            userDataRepository.saveAccessToken("")
+            userDataRepository.saveRefreshToken("")
+            userDataRepository.saveUser(User())
+            _currentUser.value = User()
+            _isAuthenticated.value = false
+            _questionnaires.value = emptyList()
+            _likedQuestionnaires.value = emptyList()
+            _userQuestionnaires.value = emptyList()
+            _authToastCode.tryEmit(1) // Logout toast
         }
     }
 
+    fun clearError() {
+        _errorState.value = ErrorState()
+    }
 
-    companion object {
-        const val TAG: String = "ViewModel"
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[APPLICATION_KEY] as TeammatesApplication)
-                TeammatesViewModel(
-                    application.container.questionnairesRepository,
-                    application.userDataRepository,
-                    //application.container.userDummyRepository,
-                    application.container.authRepository
-
+    private fun handleError(error: Throwable?) {
+        when (error) {
+            is IOException -> {
+                _errorState.value = ErrorState(
+                    isNetworkError = true,
+                    errorMessage = "Network error. Please check your connection."
+                )
+            }
+            is HttpException -> {
+                val errorCode = error.code()
+                if (errorCode == 401) {
+                    _isAuthenticated.value = false
+                    _authToastCode.tryEmit(errorCode)
+                } else {
+                    _errorState.value = ErrorState(
+                        errorCode = errorCode,
+                        errorMessage = "Server error: ${error.message()}"
+                    )
+                    _questionnairesToastCode.tryEmit(errorCode)
+                }
+            }
+            else -> {
+                _errorState.value = ErrorState(
+                    errorMessage = "Unknown error occurred: ${error?.message}"
                 )
             }
         }
     }
-}
 
-
-sealed interface TeammatesUiState {
-
-    data object Loading : TeammatesUiState
-
-    data class Login(
-        val isLoggedOut: Boolean,
-        val statusResponse: Int = 0,
-    ) : TeammatesUiState
-
-    data class Error(
-        val statusResponse: Int
-    ) : TeammatesUiState
-
-    data class Home(
-        val userDummy: UserDummy = UserDummy(),
-        val user: User,
-        var questionnaires: List<Questionnaire>,
-        var likedQuestionnaires: List<Questionnaire>,
-        val userQuestionnaires: List<Questionnaire>,
-    ) : TeammatesUiState
-
-    data object ErrorNetwork : TeammatesUiState
-
-
+    companion object {
+        const val TAG: String = "ViewModel"
+    }
 }
