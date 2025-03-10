@@ -1,12 +1,21 @@
 package com.pezont.teammates.ui.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Drafts
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -14,12 +23,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.pezont.teammates.R
+import com.pezont.teammates.models.ContentType
+import com.pezont.teammates.models.NavigationItemContent
+import com.pezont.teammates.ui.TeammatesBackHandler
 import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.items.HomeDestination
+import com.pezont.teammates.ui.items.LoadingDestination
 import com.pezont.teammates.ui.items.TeammatesHomeItem
 import com.pezont.teammates.ui.items.TeammatesLoadingItem
+import com.pezont.teammates.ui.screens.ErrorDestination
 import com.pezont.teammates.ui.screens.ErrorScreen
+import com.pezont.teammates.ui.screens.LoginDestination
 import com.pezont.teammates.ui.screens.LoginScreen
 import com.pezont.teammates.ui.screens.ProfileDestination
 import com.pezont.teammates.ui.screens.ProfileScreen
@@ -29,6 +45,9 @@ import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateDestina
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateScreen
 import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesDestination
 import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesScreen
+import com.pezont.teammates.ui.sendAuthToast
+import com.pezont.teammates.ui.sendQuestionnairesToast
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -41,22 +60,21 @@ fun TeammatesNavGraph(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-//    LaunchedEffect(Unit) {
-//        launch {
-//            viewModel.authToastCode.collect { code ->
-//                code?.let { sendAuthToast(it, context) }
-//            }
-//        }
-//        launch {
-//            viewModel.questionnairesToastCode.collect { code ->
-//                code?.let { sendQuestionnairesToast(it, context) }
-//            }
-//        }
-//    }
+    LaunchedEffect(Unit) {
+        launch {
+            viewModel.authToastCode.collect { code ->
+                code?.let { sendAuthToast(it, context) }
+            }
+        }
+        launch {
+            viewModel.questionnairesToastCode.collect { code ->
+                code?.let { sendQuestionnairesToast(it, context) }
+            }
+        }
+    }
 
-    val isAuthenticated by viewModel.isAuthenticated.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val errorState by viewModel.errorState.collectAsState()
+    val teammatesAppState by viewModel.teammatesAppState.collectAsState()
+
 
     var currentTab by remember { mutableStateOf(ContentType.Home) }
 
@@ -68,17 +86,21 @@ fun TeammatesNavGraph(
             teammatesAppState.errorState.isNetworkError -> {
                 navController.navigate(ErrorDestination.route)
             }
-        }
-    }
-
-    LaunchedEffect(isAuthenticated) {
-        if (!isAuthenticated) {
-            navController.navigate(Routes.LOGIN) {
-                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            teammatesAppState.errorState.errorCode != 0 -> {
+                navController.navigate(ErrorDestination.route)
             }
-        } else if (navController.currentDestination?.route == Routes.LOGIN) {
-            navController.navigate(Routes.HOME) {
-                popUpTo(Routes.LOGIN) { inclusive = true }
+            teammatesAppState.isLoading -> {
+                navController.navigate(LoadingDestination.route)
+            }
+            !teammatesAppState.isAuthenticated -> {
+                navController.navigate(LoginDestination.route) {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
+            }
+            teammatesAppState.isAuthenticated && navController.currentDestination?.route == LoginDestination.route -> {
+                navController.navigate(HomeDestination.route) {
+                    popUpTo(LoginDestination.route) { inclusive = true }
+                }
             }
         }
     }
@@ -86,31 +108,33 @@ fun TeammatesNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = when {
-            isLoading -> Routes.LOADING
-            !isAuthenticated -> Routes.LOGIN
-            else -> Routes.HOME
+        startDestination = when  {
+            teammatesAppState.isLoading -> LoadingDestination.route
+            teammatesAppState.isAuthenticated -> LoginDestination.route
+            else -> HomeDestination.route
         },
 
         modifier = Modifier.padding(paddingValues),
 //        enterTransition = { fadeIn(animationSpec = tween(500)) },
 //        exitTransition = { fadeOut(animationSpec = tween(500)) },
     ) {
-        composable(Routes.LOADING) {
+        composable(LoadingDestination.route) {
             TeammatesLoadingItem()
         }
 
-        composable(Routes.LOGIN) {
+        composable(LoginDestination.route) {
             LoginScreen(viewModel)
         }
 
-        composable(Routes.ERROR) {
+        composable(ErrorDestination.route) {
             ErrorScreen(onClick = {
                 viewModel.clearError()
-                navController.navigate(Routes.HOME) {
-                    popUpTo(Routes.ERROR) { inclusive = true }
+                navController.navigate(HomeDestination.route) {
+                    popUpTo(ErrorDestination.route) { inclusive = true }
                 }
-            })
+            },
+                errorText = teammatesAppState.errorState.errorMessage
+                )
         }
 
         composable(HomeDestination.route) {
@@ -137,7 +161,8 @@ fun TeammatesNavGraph(
         }
 
         composable(LikedQuestionnairesDestination.route) {
-            val likedQuestionnaires by viewModel.likedQuestionnaires.collectAsState()
+            onTabChange(ContentType.Liked)
+            val likedQuestionnaires = teammatesAppState.likedQuestionnaires
 
             LikedQuestionnairesScreen(
                 likedQuestionnaires = likedQuestionnaires,
@@ -182,7 +207,8 @@ fun TeammatesNavGraph(
         }
 
         composable(ProfileDestination.route) {
-            val user by viewModel.currentUser.collectAsState()
+            onTabChange(ContentType.Profile)
+            val user = teammatesAppState.currentUser
 
             ProfileScreen(
                 navigateToMyQuestionnaires = {
@@ -191,7 +217,7 @@ fun TeammatesNavGraph(
                 },
                 logout = {
                     viewModel.logout()
-                    navController.navigate(Routes.LOGIN) {
+                    navController.navigate(LoginDestination.route) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 },
@@ -212,7 +238,7 @@ fun TeammatesNavGraph(
         }
 
         composable(UserQuestionnairesDestination.route) {
-            val userQuestionnaires by viewModel.userQuestionnaires.collectAsState()
+            val userQuestionnaires = teammatesAppState.userQuestionnaires
 
             UserQuestionnairesScreen(
                 navigateToQuestionnaireCreate = {

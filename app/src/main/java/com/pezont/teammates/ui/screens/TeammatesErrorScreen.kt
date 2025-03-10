@@ -29,7 +29,10 @@ object ErrorDestination : NavigationDestination {
 
 //TODO error Screen
 @Composable
-fun ErrorScreen(onClick: () -> Unit) {
+fun ErrorScreen(
+    onClick: () -> Unit,
+    errorText: String = ""
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -45,7 +48,7 @@ fun ErrorScreen(onClick: () -> Unit) {
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = stringResource(R.string.error),
+                text = "${stringResource(R.string.error)} $errorText",
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.Red
             )
