@@ -33,6 +33,7 @@ import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesScreen
 
 @Composable
 fun TeammatesNavGraph(
+    onTabChange: (ContentType) -> Unit,
     navController: NavHostController,
     viewModel: TeammatesViewModel = hiltViewModel(),
     paddingValues: PaddingValues,
@@ -57,18 +58,15 @@ fun TeammatesNavGraph(
     val isLoading by viewModel.isLoading.collectAsState()
     val errorState by viewModel.errorState.collectAsState()
 
-    LaunchedEffect(errorState) {
-        if (errorState.isNetworkError) {
-            navController.navigate(Routes.ERROR) {
-                popUpTo(Routes.HOME) { inclusive = true }
-            }
-        }
-    }
+    var currentTab by remember { mutableStateOf(ContentType.Home) }
 
-    LaunchedEffect(isLoading) {
-        if (isLoading) {
-            navController.navigate(Routes.LOADING) {
-                popUpTo(Routes.LOADING) { inclusive = true }
+    val currentRoute =
+        navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry).value?.destination?.route
+
+    LaunchedEffect(teammatesAppState) {
+        when {
+            teammatesAppState.errorState.isNetworkError -> {
+                navController.navigate(ErrorDestination.route)
             }
         }
     }
@@ -116,7 +114,8 @@ fun TeammatesNavGraph(
         }
 
         composable(HomeDestination.route) {
-            val questionnaires by viewModel.questionnaires.collectAsState()
+            onTabChange(ContentType.Home)
+            val questionnaires = teammatesAppState.questionnaires
 
             TeammatesHomeItem(
                 viewModel = viewModel,
@@ -128,6 +127,12 @@ fun TeammatesNavGraph(
                         canNavigateBack = false,
                     )
                 }
+            )
+            TeammatesBackHandler(
+                currentRoute = currentRoute,
+                onTabChange = { currentTab = it },
+                navController = navController,
+                context = context
             )
         }
 
@@ -144,9 +149,16 @@ fun TeammatesNavGraph(
                     )
                 }
             )
+            TeammatesBackHandler(
+                currentRoute = currentRoute,
+                onTabChange = { currentTab = it },
+                navController = navController,
+                context = context
+            )
         }
 
         composable(QuestionnaireCreateDestination.route) {
+            onTabChange(ContentType.Create)
             QuestionnaireCreateScreen(
                 navigateToHome = {
                     navController.navigate(HomeDestination.route) {
@@ -160,6 +172,12 @@ fun TeammatesNavGraph(
                         canNavigateBack = false,
                     )
                 }
+            )
+            TeammatesBackHandler(
+                currentRoute = currentRoute,
+                onTabChange = { currentTab = it },
+                navController = navController,
+                context = context
             )
         }
 
@@ -185,6 +203,12 @@ fun TeammatesNavGraph(
                     )
                 }
             )
+            TeammatesBackHandler(
+                currentRoute = currentRoute,
+                onTabChange = { currentTab = it },
+                navController = navController,
+                context = context
+            )
         }
 
         composable(UserQuestionnairesDestination.route) {
@@ -204,6 +228,12 @@ fun TeammatesNavGraph(
                         navigateUp = { navController.navigateUp() },
                     )
                 }
+            )
+            TeammatesBackHandler(
+                currentRoute = currentRoute,
+                onTabChange = { currentTab = it },
+                navController = navController,
+                context = context
             )
         }
     }

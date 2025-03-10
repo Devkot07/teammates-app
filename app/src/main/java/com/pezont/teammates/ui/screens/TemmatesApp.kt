@@ -26,7 +26,6 @@ import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesBottomNavigationBar
 import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.models.NavigationItemContent
-import com.pezont.teammates.ui.TeammatesBackHandler
 import com.pezont.teammates.ui.items.HomeDestination
 import com.pezont.teammates.ui.navigation.TeammatesNavGraph
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesDestination
@@ -109,13 +108,8 @@ fun TeammatesApp() {
         modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars)
     ) { paddingValues ->
 
-        TeammatesBackHandler(
-            currentRoute = currentRoute,
-            onTabChange = { currentTab = it },
-            navController = navController,
-            context = context
-        )
         TeammatesNavGraph(
+            onTabChange = { currentTab = it },
             navController = navController,
             paddingValues = paddingValues
         )
