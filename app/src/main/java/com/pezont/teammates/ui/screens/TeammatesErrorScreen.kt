@@ -20,7 +20,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
+import com.pezont.teammates.ui.navigation.NavigationDestination
 
+object ErrorDestination : NavigationDestination {
+    override val route = "error"
+    override val titleRes = R.string.error
+}
+
+//TODO error Screen
 @Composable
 fun ErrorScreen(onClick: () -> Unit) {
     Box(

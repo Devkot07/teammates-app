@@ -22,4 +22,5 @@
     <string name="header" translatable="false">Header</string>
     <string name="fill_all_fields">Fill all fields</string>
     <string name="select_game">Select game</string>
+    <string name="login">Login</string>
 </resources>

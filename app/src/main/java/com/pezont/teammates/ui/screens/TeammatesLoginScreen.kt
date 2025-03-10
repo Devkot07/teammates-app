@@ -46,6 +46,12 @@ import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.models.Credentials
 import com.pezont.teammates.ui.TeammatesViewModel
+import com.pezont.teammates.ui.navigation.NavigationDestination
+
+object LoginDestination : NavigationDestination {
+    override val route = "login"
+    override val titleRes = R.string.login
+}
 
 @Composable
 fun LabeledCheckbox(

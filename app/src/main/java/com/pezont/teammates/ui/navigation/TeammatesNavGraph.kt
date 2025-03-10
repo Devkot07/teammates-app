@@ -238,11 +238,3 @@ fun TeammatesNavGraph(
         }
     }
 }
-
-//TODO routes
-object Routes {
-    const val LOGIN = "login"
-    const val HOME = "home"
-    const val ERROR = "error"
-    const val LOADING = "loading"
-}
