@@ -18,6 +18,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
+import com.pezont.teammates.ui.navigation.NavigationDestination
+
+object LoadingDestination : NavigationDestination {
+    override val route = "loading"
+    override val titleRes = R.string.loading
+}
 
 @Composable
 fun TeammatesLoadingItem() {

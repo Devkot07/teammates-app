@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pezont.teammates.R
-import com.pezont.teammates.models.User
+import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.theme.TeammatesTheme
 
 @Composable
@@ -57,12 +57,12 @@ fun TeammatesProfile(
             .padding(paddingValues),
 
 
-    ) {
+        ) {
         Column(
             modifier = Modifier.padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.Top,
 
-        ) {
+            ) {
             Spacer(modifier = Modifier.height(10.dp))
             ProfileSection(
                 nickname = nickname,

@@ -3,7 +3,7 @@ package com.pezont.teammates.ui.screens
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import com.pezont.teammates.R
-import com.pezont.teammates.models.User
+import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.items.TeammatesProfile
 import com.pezont.teammates.ui.navigation.NavigationDestination
 
@@ -23,16 +23,9 @@ fun ProfileScreen(
         topBar = topBar,
     ) { paddingValues ->
         TeammatesProfile(
-            navigateToMyQuestionnaires,
-            logout,
-            user,
-            paddingValues
+            navigateToMyQuestionnaires, logout, user, paddingValues
         )
-
-
     }
-
-
 }
 
 

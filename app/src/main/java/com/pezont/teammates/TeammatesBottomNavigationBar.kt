@@ -1,8 +1,6 @@
 package com.pezont.teammates
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -11,13 +9,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pezont.teammates.models.ContentType
-import com.pezont.teammates.models.NavigationItemContent
+import com.pezont.teammates.domain.model.BottomNavItem
+import com.pezont.teammates.ui.screens.NavigationItemContent
 
 @Composable
 fun TeammatesBottomNavigationBar(
-    currentTab: ContentType,
-    onTabPressed: ((ContentType) -> Unit),
+    currentTab: BottomNavItem,
+    onTabPressed: ((BottomNavItem) -> Unit),
     navigationItemContentList: List<NavigationItemContent>,
     modifier: Modifier = Modifier
 ) {
@@ -31,8 +29,8 @@ fun TeammatesBottomNavigationBar(
         ) {
             for (navItem in navigationItemContentList) {
                 NavigationBarItem(
-                    selected = currentTab == navItem.contentType,
-                    onClick = { onTabPressed(navItem.contentType) },
+                    selected = currentTab == navItem.bottomNavItem,
+                    onClick = { onTabPressed(navItem.bottomNavItem) },
                     icon = {
                         Icon(
                             imageVector = navItem.icon,

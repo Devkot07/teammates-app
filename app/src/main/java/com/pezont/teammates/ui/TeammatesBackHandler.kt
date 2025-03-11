@@ -5,8 +5,8 @@ import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.pezont.teammates.models.ContentType
-import com.pezont.teammates.ui.screens.HomeDestination
+import com.pezont.teammates.domain.model.BottomNavItem
+import com.pezont.teammates.ui.items.HomeDestination
 import com.pezont.teammates.ui.screens.ProfileDestination
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesDestination
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateDestination
@@ -15,7 +15,7 @@ import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesDestinat
 @Composable
 fun TeammatesBackHandler(
     currentRoute: String?,
-    onTabChange: (ContentType) -> Unit,
+    onTabChange: (BottomNavItem) -> Unit,
     navController: NavController,
     context: Context
 ) {
@@ -30,7 +30,7 @@ fun TeammatesBackHandler(
         when (currentRoute) {
             homeRoute -> context.findActivity()?.finish()
             in bottomNavigationTabs -> {
-                onTabChange(ContentType.Home)
+                onTabChange(BottomNavItem.HOME)
                 navController.navigate(homeRoute) {
                     popUpTo(homeRoute) { inclusive = false }
                 }

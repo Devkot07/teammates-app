@@ -5,7 +5,7 @@
     <string name="authorization_error_incorrect_login_or_password">Authorization error : Incorrect login or password</string>
     <string name="authorization_error_authorization_failed">Authorization error : Authorization failed</string>
     <string name="logout">Logout</string>
-    <string name="error">Error : </string>
+    <string name="error">Error</string>
     <string name="loading">Loading</string>
     <string name="please_wait">Please Wait</string>
     <string name="no_internet_connection">No Internet Connection</string>
@@ -19,5 +19,8 @@
     <string name="back">Back</string>
     <string name="entry_information">Entry Information</string>
     <string name="create">Create</string>
-    <string name="description">Description</string>
+    <string name="description">Description</string><string name="fill_all_fields">Fill all fields</string>
+    <string name="select_game">Select game</string>
+    <string name="login">Login</string>
+    <string name="something_don_t_work_that_s_all_we_known">Something don\'t work. That\'s all we known</string>
 </resources>

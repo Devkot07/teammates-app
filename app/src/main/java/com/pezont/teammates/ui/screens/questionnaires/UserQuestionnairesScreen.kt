@@ -24,7 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
-import com.pezont.teammates.ui.TeammatesUiState
+import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.items.TeammatesLoadingItem
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import kotlinx.coroutines.CoroutineScope
@@ -41,12 +41,12 @@ object UserQuestionnairesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserQuestionnairesScreen(
+    userQuestionnaires: List<Questionnaire>,
+    onRefresh: () -> Unit,
     navigateToQuestionnaireCreate: () -> Unit,
-    getUserQuestionnaires: (teammatesUiState: TeammatesUiState.Home) -> Unit,
     topBar: @Composable () -> Unit = {},
 
-    teammatesUiState: TeammatesUiState.Home,
-) {
+    ) {
 
     Scaffold(
         topBar = topBar
@@ -55,7 +55,7 @@ fun UserQuestionnairesScreen(
         val isRefreshing = remember { mutableStateOf(false) }
         val pagerState = rememberPagerState(
             initialPage = 0,
-            pageCount = { teammatesUiState.userQuestionnaires.size + 1 })
+            pageCount = { userQuestionnaires.size + 1 })
 
         PullToRefreshBox(
             modifier = Modifier.padding(innerPadding),
@@ -65,7 +65,7 @@ fun UserQuestionnairesScreen(
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         delay(1000L)
-                        getUserQuestionnaires(teammatesUiState)
+                        onRefresh()
                     } finally {
                         withContext(Dispatchers.Main) {
                             isRefreshing.value = false
@@ -76,10 +76,10 @@ fun UserQuestionnairesScreen(
             }
         ) {
             QuestionnairesPager(
-                questionnaires = teammatesUiState.userQuestionnaires,
+                questionnaires = userQuestionnaires,
                 pagerState = pagerState,
                 lastItem = {
-                    if (teammatesUiState.userQuestionnaires.isEmpty()) {
+                    if (userQuestionnaires.isEmpty()) {
                         TeammatesLoadingItem()
                     } else {
                         CreateButton(navigateToQuestionnaireCreate)

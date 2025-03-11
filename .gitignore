@@ -26,3 +26,4 @@ output.json
 .externalNativeBuild
 .cxx
 gradle.properties
+/.kotlin/
