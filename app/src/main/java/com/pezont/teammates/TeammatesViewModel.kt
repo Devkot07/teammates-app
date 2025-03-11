@@ -1,13 +1,13 @@
-package com.pezont.teammates.ui
+package com.pezont.teammates
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pezont.teammates.data.AuthRepository
-import com.pezont.teammates.data.QuestionnairesRepository
 import com.pezont.teammates.data.UserDataRepository
-import com.pezont.teammates.models.Games
-import com.pezont.teammates.models.Questionnaire
-import com.pezont.teammates.models.User
+import com.pezont.teammates.domain.model.Games
+import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.domain.model.User
+import com.pezont.teammates.domain.repository.AuthRepository
+import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -96,29 +96,29 @@ class TeammatesViewModel @Inject constructor(
                 if (user.publicId == null) {
                     _teammatesAppState.update { it.copy(isAuthenticated = false) }
                     return@launch
-                }
-
-                val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
-                    token = userDataRepository.accessToken.first(),
-                    userId = user.publicId,
-                    page = page,
-                    limit = limit,
-                    game = game,
-                    authorId = null,
-                    questionnaireId = null
-                )
-
-                if (questionnairesResult.isSuccess) {
-                    val response = questionnairesResult.getOrNull()
-                    response?.let { newQuestionnaires ->
-                        if (page == 1) {
-                            _teammatesAppState.update { it.copy(questionnaires = newQuestionnaires) }
-                        } else {
-                            _teammatesAppState.update { it.copy(questionnaires = teammatesAppState.value.questionnaires + newQuestionnaires) }
-                        }
-                    }
                 } else {
-                    handleError(questionnairesResult.exceptionOrNull())
+                    val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
+                        token = userDataRepository.accessToken.first(),
+                        userId = user.publicId!!,
+                        page = page,
+                        limit = limit,
+                        game = game,
+                        authorId = null,
+                        questionnaireId = null
+                    )
+
+                    if (questionnairesResult.isSuccess) {
+                        val response = questionnairesResult.getOrNull()
+                        response?.let { newQuestionnaires ->
+                            if (page == 1) {
+                                _teammatesAppState.update { it.copy(questionnaires = newQuestionnaires) }
+                            } else {
+                                _teammatesAppState.update { it.copy(questionnaires = teammatesAppState.value.questionnaires + newQuestionnaires) }
+                            }
+                        }
+                    } else {
+                        handleError(questionnairesResult.exceptionOrNull())
+                    }
                 }
             } catch (e: Exception) {
                 handleError(e)
@@ -137,25 +137,26 @@ class TeammatesViewModel @Inject constructor(
                 if (user.publicId == null) {
                     _teammatesAppState.update { it.copy(isAuthenticated = false) }
                     return@launch
-                }
-
-                val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
-                    token = userDataRepository.accessToken.first(),
-                    userId = user.publicId,
-                    page = null,
-                    limit = 100,
-                    game = null,
-                    authorId = user.publicId,
-                    questionnaireId = null
-                )
-
-                if (questionnairesResult.isSuccess) {
-                    val response = questionnairesResult.getOrNull()
-                    response?.let {
-                        _teammatesAppState.update { state -> state.copy(userQuestionnaires = it) }
-                    }
                 } else {
-                    handleError(questionnairesResult.exceptionOrNull())
+
+                    val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
+                        token = userDataRepository.accessToken.first(),
+                        userId = user.publicId!!,
+                        page = null,
+                        limit = 100,
+                        game = null,
+                        authorId = user.publicId,
+                        questionnaireId = null
+                    )
+
+                    if (questionnairesResult.isSuccess) {
+                        val response = questionnairesResult.getOrNull()
+                        response?.let {
+                            _teammatesAppState.update { state -> state.copy(userQuestionnaires = it) }
+                        }
+                    } else {
+                        handleError(questionnairesResult.exceptionOrNull())
+                    }
                 }
             } catch (e: Exception) {
                 handleError(e)
@@ -179,22 +180,22 @@ class TeammatesViewModel @Inject constructor(
                 if (user.publicId == null) {
                     _teammatesAppState.update { it.copy(isAuthenticated = false) }
                     return@launch
-                }
-
-                val createQuestionnaireResult = questionnairesRepository.createQuestionnaire(
-                    token = userDataRepository.accessToken.first(),
-                    header = header,
-                    game = selectedGame,
-                    description = description,
-                    authorId = user.publicId,
-                    image = image,
-                )
-
-                if (createQuestionnaireResult.isSuccess) {
-                    loadUserQuestionnaires()
-                    _questionnairesToastCode.tryEmit(200)
                 } else {
-                    handleError(createQuestionnaireResult.exceptionOrNull())
+                    val createQuestionnaireResult = questionnairesRepository.createQuestionnaire(
+                        token = userDataRepository.accessToken.first(),
+                        header = header,
+                        game = selectedGame,
+                        description = description,
+                        authorId = user.publicId!!,
+                        image = image,
+                    )
+
+                    if (createQuestionnaireResult.isSuccess) {
+                        loadUserQuestionnaires()
+                        _questionnairesToastCode.tryEmit(200)
+                    } else {
+                        handleError(createQuestionnaireResult.exceptionOrNull())
+                    }
                 }
             } catch (e: Exception) {
                 handleError(e)
@@ -279,7 +280,7 @@ data class TeammatesUiState(
 data class ErrorState(
     val isNetworkError: Boolean = false,
     val errorCode: Int = 0,
-    val errorMessage: String = ""
+    val errorMessage: String? = null
 )
 
 sealed class UiEvent {

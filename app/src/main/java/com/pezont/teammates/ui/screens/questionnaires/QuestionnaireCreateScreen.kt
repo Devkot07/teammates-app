@@ -51,8 +51,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pezont.teammates.R
-import com.pezont.teammates.models.Games
-import com.pezont.teammates.models.QuestionnaireForm
+import com.pezont.teammates.domain.model.Games
+import com.pezont.teammates.domain.model.QuestionnaireForm
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.theme.TeammatesTheme
 import okhttp3.MediaType.Companion.toMediaTypeOrNull

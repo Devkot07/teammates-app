@@ -44,9 +44,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
-import com.pezont.teammates.models.ContentType
-import com.pezont.teammates.models.Credentials
-import com.pezont.teammates.ui.TeammatesViewModel
+import com.pezont.teammates.TeammatesViewModel
+import com.pezont.teammates.domain.model.BottomNavItem
+import com.pezont.teammates.domain.model.Credentials
 import com.pezont.teammates.ui.navigation.NavigationDestination
 
 object LoginDestination : NavigationDestination {
@@ -56,9 +56,7 @@ object LoginDestination : NavigationDestination {
 
 @Composable
 fun LabeledCheckbox(
-    label: String,
-    onCheckChanged: () -> Unit,
-    isChecked: Boolean
+    label: String, onCheckChanged: () -> Unit, isChecked: Boolean
 ) {
 
     Row(
@@ -84,21 +82,16 @@ fun LoginField(
     val focusManager = LocalFocusManager.current
     val leadingIcon = @Composable {
         Icon(
-            Icons.Default.Person,
-            contentDescription = "",
-            tint = MaterialTheme.colorScheme.primary
+            Icons.Default.Person, contentDescription = "", tint = MaterialTheme.colorScheme.primary
         )
     }
 
-    TextField(
-        leadingIcon = leadingIcon,
+    TextField(leadingIcon = leadingIcon,
         value = value,
         onValueChange = onChange,
         modifier = modifier,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        keyboardActions = KeyboardActions(
-            onNext = { focusManager.moveFocus(FocusDirection.Down) }
-        ),
+        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
         placeholder = { Text(placeholder) },
         label = { Text(label) },
         singleLine = true,
@@ -120,9 +113,7 @@ fun PasswordField(
 
     val leadingIcon = @Composable {
         Icon(
-            Icons.Default.Key,
-            contentDescription = "",
-            tint = MaterialTheme.colorScheme.primary
+            Icons.Default.Key, contentDescription = "", tint = MaterialTheme.colorScheme.primary
         )
     }
     val trailingIcon = @Composable {
@@ -136,18 +127,14 @@ fun PasswordField(
     }
 
 
-    TextField(
-        value = value,
+    TextField(value = value,
         onValueChange = onChange,
         modifier = modifier,
         trailingIcon = trailingIcon,
         keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Password
+            imeAction = ImeAction.Done, keyboardType = KeyboardType.Password
         ),
-        keyboardActions = KeyboardActions(
-            onDone = { submit() }
-        ),
+        keyboardActions = KeyboardActions(onDone = { submit() }),
         placeholder = { Text(placeholder) },
         label = { Text(label) },
         singleLine = true,
@@ -158,7 +145,7 @@ fun PasswordField(
 
 @Composable
 fun LoginScreen(
-    onTabChange: (ContentType) -> Unit,
+    onTabChange: (BottomNavItem) -> Unit,
     viewModel: TeammatesViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -190,10 +177,7 @@ fun LoginScreen(
             onChange = { data -> credentials = credentials.copy(pwd = data) },
             submit = {
                 tryLogin(
-                    onTabChange,
-                    credentials,
-                    context,
-                    viewModel
+                    onTabChange, credentials, context, viewModel
                 )
             },
             modifier = Modifier.wrapContentWidth(Alignment.CenterHorizontally)
@@ -203,10 +187,7 @@ fun LoginScreen(
             onClick = {
                 if (credentials.isNotEmpty()) {
                     tryLogin(
-                        onTabChange,
-                        credentials,
-                        context,
-                        viewModel
+                        onTabChange, credentials, context, viewModel
                     )
                 } else {
                     Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
@@ -222,13 +203,13 @@ fun LoginScreen(
 }
 
 fun tryLogin(
-    onTabChange: (ContentType) -> Unit,
+    onTabChange: (BottomNavItem) -> Unit,
     credentials: Credentials,
     context: Context,
     viewModel: TeammatesViewModel
 ) {
     if (credentials.isNotEmpty()) {
-        onTabChange(ContentType.Home)
+        onTabChange(BottomNavItem.HOME)
         viewModel.login(credentials.login, credentials.pwd)
     } else {
         Toast.makeText(context, context.getString(R.string.fill_all_fields), Toast.LENGTH_SHORT)

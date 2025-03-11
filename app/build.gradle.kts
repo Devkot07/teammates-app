@@ -55,6 +55,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":data"))
+    implementation(project(":domain"))
+
     // AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -84,13 +87,9 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
-    implementation(libs.retrofit2.kotlinx.serialization.converter)
 
     // Image loading
     implementation(libs.coil.compose)
-
-    // JSON serialization
-    implementation(libs.jetbrains.kotlinx.serialization.json)
 
     // Dagger Hilt
     implementation(libs.hilt.android)

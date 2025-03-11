@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pezont.teammates.data
+package com.pezont.teammates.di
 
 import android.content.Context
 import android.util.Log
-import com.pezont.teammates.dummy.AuthDummyApiService
-import com.pezont.teammates.dummy.NetworkUserDummyRepository
-import com.pezont.teammates.dummy.UserDummyRepository
-import com.pezont.teammates.network.TeammatesAuthApiService
-import com.pezont.teammates.network.TeammatesQuestionnairesApiService
+import com.pezont.teammates.data.AuthRepositoryImpl
+import com.pezont.teammates.data.QuestionnairesRepositoryImpl
+import com.pezont.teammates.domain.repository.AuthRepository
+import com.pezont.teammates.domain.repository.QuestionnairesRepository
+import com.pezont.teammates.data.TeammatesAuthApiService
+import com.pezont.teammates.data.TeammatesQuestionnairesApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -35,14 +36,7 @@ interface AppContainer {
 
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
-    private val ip = "192.168.139.235"
-    // android.aapt2FromMavenOverride=/usr/bin/aapt2
-    // cuddly-robot-pjqxjwp7g59c6495
-    //obscure-space-carnival-7vrqpvv7jqwr275-
-    private val appIp = "potential-robot-4jg4wjjqp5vv2qx7w-"
-
-    // TODO  ip
-
+    private val ip = "potential-robot-4jg4wjjqp5vv2qx7w-"
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor().apply {
@@ -62,19 +56,19 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         val retrofitService =
             createRetrofit(
                 //"http://$ip:8100/"
-                "https://${appIp}8100.app.github.dev"
+                "https://${ip}8100.app.github.dev"
             ).create(TeammatesAuthApiService::class.java)
-        Log.i("LOGIC", "http://${appIp}8100.app.github.dev")
-        NetworkAuthRepository(retrofitService, context)
+        Log.i("LOGIC", "http://${ip}8100.app.github.dev")
+        AuthRepositoryImpl(retrofitService, context)
     }
 
     override val questionnairesRepository: QuestionnairesRepository by lazy {
         val retrofitService =
             createRetrofit(
                 //"http://$ip:8000/"
-                "https://${appIp}8000.app.github.dev"
+                "https://${ip}8000.app.github.dev"
             ).create(TeammatesQuestionnairesApiService::class.java)
-        NetworkQuestionnairesRepository(retrofitService, context)
+        QuestionnairesRepositoryImpl(retrofitService, context)
     }
 
 

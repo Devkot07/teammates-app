@@ -18,14 +18,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesBottomNavigationBar
-import com.pezont.teammates.models.ContentType
-import com.pezont.teammates.models.NavigationItemContent
+import com.pezont.teammates.domain.model.BottomNavItem
 import com.pezont.teammates.ui.items.HomeDestination
 import com.pezont.teammates.ui.navigation.TeammatesNavGraph
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesDestination
@@ -38,24 +37,13 @@ fun TeammatesApp() {
 
     val navigationItemContentList = listOf(
         NavigationItemContent(
-            ContentType.Home,
-            Icons.Default.Home,
-            stringResource(R.string.home)
-        ),
-        NavigationItemContent(
-            ContentType.Liked,
-            Icons.Default.Favorite,
-            stringResource(R.string.favorites)
-        ),
-        NavigationItemContent(
-            ContentType.Create,
-            Icons.Default.AddCircle,
-            stringResource(R.string.create)
-        ),
-        NavigationItemContent(
-            ContentType.Profile,
-            Icons.Default.Drafts,
-            stringResource(R.string.profile)
+            BottomNavItem.HOME, Icons.Default.Home, stringResource(R.string.home)
+        ), NavigationItemContent(
+            BottomNavItem.LIKED, Icons.Default.Favorite, stringResource(R.string.favorites)
+        ), NavigationItemContent(
+            BottomNavItem.CREATE, Icons.Default.AddCircle, stringResource(R.string.create)
+        ), NavigationItemContent(
+            BottomNavItem.PROFILE, Icons.Default.Drafts, stringResource(R.string.profile)
         )
     )
 
@@ -66,7 +54,7 @@ fun TeammatesApp() {
         ProfileDestination.route
     )
 
-    var currentTab by remember { mutableStateOf(ContentType.Home) }
+    var currentTab by remember { mutableStateOf(BottomNavItem.HOME) }
 
     val currentRoute =
         navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry).value?.destination?.route
@@ -81,19 +69,19 @@ fun TeammatesApp() {
                     onTabPressed = { contentType ->
                         currentTab = contentType
                         when (contentType) {
-                            ContentType.Home -> navController.navigate(
+                            BottomNavItem.HOME -> navController.navigate(
                                 HomeDestination.route
                             )
 
-                            ContentType.Liked -> navController.navigate(
+                            BottomNavItem.LIKED -> navController.navigate(
                                 LikedQuestionnairesDestination.route
                             )
 
-                            ContentType.Create -> navController.navigate(
+                            BottomNavItem.CREATE -> navController.navigate(
                                 QuestionnaireCreateDestination.route
                             )
 
-                            ContentType.Profile -> navController.navigate(
+                            BottomNavItem.PROFILE -> navController.navigate(
                                 ProfileDestination.route
                             )
                         }
@@ -102,8 +90,7 @@ fun TeammatesApp() {
                     modifier = Modifier.height(60.dp)
                 )
             }
-        },
-        modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars)
+        }, modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars)
     ) { paddingValues ->
 
         TeammatesNavGraph(
@@ -115,12 +102,6 @@ fun TeammatesApp() {
 
 }
 
-
-
-
-
-
-
-
-
-
+data class NavigationItemContent(
+    val bottomNavItem: BottomNavItem, val icon: ImageVector, val text: String
+)

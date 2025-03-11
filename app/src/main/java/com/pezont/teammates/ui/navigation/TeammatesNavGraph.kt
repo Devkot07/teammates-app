@@ -17,10 +17,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.pezont.teammates.models.ContentType
+import com.pezont.teammates.TeammatesViewModel
+import com.pezont.teammates.domain.model.BottomNavItem
 import com.pezont.teammates.ui.TeammatesBackHandler
 import com.pezont.teammates.ui.TeammatesTopAppBar
-import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.items.HomeDestination
 import com.pezont.teammates.ui.items.LoadingDestination
 import com.pezont.teammates.ui.items.TeammatesHomeItem
@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TeammatesNavGraph(
-    onTabChange: (ContentType) -> Unit,
+    onTabChange: (BottomNavItem) -> Unit,
     navController: NavHostController,
     viewModel: TeammatesViewModel = hiltViewModel(),
     paddingValues: PaddingValues,
@@ -52,6 +52,7 @@ fun TeammatesNavGraph(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
+    //TODO SnackBars
     LaunchedEffect(Unit) {
         launch {
             viewModel.authToastCode.collect { code ->
@@ -68,7 +69,7 @@ fun TeammatesNavGraph(
     val teammatesAppState by viewModel.teammatesAppState.collectAsState()
 
 
-    var currentTab by remember { mutableStateOf(ContentType.Home) }
+    var currentTab by remember { mutableStateOf(BottomNavItem.HOME) }
 
     val currentRoute =
         navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry).value?.destination?.route
@@ -135,7 +136,7 @@ fun TeammatesNavGraph(
         }
 
         composable(HomeDestination.route) {
-            onTabChange(ContentType.Home)
+            onTabChange(BottomNavItem.HOME)
             val questionnaires = teammatesAppState.questionnaires
 
             TeammatesHomeItem(
@@ -158,7 +159,7 @@ fun TeammatesNavGraph(
         }
 
         composable(LikedQuestionnairesDestination.route) {
-            onTabChange(ContentType.Liked)
+            onTabChange(BottomNavItem.LIKED)
             val likedQuestionnaires = teammatesAppState.likedQuestionnaires
 
             LikedQuestionnairesScreen(
@@ -180,7 +181,7 @@ fun TeammatesNavGraph(
         }
 
         composable(QuestionnaireCreateDestination.route) {
-            onTabChange(ContentType.Create)
+            onTabChange(BottomNavItem.CREATE)
             QuestionnaireCreateScreen(
                 navigateToHome = {
                     navController.navigate(HomeDestination.route) {
@@ -204,7 +205,8 @@ fun TeammatesNavGraph(
         }
 
         composable(ProfileDestination.route) {
-            onTabChange(ContentType.Profile)
+            onTabChange(BottomNavItem.PROFILE)
+            //TODO get user from data
             val user = teammatesAppState.currentUser
 
             ProfileScreen(
@@ -240,7 +242,7 @@ fun TeammatesNavGraph(
             UserQuestionnairesScreen(
                 navigateToQuestionnaireCreate = {
                     navController.navigate(QuestionnaireCreateDestination.route)
-                    onTabChange(ContentType.Create)
+                    onTabChange(BottomNavItem.CREATE)
                 },
                 userQuestionnaires = userQuestionnaires,
                 onRefresh = viewModel::loadUserQuestionnaires,

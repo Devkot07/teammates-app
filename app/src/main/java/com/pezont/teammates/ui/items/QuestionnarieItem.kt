@@ -34,7 +34,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
-import com.pezont.teammates.models.Questionnaire
+import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.buttons.LikeButton
 import com.pezont.teammates.ui.theme.TeammatesTheme
 
@@ -76,9 +76,11 @@ fun QuestionnaireCard(
     ) {
         Scaffold(
             floatingActionButton = {
-                LikeButton(modifier = Modifier
-                    .wrapContentHeight()
-                    .background(Color.Transparent))
+                LikeButton(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .background(Color.Transparent)
+                )
             }
 
         ) { paddingValues ->

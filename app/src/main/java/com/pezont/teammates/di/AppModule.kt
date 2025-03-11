@@ -4,11 +4,9 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.pezont.teammates.data.AppContainer
-import com.pezont.teammates.data.AuthRepository
-import com.pezont.teammates.data.DefaultAppContainer
-import com.pezont.teammates.data.QuestionnairesRepository
 import com.pezont.teammates.data.UserDataRepository
+import com.pezont.teammates.domain.repository.AuthRepository
+import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +18,7 @@ private const val LAYOUT_PREFERENCE_NAME = "layout_preferences"
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = LAYOUT_PREFERENCE_NAME
 )
+
 
 @Module
 @InstallIn(SingletonComponent::class)

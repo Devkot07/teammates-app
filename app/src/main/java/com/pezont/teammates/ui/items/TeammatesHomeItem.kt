@@ -18,8 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
-import com.pezont.teammates.models.Questionnaire
-import com.pezont.teammates.ui.TeammatesViewModel
+import com.pezont.teammates.TeammatesViewModel
+import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnairesPager
 import kotlinx.coroutines.CoroutineScope
