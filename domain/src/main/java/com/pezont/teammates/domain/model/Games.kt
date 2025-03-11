@@ -1,9 +1,9 @@
-package com.pezont.teammates.models
+package com.pezont.teammates.domain.model
 
 enum class Games(val nameOfGame: String) {
     CS2("CS2"),
     DOTA2("Dota 2"),
     GTA5("GTA 5"),
-    VALORANT("Valorant")
+    VALORANT("Valorant");
 
 }

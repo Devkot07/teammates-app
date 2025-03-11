@@ -1,4 +1,4 @@
-package com.pezont.teammates.models
+package com.pezont.teammates.domain.model
 
 data class QuestionnaireForm(
     var header: String,

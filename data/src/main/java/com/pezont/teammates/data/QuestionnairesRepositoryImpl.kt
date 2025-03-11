@@ -4,39 +4,17 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.pezont.teammates.models.CreateQuestionnaireRequest
-import com.pezont.teammates.models.Games
-import com.pezont.teammates.models.Questionnaire
-import com.pezont.teammates.network.TeammatesQuestionnairesApiService
+import com.pezont.teammates.domain.repository.QuestionnairesRepository
+import com.pezont.teammates.domain.model.Games
+import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.domain.model.CreateQuestionnaireRequest
 import okhttp3.MultipartBody
 import java.io.IOException
 
 
-interface QuestionnairesRepository {
-
-    suspend fun getQuestionnairesFromRepo(
-        token: String,
-        userId: String,
-        page: Int?,
-        limit: Int?,
-        game: Games?,
-        authorId: String?,
-        questionnaireId: String?,
-    ): Result<List<Questionnaire>>
-
-    suspend fun createQuestionnaire(
-        token: String,
-        header: String,
-        game: Games,
-        description: String,
-        authorId: String,
-        image: MultipartBody.Part?
-    ): Result<Questionnaire>
-
-}
 
 
-class NetworkQuestionnairesRepository(
+class QuestionnairesRepositoryImpl(
     private val teammatesQuestionnairesApiService: TeammatesQuestionnairesApiService,
     private val context: Context
 ) : QuestionnairesRepository {
