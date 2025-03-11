@@ -1,13 +1,7 @@
 package com.pezont.teammates.ui.navigation
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Drafts
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,9 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.pezont.teammates.R
 import com.pezont.teammates.models.ContentType
-import com.pezont.teammates.models.NavigationItemContent
 import com.pezont.teammates.ui.TeammatesBackHandler
 import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.TeammatesViewModel
@@ -86,17 +78,21 @@ fun TeammatesNavGraph(
             teammatesAppState.errorState.isNetworkError -> {
                 navController.navigate(ErrorDestination.route)
             }
+
             teammatesAppState.errorState.errorCode != 0 -> {
                 navController.navigate(ErrorDestination.route)
             }
+
             teammatesAppState.isLoading -> {
                 navController.navigate(LoadingDestination.route)
             }
+
             !teammatesAppState.isAuthenticated -> {
                 navController.navigate(LoginDestination.route) {
                     popUpTo(navController.graph.startDestinationId) { inclusive = true }
                 }
             }
+
             teammatesAppState.isAuthenticated && navController.currentDestination?.route == LoginDestination.route -> {
                 navController.navigate(HomeDestination.route) {
                     popUpTo(LoginDestination.route) { inclusive = true }
@@ -108,7 +104,7 @@ fun TeammatesNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = when  {
+        startDestination = when {
             teammatesAppState.isLoading -> LoadingDestination.route
             teammatesAppState.isAuthenticated -> LoginDestination.route
             else -> HomeDestination.route
@@ -123,18 +119,19 @@ fun TeammatesNavGraph(
         }
 
         composable(LoginDestination.route) {
-            LoginScreen(viewModel)
+            LoginScreen(onTabChange, viewModel)
         }
 
         composable(ErrorDestination.route) {
-            ErrorScreen(onClick = {
-                viewModel.clearError()
-                navController.navigate(HomeDestination.route) {
-                    popUpTo(ErrorDestination.route) { inclusive = true }
-                }
-            },
+            ErrorScreen(
+                onClick = {
+                    viewModel.clearError()
+                    navController.navigate(HomeDestination.route) {
+                        popUpTo(ErrorDestination.route) { inclusive = true }
+                    }
+                },
                 errorText = teammatesAppState.errorState.errorMessage
-                )
+            )
         }
 
         composable(HomeDestination.route) {
@@ -243,7 +240,7 @@ fun TeammatesNavGraph(
             UserQuestionnairesScreen(
                 navigateToQuestionnaireCreate = {
                     navController.navigate(QuestionnaireCreateDestination.route)
-                    //Todo current tab
+                    onTabChange(ContentType.Create)
                 },
                 userQuestionnaires = userQuestionnaires,
                 onRefresh = viewModel::loadUserQuestionnaires,

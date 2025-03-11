@@ -44,6 +44,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
+import com.pezont.teammates.models.ContentType
 import com.pezont.teammates.models.Credentials
 import com.pezont.teammates.ui.TeammatesViewModel
 import com.pezont.teammates.ui.navigation.NavigationDestination
@@ -157,6 +158,7 @@ fun PasswordField(
 
 @Composable
 fun LoginScreen(
+    onTabChange: (ContentType) -> Unit,
     viewModel: TeammatesViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -188,6 +190,7 @@ fun LoginScreen(
             onChange = { data -> credentials = credentials.copy(pwd = data) },
             submit = {
                 tryLogin(
+                    onTabChange,
                     credentials,
                     context,
                     viewModel
@@ -200,6 +203,7 @@ fun LoginScreen(
             onClick = {
                 if (credentials.isNotEmpty()) {
                     tryLogin(
+                        onTabChange,
                         credentials,
                         context,
                         viewModel
@@ -218,13 +222,16 @@ fun LoginScreen(
 }
 
 fun tryLogin(
+    onTabChange: (ContentType) -> Unit,
     credentials: Credentials,
     context: Context,
     viewModel: TeammatesViewModel
 ) {
     if (credentials.isNotEmpty()) {
-        viewModel.login( credentials.login, credentials.pwd)
+        onTabChange(ContentType.Home)
+        viewModel.login(credentials.login, credentials.pwd)
     } else {
-        Toast.makeText(context, context.getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.fill_all_fields), Toast.LENGTH_SHORT)
+            .show()
     }
 }

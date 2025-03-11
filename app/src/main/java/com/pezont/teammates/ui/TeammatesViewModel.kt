@@ -22,6 +22,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
+//TODO DI
 @HiltViewModel
 class TeammatesViewModel @Inject constructor(
     private val questionnairesRepository: QuestionnairesRepository,
@@ -70,7 +71,12 @@ class TeammatesViewModel @Inject constructor(
                         userDataRepository.saveAccessToken(it.accessToken)
                         userDataRepository.saveRefreshToken(it.refreshToken)
                         userDataRepository.saveUser(it.user)
-                        _teammatesAppState.update { state -> state.copy(isAuthenticated = true, currentUser = it.user) }
+                        _teammatesAppState.update { state ->
+                            state.copy(
+                                isAuthenticated = true,
+                                currentUser = it.user
+                            )
+                        }
                     }
                 } else {
                     handleError(authResult.exceptionOrNull())
@@ -82,6 +88,7 @@ class TeammatesViewModel @Inject constructor(
             }
         }
     }
+
     fun fetchQuestionnaires(game: Games? = null, page: Int = 1, limit: Int = 10) {
         viewModelScope.launch {
             try {
@@ -103,7 +110,7 @@ class TeammatesViewModel @Inject constructor(
 
                 if (questionnairesResult.isSuccess) {
                     val response = questionnairesResult.getOrNull()
-                    response?.let {newQuestionnaires ->
+                    response?.let { newQuestionnaires ->
                         if (page == 1) {
                             _teammatesAppState.update { it.copy(questionnaires = newQuestionnaires) }
                         } else {
@@ -239,7 +246,9 @@ class TeammatesViewModel @Inject constructor(
                         _questionnairesToastCode.tryEmit(errorCode)
                         ErrorState(
                             errorCode = errorCode,
-                            errorMessage = "Server error ${error.response()?.errorBody()?.string() ?: "Unknown"}"
+                            errorMessage = "Server error ${
+                                error.response()?.errorBody()?.string() ?: "Unknown"
+                            }"
                         )
                     }
                 }

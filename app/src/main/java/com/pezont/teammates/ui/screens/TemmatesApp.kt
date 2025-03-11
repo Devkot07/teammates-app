@@ -34,8 +34,6 @@ import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateDestina
 @Composable
 fun TeammatesApp() {
 
-    val context = LocalContext.current
-
     val navController = rememberNavController()
 
     val navigationItemContentList = listOf(

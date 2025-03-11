@@ -65,7 +65,6 @@ object QuestionnaireCreateDestination : NavigationDestination {
 }
 
 
-// TODO checking for filled fields
 @Composable
 fun QuestionnaireCreateScreen(
     modifier: Modifier = Modifier,

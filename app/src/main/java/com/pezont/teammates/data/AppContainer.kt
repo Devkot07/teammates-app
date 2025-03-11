@@ -30,14 +30,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 interface AppContainer {
     val questionnairesRepository: QuestionnairesRepository
-    val userDummyRepository: UserDummyRepository
     val authRepository: AuthRepository
-
 }
 
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
-    private val dummyUrl = "https://dummyjson.com/"
     private val ip = "192.168.139.235"
     // android.aapt2FromMavenOverride=/usr/bin/aapt2
     // cuddly-robot-pjqxjwp7g59c6495
@@ -60,10 +57,6 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         .baseUrl(baseUrl)
         .build()
 
-    override val userDummyRepository: UserDummyRepository by lazy {
-        val retrofitService = createRetrofit(dummyUrl).create(AuthDummyApiService::class.java)
-        NetworkUserDummyRepository(retrofitService, context)
-    }
 
     override val authRepository: AuthRepository by lazy {
         val retrofitService =
