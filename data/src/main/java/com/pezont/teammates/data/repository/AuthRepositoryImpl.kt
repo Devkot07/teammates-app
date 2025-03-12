@@ -1,9 +1,10 @@
-package com.pezont.teammates.data
+package com.pezont.teammates.data.repository
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import com.pezont.teammates.data.TeammatesAuthApiService
 import com.pezont.teammates.domain.model.LoginResponse
 import com.pezont.teammates.domain.model.LoginRequest
 import com.pezont.teammates.domain.repository.AuthRepository

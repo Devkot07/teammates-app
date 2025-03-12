@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.pezont.teammates"
-        minSdk = 31
+        minSdk = 30
         //noinspection OldTargetApi
         targetSdk = 34
         versionCode = 1

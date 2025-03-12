@@ -29,7 +29,6 @@ object ErrorDestination : NavigationDestination {
     override val titleRes = R.string.error
 }
 
-//TODO error Screen
 @Composable
 fun ErrorScreen(
     onClick: () -> Unit, errorText: String? = null

@@ -17,8 +17,8 @@ package com.pezont.teammates.di
 
 import android.content.Context
 import android.util.Log
-import com.pezont.teammates.data.AuthRepositoryImpl
-import com.pezont.teammates.data.QuestionnairesRepositoryImpl
+import com.pezont.teammates.data.repository.AuthRepositoryImpl
+import com.pezont.teammates.data.repository.QuestionnairesRepositoryImpl
 import com.pezont.teammates.domain.repository.AuthRepository
 import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.data.TeammatesAuthApiService
