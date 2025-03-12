@@ -2,7 +2,7 @@ package com.pezont.teammates
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pezont.teammates.data.UserDataRepository
+import com.pezont.teammates.data.repository.UserDataRepository
 import com.pezont.teammates.domain.model.Games
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TeammatesViewModel @Inject constructor(
     private val questionnairesRepository: QuestionnairesRepository,
-    private val userDataRepository: UserDataRepository,
+    val userDataRepository: UserDataRepository,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
@@ -53,7 +53,6 @@ class TeammatesViewModel @Inject constructor(
             _teammatesAppState.update {
                 it.copy(
                     isAuthenticated = isLoggedIn,
-                    currentUser = user,
                     isLoading = false
                 )
             }
@@ -74,7 +73,6 @@ class TeammatesViewModel @Inject constructor(
                         _teammatesAppState.update { state ->
                             state.copy(
                                 isAuthenticated = true,
-                                currentUser = it.user
                             )
                         }
                     }
@@ -215,7 +213,6 @@ class TeammatesViewModel @Inject constructor(
                 it.copy(
                     isAuthenticated = false,
                     isLoading = false,
-                    currentUser = User(),
                     questionnaires = emptyList(),
                     likedQuestionnaires = emptyList(),
                     userQuestionnaires = emptyList()
@@ -271,7 +268,6 @@ data class TeammatesUiState(
     val isLoading: Boolean = false,
     val isAuthenticated: Boolean = false,
     val errorState: ErrorState = ErrorState(),
-    val currentUser: User = User(),
     val questionnaires: List<Questionnaire> = emptyList(),
     val likedQuestionnaires: List<Questionnaire> = emptyList(),
     val userQuestionnaires: List<Questionnaire> = emptyList()

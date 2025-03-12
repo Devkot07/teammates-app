@@ -61,7 +61,6 @@ fun TeammatesHomeItem(
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         delay(1000L)
-                        //TODO clear teammatesUiState.questionnaires
                         onRefresh()
                     } finally {
                         withContext(Dispatchers.Main) {

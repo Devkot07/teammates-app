@@ -19,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.BottomNavItem
+import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.TeammatesBackHandler
 import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.items.HomeDestination
@@ -39,6 +40,7 @@ import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesDestinat
 import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesScreen
 import com.pezont.teammates.ui.sendAuthToast
 import com.pezont.teammates.ui.sendQuestionnairesToast
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
@@ -206,8 +208,7 @@ fun TeammatesNavGraph(
 
         composable(ProfileDestination.route) {
             onTabChange(BottomNavItem.PROFILE)
-            //TODO get user from data
-            val user = teammatesAppState.currentUser
+            val user by viewModel.userDataRepository.user.collectAsState(initial = User())
 
             ProfileScreen(
                 navigateToMyQuestionnaires = {
@@ -220,7 +221,7 @@ fun TeammatesNavGraph(
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 },
-                user = user,
+                user = user ,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(ProfileDestination.titleRes),

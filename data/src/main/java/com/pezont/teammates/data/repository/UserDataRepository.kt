@@ -1,4 +1,4 @@
-package com.pezont.teammates.data
+package com.pezont.teammates.data.repository
 
 import android.util.Log
 import androidx.datastore.core.DataStore
