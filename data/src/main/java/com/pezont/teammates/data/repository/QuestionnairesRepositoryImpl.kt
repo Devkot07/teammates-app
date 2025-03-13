@@ -29,7 +29,7 @@ class QuestionnairesRepositoryImpl(
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    override suspend fun getQuestionnairesFromRepo(
+    override suspend fun loadQuestionnaires(
         token: String,
         userId: String,
         page: Int?,

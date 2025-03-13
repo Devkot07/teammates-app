@@ -40,7 +40,6 @@ import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesDestinat
 import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesScreen
 import com.pezont.teammates.ui.sendAuthToast
 import com.pezont.teammates.ui.sendQuestionnairesToast
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
@@ -52,7 +51,6 @@ fun TeammatesNavGraph(
     paddingValues: PaddingValues,
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
     //TODO SnackBars
     LaunchedEffect(Unit) {
@@ -208,7 +206,7 @@ fun TeammatesNavGraph(
 
         composable(ProfileDestination.route) {
             onTabChange(BottomNavItem.PROFILE)
-            val user by viewModel.userDataRepository.user.collectAsState(initial = User())
+            val user = teammatesAppState.user
 
             ProfileScreen(
                 navigateToMyQuestionnaires = {
@@ -221,7 +219,7 @@ fun TeammatesNavGraph(
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 },
-                user = user ,
+                user = user,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(ProfileDestination.titleRes),

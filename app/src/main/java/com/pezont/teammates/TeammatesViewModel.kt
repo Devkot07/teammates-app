@@ -1,13 +1,15 @@
 package com.pezont.teammates
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pezont.teammates.data.repository.UserDataRepository
+import com.pezont.teammates.data.repository.UserDataRepositoryImpl
 import com.pezont.teammates.domain.model.Games
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.repository.AuthRepository
 import com.pezont.teammates.domain.repository.QuestionnairesRepository
+import com.pezont.teammates.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +27,9 @@ import javax.inject.Inject
 //TODO DI
 @HiltViewModel
 class TeammatesViewModel @Inject constructor(
+    private val loginUseCase: LoginUseCase,
     private val questionnairesRepository: QuestionnairesRepository,
-    val userDataRepository: UserDataRepository,
+    private val userDataRepository: UserDataRepositoryImpl,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
@@ -52,40 +55,31 @@ class TeammatesViewModel @Inject constructor(
             val isLoggedIn = user.publicId != null
             _teammatesAppState.update {
                 it.copy(
-                    isAuthenticated = isLoggedIn,
-                    isLoading = false
+                    user = user, isAuthenticated = isLoggedIn, isLoading = false
                 )
             }
         }
     }
 
+
     fun login(nickname: String, password: String) {
         viewModelScope.launch {
             _teammatesAppState.update { it.copy(isLoading = true) }
-            try {
-                val authResult = authRepository.login(nickname, password)
-                if (authResult.isSuccess) {
-                    val response = authResult.getOrNull()
-                    response?.let {
-                        userDataRepository.saveAccessToken(it.accessToken)
-                        userDataRepository.saveRefreshToken(it.refreshToken)
-                        userDataRepository.saveUser(it.user)
-                        _teammatesAppState.update { state ->
-                            state.copy(
-                                isAuthenticated = true,
-                            )
-                        }
-                    }
-                } else {
-                    handleError(authResult.exceptionOrNull())
-                }
-            } catch (e: Exception) {
-                handleError(e)
-            } finally {
-                _teammatesAppState.update { it.copy(isLoading = false) }
+
+            runCatching {
+                loginUseCase(nickname, password)
             }
+                .onSuccess { _teammatesAppState.update { it.copy(isAuthenticated = true) } }
+                .onFailure { handleError(it) }
+
+            _teammatesAppState.update { it.copy(isLoading = false) }
         }
     }
+
+
+
+
+
 
     fun fetchQuestionnaires(game: Games? = null, page: Int = 1, limit: Int = 10) {
         viewModelScope.launch {
@@ -95,7 +89,7 @@ class TeammatesViewModel @Inject constructor(
                     _teammatesAppState.update { it.copy(isAuthenticated = false) }
                     return@launch
                 } else {
-                    val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
+                    val questionnairesResult = questionnairesRepository.loadQuestionnaires(
                         token = userDataRepository.accessToken.first(),
                         userId = user.publicId!!,
                         page = page,
@@ -137,7 +131,7 @@ class TeammatesViewModel @Inject constructor(
                     return@launch
                 } else {
 
-                    val questionnairesResult = questionnairesRepository.getQuestionnairesFromRepo(
+                    val questionnairesResult = questionnairesRepository.loadQuestionnaires(
                         token = userDataRepository.accessToken.first(),
                         userId = user.publicId!!,
                         page = null,
@@ -165,10 +159,7 @@ class TeammatesViewModel @Inject constructor(
     }
 
     fun createNewQuestionnaire(
-        header: String,
-        description: String,
-        selectedGame: Games,
-        image: MultipartBody.Part?
+        header: String, description: String, selectedGame: Games, image: MultipartBody.Part?
     ) {
         viewModelScope.launch {
             _teammatesAppState.update { it.copy(isLoading = true) }
@@ -211,6 +202,7 @@ class TeammatesViewModel @Inject constructor(
             userDataRepository.saveUser(User())
             _teammatesAppState.update {
                 it.copy(
+                    user = User(),
                     isAuthenticated = false,
                     isLoading = false,
                     questionnaires = emptyList(),
@@ -229,32 +221,39 @@ class TeammatesViewModel @Inject constructor(
 
     private fun handleError(error: Throwable?) {
         _teammatesAppState.update { currentState ->
-            val newErrorState = when (error) {
-                is IOException -> ErrorState(
-                    isNetworkError = true,
-                    errorMessage = "Network error. Please check your connection."
+            when (error) {
+                is IOException -> currentState.copy(
+                    errorState = ErrorState(
+                        isNetworkError = true,
+                        errorMessage = "Network error. Please check your connection."
+                    )
                 )
 
                 is HttpException -> {
                     val errorCode = error.code()
+
                     if (errorCode == 401) {
                         _authToastCode.tryEmit(errorCode)
                         return@update currentState.copy(isAuthenticated = false)
-                    } else {
-                        _questionnairesToastCode.tryEmit(errorCode)
-                        ErrorState(
-                            errorCode = errorCode,
-                            errorMessage = "Server error ${
+                    }
+
+                    _questionnairesToastCode.tryEmit(errorCode)
+
+                    currentState.copy(
+                        errorState = ErrorState(
+                            errorCode = errorCode, errorMessage = "Server error: ${
                                 error.response()?.errorBody()?.string() ?: "Unknown"
                             }"
                         )
-                    }
+                    )
                 }
 
-                else -> ErrorState(errorMessage = "Unknown error occurred: ${error?.message}")
+                else -> currentState.copy(
+                    errorState = ErrorState(
+                        errorMessage = "Unknown error occurred: ${error?.message}"
+                    )
+                )
             }
-
-            currentState.copy(errorState = newErrorState)
         }
     }
 
@@ -265,18 +264,18 @@ class TeammatesViewModel @Inject constructor(
 }
 
 data class TeammatesUiState(
-    val isLoading: Boolean = false,
+    val user: User = User(),
     val isAuthenticated: Boolean = false,
+    val isLoading: Boolean = false,
     val errorState: ErrorState = ErrorState(),
     val questionnaires: List<Questionnaire> = emptyList(),
     val likedQuestionnaires: List<Questionnaire> = emptyList(),
     val userQuestionnaires: List<Questionnaire> = emptyList()
 )
 
+
 data class ErrorState(
-    val isNetworkError: Boolean = false,
-    val errorCode: Int = 0,
-    val errorMessage: String? = null
+    val isNetworkError: Boolean = false, val errorCode: Int = 0, val errorMessage: String? = null
 )
 
 sealed class UiEvent {

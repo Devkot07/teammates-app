@@ -54,20 +54,15 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val authRepository: AuthRepository by lazy {
         val retrofitService =
-            createRetrofit(
-                //"http://$ip:8100/"
-                "https://${ip}8100.app.github.dev"
-            ).create(TeammatesAuthApiService::class.java)
-        Log.i("LOGIC", "http://${ip}8100.app.github.dev")
+            createRetrofit("https://${ip}8100.app.github.dev")
+                .create(TeammatesAuthApiService::class.java)
         AuthRepositoryImpl(retrofitService, context)
     }
 
     override val questionnairesRepository: QuestionnairesRepository by lazy {
         val retrofitService =
-            createRetrofit(
-                //"http://$ip:8000/"
-                "https://${ip}8000.app.github.dev"
-            ).create(TeammatesQuestionnairesApiService::class.java)
+            createRetrofit("https://${ip}8000.app.github.dev")
+                .create(TeammatesQuestionnairesApiService::class.java)
         QuestionnairesRepositoryImpl(retrofitService, context)
     }
 
