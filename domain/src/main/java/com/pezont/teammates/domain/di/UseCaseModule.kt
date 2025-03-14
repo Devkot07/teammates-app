@@ -1,8 +1,12 @@
 package com.pezont.teammates.domain.di
 
 import com.pezont.teammates.domain.repository.AuthRepository
+import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.domain.repository.UserDataRepository
+import com.pezont.teammates.domain.usecase.CheckAuthenticationUseCase
+import com.pezont.teammates.domain.usecase.LoadQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoginUseCase
+import com.pezont.teammates.domain.usecase.LogoutUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,28 +24,27 @@ object UseCaseModule {
         return LoginUseCase(authRepository, userDataRepository)
     }
 
+    @Provides
+    fun provideLogoutUseCase(
+        userDataRepository: UserDataRepository
+    ): LogoutUseCase {
+        return LogoutUseCase(userDataRepository)
+    }
 
-//    @Provides
-//    fun provideLogoutUseCase(
-//        userDataRepository: UserDataRepository
-//    ): LogoutUseCase {
-//        return LogoutUseCase(userDataRepository)
-//    }
-//
-//    @Provides
-//    fun provideCheckAuthenticationUseCase(
-//        userDataRepository: UserDataRepository
-//    ): CheckAuthenticationUseCase {
-//        return CheckAuthenticationUseCase(userDataRepository)
-//    }
-//
-//    @Provides
-//    fun provideGetQuestionnairesUseCase(
-//        questionnairesRepository: QuestionnairesRepository,
-//        userDataRepository: UserDataRepository
-//    ): GetQuestionnairesUseCase {
-//        return GetQuestionnairesUseCase(questionnairesRepository, userDataRepository)
-//    }
+    @Provides
+    fun provideCheckAuthenticationUseCase(
+        userDataRepository: UserDataRepository
+    ): CheckAuthenticationUseCase {
+        return CheckAuthenticationUseCase(userDataRepository)
+    }
+
+    @Provides
+    fun provideGetQuestionnairesUseCase(
+        questionnairesRepository: QuestionnairesRepository,
+        userDataRepository: UserDataRepository
+    ): LoadQuestionnairesUseCase {
+        return LoadQuestionnairesUseCase(questionnairesRepository, userDataRepository)
+    }
 //
 //    @Provides
 //    fun provideGetUserQuestionnairesUseCase(

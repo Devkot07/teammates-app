@@ -1,6 +1,5 @@
 package com.pezont.teammates
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pezont.teammates.data.repository.UserDataRepositoryImpl
@@ -9,7 +8,10 @@ import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.repository.AuthRepository
 import com.pezont.teammates.domain.repository.QuestionnairesRepository
+import com.pezont.teammates.domain.usecase.CheckAuthenticationUseCase
+import com.pezont.teammates.domain.usecase.LoadQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoginUseCase
+import com.pezont.teammates.domain.usecase.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +30,10 @@ import javax.inject.Inject
 @HiltViewModel
 class TeammatesViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
+    private val logoutUseCase: LogoutUseCase,
+    private val checkAuthenticationUseCase: CheckAuthenticationUseCase,
+
+    private val loadQuestionnairesUseCase: LoadQuestionnairesUseCase,
     private val questionnairesRepository: QuestionnairesRepository,
     private val userDataRepository: UserDataRepositoryImpl,
     private val authRepository: AuthRepository,
@@ -51,70 +57,37 @@ class TeammatesViewModel @Inject constructor(
 
     private suspend fun checkAuthentication() {
         _teammatesAppState.update { it.copy(isLoading = true) }
-        userDataRepository.user.collect { user ->
-            val isLoggedIn = user.publicId != null
-            _teammatesAppState.update {
-                it.copy(
-                    user = user, isAuthenticated = isLoggedIn, isLoading = false
-                )
-            }
-        }
+        runCatching {
+            checkAuthenticationUseCase().first()
+        }.onSuccess { isAuthenticated ->
+            _teammatesAppState.update { it.copy(isAuthenticated = isAuthenticated) }
+        }.onFailure { handleError(it) }
+        _teammatesAppState.update { it.copy(isLoading = false) }
     }
 
 
     fun login(nickname: String, password: String) {
         viewModelScope.launch {
             _teammatesAppState.update { it.copy(isLoading = true) }
-
-            runCatching {
-                loginUseCase(nickname, password)
-            }
+            loginUseCase(nickname, password)
                 .onSuccess { _teammatesAppState.update { it.copy(isAuthenticated = true) } }
                 .onFailure { handleError(it) }
-
             _teammatesAppState.update { it.copy(isLoading = false) }
         }
     }
 
 
-
-
-
-
-    fun fetchQuestionnaires(game: Games? = null, page: Int = 1, limit: Int = 10) {
+    fun loadQuestionnaires(game: Games? = null, page: Int = 1) {
         viewModelScope.launch {
-            try {
-                val user = userDataRepository.user.first()
-                if (user.publicId == null) {
-                    _teammatesAppState.update { it.copy(isAuthenticated = false) }
-                    return@launch
-                } else {
-                    val questionnairesResult = questionnairesRepository.loadQuestionnaires(
-                        token = userDataRepository.accessToken.first(),
-                        userId = user.publicId!!,
-                        page = page,
-                        limit = limit,
-                        game = game,
-                        authorId = null,
-                        questionnaireId = null
-                    )
-
-                    if (questionnairesResult.isSuccess) {
-                        val response = questionnairesResult.getOrNull()
-                        response?.let { newQuestionnaires ->
-                            if (page == 1) {
-                                _teammatesAppState.update { it.copy(questionnaires = newQuestionnaires) }
-                            } else {
-                                _teammatesAppState.update { it.copy(questionnaires = teammatesAppState.value.questionnaires + newQuestionnaires) }
-                            }
-                        }
+            runCatching { loadQuestionnairesUseCase(game, page) }
+                .onSuccess { result ->
+                    val newQuestionnaires = result.getOrNull() ?: emptyList()
+                    if (page == 1) {
+                        _teammatesAppState.update { it.copy(questionnaires = newQuestionnaires) }
                     } else {
-                        handleError(questionnairesResult.exceptionOrNull())
+                        _teammatesAppState.update { it.copy(questionnaires = teammatesAppState.value.questionnaires + newQuestionnaires) }
                     }
-                }
-            } catch (e: Exception) {
-                handleError(e)
-            }
+                }.onFailure { handleError(it) }
         }
     }
 
@@ -197,20 +170,20 @@ class TeammatesViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
-            userDataRepository.saveAccessToken("")
-            userDataRepository.saveRefreshToken("")
-            userDataRepository.saveUser(User())
-            _teammatesAppState.update {
-                it.copy(
-                    user = User(),
-                    isAuthenticated = false,
-                    isLoading = false,
-                    questionnaires = emptyList(),
-                    likedQuestionnaires = emptyList(),
-                    userQuestionnaires = emptyList()
-                )
-            }
-            _authToastCode.tryEmit(1)
+            logoutUseCase()
+                .onSuccess {
+                    _teammatesAppState.update {
+                        it.copy(
+                            user = User(),
+                            isAuthenticated = false,
+                            isLoading = false,
+                            questionnaires = emptyList(),
+                            likedQuestionnaires = emptyList(),
+                            userQuestionnaires = emptyList()
+                        )
+                    }
+                    _authToastCode.tryEmit(1)
+                }
         }
     }
 

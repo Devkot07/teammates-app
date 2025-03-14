@@ -8,7 +8,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,7 +18,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.BottomNavItem
-import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.TeammatesBackHandler
 import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.items.HomeDestination
@@ -142,7 +140,7 @@ fun TeammatesNavGraph(
             TeammatesHomeItem(
                 viewModel = viewModel,
                 questionnaires = questionnaires,
-                onRefresh = viewModel::fetchQuestionnaires,
+                onRefresh = viewModel::loadQuestionnaires,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(HomeDestination.titleRes),
