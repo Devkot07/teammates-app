@@ -162,7 +162,7 @@ fun TeammatesNavGraph(
 
             LikedQuestionnairesScreen(
                 likedQuestionnaires = likedQuestionnaires,
-                onRefresh = viewModel::loadLikedQuestionnaires,
+                viewModel = viewModel,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(LikedQuestionnairesDestination.titleRes),

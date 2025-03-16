@@ -107,27 +107,22 @@ class TeammatesViewModel @Inject constructor(
         }
     }
 
-    fun loadLikedQuestionnaires() {
-        viewModelScope.launch {
-            viewModelScope.launch {
-                loadLikedQuestionnairesUseCase()
-                    .onSuccess { result ->
-                        Log.i(TAG, result.toString())
-                        _teammatesAppState.update { it.copy(likedQuestionnaires = result) }
-                    }.onFailure { handleError(it) }
-            }
-        }
+    suspend fun loadLikedQuestionnaires() {
+            loadLikedQuestionnairesUseCase()
+                .onSuccess { result ->
+                    Log.i(TAG, result.toString())
+                    _teammatesAppState.update { it.copy(likedQuestionnaires = result) }
+                }.onFailure { handleError(it) }
     }
 
     fun loadUserQuestionnaires() {
         viewModelScope.launch {
-            viewModelScope.launch {
-                loadUserQuestionnairesUseCase(game = null)
-                    .onSuccess { result ->
-                        Log.i(TAG, result.toString())
-                        _teammatesAppState.update { it.copy(userQuestionnaires = result) }
-                    }.onFailure { handleError(it) }
-            }
+            loadUserQuestionnairesUseCase(game = null)
+                .onSuccess { result ->
+                    Log.i(TAG, result.toString())
+                    _teammatesAppState.update { it.copy(userQuestionnaires = result) }
+                }.onFailure { handleError(it) }
+
         }
     }
 

@@ -23,4 +23,6 @@
     <string name="select_game">Select game</string>
     <string name="login">Login</string>
     <string name="something_don_t_work_that_s_all_we_known">Something don\'t work. That\'s all we known</string>
+    <string name="you_haven_t_liked_any_questionnaire">You haven\'t liked any questionnaire</string>
+    <string name="end">end</string>
 </resources>
