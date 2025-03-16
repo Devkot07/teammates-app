@@ -1,5 +1,6 @@
 package com.pezont.teammates
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pezont.teammates.data.repository.UserDataRepositoryImpl
@@ -9,7 +10,10 @@ import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.repository.AuthRepository
 import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.domain.usecase.CheckAuthenticationUseCase
+import com.pezont.teammates.domain.usecase.LoadLikedQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadQuestionnairesUseCase
+import com.pezont.teammates.domain.usecase.LoadUserQuestionnairesUseCase
+import com.pezont.teammates.domain.usecase.LoadUserUseCase
 import com.pezont.teammates.domain.usecase.LoginUseCase
 import com.pezont.teammates.domain.usecase.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +37,12 @@ class TeammatesViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val checkAuthenticationUseCase: CheckAuthenticationUseCase,
 
+    private val loadUserUseCase: LoadUserUseCase,
+
     private val loadQuestionnairesUseCase: LoadQuestionnairesUseCase,
+    private val loadUserQuestionnairesUseCase: LoadUserQuestionnairesUseCase,
+    private val loadLikedQuestionnairesUseCase: LoadLikedQuestionnairesUseCase,
+
     private val questionnairesRepository: QuestionnairesRepository,
     private val userDataRepository: UserDataRepositoryImpl,
     private val authRepository: AuthRepository,
@@ -62,7 +71,7 @@ class TeammatesViewModel @Inject constructor(
         }.onSuccess { isAuthenticated ->
             _teammatesAppState.update { it.copy(isAuthenticated = isAuthenticated) }
         }.onFailure { handleError(it) }
-        _teammatesAppState.update { it.copy(isLoading = false) }
+        _teammatesAppState.update { it.copy(isLoading = false, user = loadUserUseCase()) }
     }
 
 
@@ -70,7 +79,14 @@ class TeammatesViewModel @Inject constructor(
         viewModelScope.launch {
             _teammatesAppState.update { it.copy(isLoading = true) }
             loginUseCase(nickname, password)
-                .onSuccess { _teammatesAppState.update { it.copy(isAuthenticated = true) } }
+                .onSuccess {
+                    _teammatesAppState.update {
+                        it.copy(
+                            isAuthenticated = true,
+                            user = loadUserUseCase()
+                        )
+                    }
+                }
                 .onFailure { handleError(it) }
             _teammatesAppState.update { it.copy(isLoading = false) }
         }

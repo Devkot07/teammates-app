@@ -8,6 +8,7 @@ import com.pezont.teammates.data.repository.UserDataRepositoryImpl
 import com.pezont.teammates.domain.repository.AuthRepository
 import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.domain.repository.UserDataRepository
+import com.pezont.teammates.domain.repository.UsersRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,5 +54,11 @@ object AppModule {
     @Singleton
     fun provideAuthRepository(appContainer: AppContainer): AuthRepository {
         return appContainer.authRepository
+    }
+
+    @Provides
+    @Singleton
+    fun provideUsersRepository(appContainer: AppContainer): UsersRepository {
+        return appContainer.usersRepository
     }
 }

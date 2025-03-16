@@ -4,27 +4,23 @@ import com.pezont.teammates.domain.model.Games
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.domain.repository.UserDataRepository
+import com.pezont.teammates.domain.repository.UsersRepository
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class LoadQuestionnairesUseCase @Inject constructor(
-    private val questionnairesRepository: QuestionnairesRepository,
+class LoadLikedQuestionnairesUseCase @Inject constructor(
+    private val usersRepository: UsersRepository,
     private val userDataRepository: UserDataRepository
 ) {
-    suspend operator fun invoke(page: Int = 1, limit: Int = 10, game: Games?, authorId: String?): Result<List<Questionnaire>> {
+    suspend operator fun invoke(): Result<List<Questionnaire>> {
         return runCatching {
 
             val user = userDataRepository.user.first()
             if (user.publicId == null) throw Exception("User not authenticated")
 
-            questionnairesRepository.loadQuestionnaires(
+            usersRepository.loadLikedQuestionnaires(
                 token = userDataRepository.accessToken.first(),
                 userId = user.publicId,
-                page = page,
-                limit = limit,
-                game = game,
-                authorId = authorId,
-                questionnaireId = null
             ).getOrThrow()
         }
     }

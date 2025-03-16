@@ -98,7 +98,7 @@ fun LikedQuestionnairesScreen(
                     val newPage =
                         if (likedQuestionnaires.size % 10 == 0) pagerState.currentPage / 10 + 1 else pagerState.currentPage / 10 + 2
                     try {
-                        //viewModel.tryGetLikedQuestionnaires()
+                        onRefresh()
                     } finally {
                         Log.i("LOGIC", "Loading more items")
                         isLoadingMore.value = false

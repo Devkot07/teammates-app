@@ -16,13 +16,15 @@
 package com.pezont.teammates.di
 
 import android.content.Context
-import android.util.Log
 import com.pezont.teammates.data.repository.AuthRepositoryImpl
 import com.pezont.teammates.data.repository.QuestionnairesRepositoryImpl
 import com.pezont.teammates.domain.repository.AuthRepository
 import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.data.TeammatesAuthApiService
 import com.pezont.teammates.data.TeammatesQuestionnairesApiService
+import com.pezont.teammates.data.TeammatesUsersApiService
+import com.pezont.teammates.data.repository.UsersRepositoryImpl
+import com.pezont.teammates.domain.repository.UsersRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -32,6 +34,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 interface AppContainer {
     val questionnairesRepository: QuestionnairesRepository
     val authRepository: AuthRepository
+    val usersRepository: UsersRepository
 }
 
 
@@ -65,6 +68,15 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
                 .create(TeammatesQuestionnairesApiService::class.java)
         QuestionnairesRepositoryImpl(retrofitService, context)
     }
+
+    override val usersRepository: UsersRepository by lazy {
+        val retrofitService =
+            createRetrofit("https://${ip}8200.app.github.dev")
+                .create(TeammatesUsersApiService::class.java)
+        UsersRepositoryImpl(retrofitService, context)
+    }
+
+
 
 
 }

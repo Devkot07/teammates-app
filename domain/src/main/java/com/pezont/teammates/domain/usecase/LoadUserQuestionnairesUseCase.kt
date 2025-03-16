@@ -7,11 +7,11 @@ import com.pezont.teammates.domain.repository.UserDataRepository
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class LoadQuestionnairesUseCase @Inject constructor(
+class LoadUserQuestionnairesUseCase @Inject constructor(
     private val questionnairesRepository: QuestionnairesRepository,
     private val userDataRepository: UserDataRepository
 ) {
-    suspend operator fun invoke(page: Int = 1, limit: Int = 10, game: Games?, authorId: String?): Result<List<Questionnaire>> {
+    suspend operator fun invoke(limit: Int = 100, game: Games?): Result<List<Questionnaire>> {
         return runCatching {
 
             val user = userDataRepository.user.first()
@@ -20,10 +20,10 @@ class LoadQuestionnairesUseCase @Inject constructor(
             questionnairesRepository.loadQuestionnaires(
                 token = userDataRepository.accessToken.first(),
                 userId = user.publicId,
-                page = page,
+                page = null,
                 limit = limit,
                 game = game,
-                authorId = authorId,
+                authorId = user.publicId,
                 questionnaireId = null
             ).getOrThrow()
         }
