@@ -3,13 +3,11 @@ package com.pezont.teammates
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pezont.teammates.data.repository.UserDataRepositoryImpl
 import com.pezont.teammates.domain.model.Games
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
-import com.pezont.teammates.domain.repository.AuthRepository
-import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.domain.usecase.CheckAuthenticationUseCase
+import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
 import com.pezont.teammates.domain.usecase.LoadLikedQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadUserQuestionnairesUseCase
@@ -30,7 +28,6 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-//TODO DI
 @HiltViewModel
 class TeammatesViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
@@ -43,9 +40,8 @@ class TeammatesViewModel @Inject constructor(
     private val loadUserQuestionnairesUseCase: LoadUserQuestionnairesUseCase,
     private val loadLikedQuestionnairesUseCase: LoadLikedQuestionnairesUseCase,
 
-    private val questionnairesRepository: QuestionnairesRepository,
-    private val userDataRepository: UserDataRepositoryImpl,
-    private val authRepository: AuthRepository,
+    private val createNewQuestionnaireUseCase: CreateQuestionnaireUseCase,
+
 ) : ViewModel() {
 
     private val _teammatesAppState = MutableStateFlow(TeammatesUiState())
@@ -78,16 +74,11 @@ class TeammatesViewModel @Inject constructor(
     fun login(nickname: String, password: String) {
         viewModelScope.launch {
             _teammatesAppState.update { it.copy(isLoading = true) }
-            loginUseCase(nickname, password)
-                .onSuccess {
-                    _teammatesAppState.update {
-                        it.copy(
-                            isAuthenticated = true,
-                            user = loadUserUseCase()
-                        )
-                    }
+            loginUseCase(nickname, password).onSuccess {
+                _teammatesAppState.update {
+                    it.copy(isAuthenticated = true, user = loadUserUseCase())
                 }
-                .onFailure { handleError(it) }
+            }.onFailure { handleError(it) }
             _teammatesAppState.update { it.copy(isLoading = false) }
         }
     }
@@ -95,33 +86,32 @@ class TeammatesViewModel @Inject constructor(
 
     fun loadQuestionnaires(game: Games? = null, page: Int = 1) {
         viewModelScope.launch {
-            loadQuestionnairesUseCase(page = page, game = game, authorId = null)
-                .onSuccess { result ->
-                    Log.i(TAG, result.toString())
-                    if (page == 1) {
-                        _teammatesAppState.update { it.copy(questionnaires = result) }
-                    } else {
-                        _teammatesAppState.update { it.copy(questionnaires = teammatesAppState.value.questionnaires + result) }
-                    }
-                }.onFailure { handleError(it) }
+            loadQuestionnairesUseCase(
+                page = page, game = game, authorId = null
+            ).onSuccess { result ->
+                Log.i(TAG, result.toString())
+                if (page == 1) {
+                    _teammatesAppState.update { it.copy(questionnaires = result) }
+                } else {
+                    _teammatesAppState.update { it.copy(questionnaires = teammatesAppState.value.questionnaires + result) }
+                }
+            }.onFailure { handleError(it) }
         }
     }
 
     suspend fun loadLikedQuestionnaires() {
-            loadLikedQuestionnairesUseCase()
-                .onSuccess { result ->
-                    Log.i(TAG, result.toString())
-                    _teammatesAppState.update { it.copy(likedQuestionnaires = result) }
-                }.onFailure { handleError(it) }
+        loadLikedQuestionnairesUseCase().onSuccess { result ->
+            Log.i(TAG, result.toString())
+            _teammatesAppState.update { it.copy(likedQuestionnaires = result) }
+        }.onFailure { handleError(it) }
     }
 
     fun loadUserQuestionnaires() {
         viewModelScope.launch {
-            loadUserQuestionnairesUseCase(game = null)
-                .onSuccess { result ->
-                    Log.i(TAG, result.toString())
-                    _teammatesAppState.update { it.copy(userQuestionnaires = result) }
-                }.onFailure { handleError(it) }
+            loadUserQuestionnairesUseCase(game = null).onSuccess { result ->
+                Log.i(TAG, result.toString())
+                _teammatesAppState.update { it.copy(userQuestionnaires = result) }
+            }.onFailure { handleError(it) }
 
         }
     }
@@ -131,35 +121,15 @@ class TeammatesViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             _teammatesAppState.update { it.copy(isLoading = true) }
+            createNewQuestionnaireUseCase(
+                header = header,
+                selectedGame = selectedGame,
+                description = description,
+                image = image
+            ).onSuccess { //TODO SnackBar
 
-            try {
-                val user = userDataRepository.user.first()
-                if (user.publicId == null) {
-                    _teammatesAppState.update { it.copy(isAuthenticated = false) }
-                    return@launch
-                } else {
-                    val createQuestionnaireResult = questionnairesRepository.createQuestionnaire(
-                        token = userDataRepository.accessToken.first(),
-                        header = header,
-                        game = selectedGame,
-                        description = description,
-                        authorId = user.publicId!!,
-                        image = image,
-                    )
-
-                    if (createQuestionnaireResult.isSuccess) {
-                        loadUserQuestionnaires()
-                        _questionnairesToastCode.tryEmit(200)
-                    } else {
-                        handleError(createQuestionnaireResult.exceptionOrNull())
-                    }
-                }
-            } catch (e: Exception) {
-                handleError(e)
-            } finally {
-                _teammatesAppState.update { it.copy(isLoading = false) }
-
-            }
+            }.onFailure { handleError(it) }
+            _teammatesAppState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -167,18 +137,18 @@ class TeammatesViewModel @Inject constructor(
         viewModelScope.launch {
             logoutUseCase()
                 .onSuccess {
-                    _teammatesAppState.update {
-                        it.copy(
-                            user = User(),
-                            isAuthenticated = false,
-                            isLoading = false,
-                            questionnaires = emptyList(),
-                            likedQuestionnaires = emptyList(),
-                            userQuestionnaires = emptyList()
-                        )
-                    }
-                    _authToastCode.tryEmit(1)
+                _teammatesAppState.update {
+                    it.copy(
+                        user = User(),
+                        isAuthenticated = false,
+                        isLoading = false,
+                        questionnaires = emptyList(),
+                        likedQuestionnaires = emptyList(),
+                        userQuestionnaires = emptyList()
+                    )
                 }
+                _authToastCode.tryEmit(1)
+            }
         }
     }
 

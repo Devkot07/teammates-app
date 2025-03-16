@@ -5,6 +5,7 @@ import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.domain.repository.UserDataRepository
 import com.pezont.teammates.domain.repository.UsersRepository
 import com.pezont.teammates.domain.usecase.CheckAuthenticationUseCase
+import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
 import com.pezont.teammates.domain.usecase.LoadLikedQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadUserUseCase
@@ -73,28 +74,11 @@ object UseCaseModule {
         return LoadLikedQuestionnairesUseCase(usersRepository, userDataRepository)
     }
 
-//
-//    @Provides
-//    fun provideGetUserQuestionnairesUseCase(
-//        questionnairesRepository: QuestionnairesRepository,
-//        userDataRepository: UserDataRepository
-//    ): GetUserQuestionnairesUseCase {
-//        return GetUserQuestionnairesUseCase(questionnairesRepository, userDataRepository)
-//    }
-//
-//    @Provides
-//    fun provideGetLikedQuestionnairesUseCase(
-//        questionnairesRepository: QuestionnairesRepository,
-//        userDataRepository: UserDataRepository
-//    ): GetLikedQuestionnairesUseCase {
-//        return GetLikedQuestionnairesUseCase(questionnairesRepository, userDataRepository)
-//    }
-//
-//    @Provides
-//    fun provideCreateQuestionnaireUseCase(
-//        questionnairesRepository: QuestionnairesRepository,
-//        userDataRepository: UserDataRepository
-//    ): CreateQuestionnaireUseCase {
-//        return CreateQuestionnaireUseCase(questionnairesRepository, userDataRepository)
-//    }
+    @Provides
+    fun provideCreateQuestionnaireUseCase(
+        questionnairesRepository: QuestionnairesRepository,
+        userDataRepository: UserDataRepository
+    ): CreateQuestionnaireUseCase {
+        return CreateQuestionnaireUseCase(questionnairesRepository, userDataRepository)
+    }
 }
