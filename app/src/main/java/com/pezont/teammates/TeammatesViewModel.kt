@@ -95,13 +95,13 @@ class TeammatesViewModel @Inject constructor(
 
     fun loadQuestionnaires(game: Games? = null, page: Int = 1) {
         viewModelScope.launch {
-            runCatching { loadQuestionnairesUseCase(game, page) }
+            loadQuestionnairesUseCase(page = page, game = game, authorId = null)
                 .onSuccess { result ->
-                    val newQuestionnaires = result.getOrNull() ?: emptyList()
+                    Log.i(TAG, result.toString())
                     if (page == 1) {
-                        _teammatesAppState.update { it.copy(questionnaires = newQuestionnaires) }
+                        _teammatesAppState.update { it.copy(questionnaires = result) }
                     } else {
-                        _teammatesAppState.update { it.copy(questionnaires = teammatesAppState.value.questionnaires + newQuestionnaires) }
+                        _teammatesAppState.update { it.copy(questionnaires = teammatesAppState.value.questionnaires + result) }
                     }
                 }.onFailure { handleError(it) }
         }
