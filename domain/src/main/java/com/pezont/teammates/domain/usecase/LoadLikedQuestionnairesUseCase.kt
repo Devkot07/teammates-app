@@ -1,8 +1,6 @@
 package com.pezont.teammates.domain.usecase
 
-import com.pezont.teammates.domain.model.Games
 import com.pezont.teammates.domain.model.Questionnaire
-import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.domain.repository.UserDataRepository
 import com.pezont.teammates.domain.repository.UsersRepository
 import kotlinx.coroutines.flow.first

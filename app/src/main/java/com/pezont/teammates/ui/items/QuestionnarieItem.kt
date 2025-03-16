@@ -72,7 +72,7 @@ fun QuestionnaireCard(
     val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
 
     Card(
-        modifier = modifier.clickable() {
+        modifier = modifier.clickable {
             navigateToQuestionnaireDetails()
         }
 
