@@ -34,6 +34,8 @@ import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesDestina
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesScreen
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateDestination
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateScreen
+import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireDetailsDestination
+import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireDetailsScreen
 import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesDestination
 import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesScreen
 import com.pezont.teammates.ui.sendAuthToast
@@ -141,6 +143,9 @@ fun TeammatesNavGraph(
                 viewModel = viewModel,
                 questionnaires = questionnaires,
                 onRefresh = viewModel::loadQuestionnaires,
+                navigateToQuestionnaireDetails = {
+                    navController.navigate(QuestionnaireDetailsDestination.route)
+                },
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(HomeDestination.titleRes),
@@ -163,6 +168,9 @@ fun TeammatesNavGraph(
             LikedQuestionnairesScreen(
                 likedQuestionnaires = likedQuestionnaires,
                 viewModel = viewModel,
+                navigateToQuestionnaireDetails = {
+                    navController.navigate(QuestionnaireDetailsDestination.route)
+                },
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(LikedQuestionnairesDestination.titleRes),
@@ -243,6 +251,10 @@ fun TeammatesNavGraph(
                 },
                 userQuestionnaires = userQuestionnaires,
                 onRefresh = viewModel::loadUserQuestionnaires,
+                navigateToQuestionnaireDetails = {
+                    navController.navigate(QuestionnaireDetailsDestination.route)
+                },
+                viewModel = viewModel,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(UserQuestionnairesDestination.titleRes),
@@ -256,6 +268,22 @@ fun TeammatesNavGraph(
                 onTabChange = { currentTab = it },
                 navController = navController,
                 context = context
+            )
+        }
+
+        composable(QuestionnaireDetailsDestination.route) {
+            val selectedQuestionnaire = teammatesAppState.selectedQuestionnaire
+
+            QuestionnaireDetailsScreen(
+                viewModel = viewModel,
+                questionnaire = selectedQuestionnaire,
+                topBar = {
+                    TeammatesTopAppBar(
+                        title = stringResource(QuestionnaireDetailsDestination.titleRes),
+                        canNavigateBack = true,
+                        navigateUp = { navController.navigateUp() },
+                    )
+                }
             )
         }
     }

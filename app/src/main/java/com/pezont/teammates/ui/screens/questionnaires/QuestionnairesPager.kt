@@ -5,6 +5,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.items.QuestionnaireItem
 
@@ -13,6 +14,8 @@ import com.pezont.teammates.ui.items.QuestionnaireItem
 fun QuestionnairesPager(
     pagerState: PagerState,
     questionnaires: List<Questionnaire>,
+    navigateToQuestionnaireDetails: () -> Unit,
+    viewModel: TeammatesViewModel,
     lastItem: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -25,6 +28,10 @@ fun QuestionnairesPager(
         if (pageIndex < questionnaires.size) {
             val questionnaire = questionnaires[pageIndex]
             QuestionnaireItem(
+                navigateToQuestionnaireDetails = {
+                    navigateToQuestionnaireDetails()
+                    viewModel.updateSelectedQuestionnaire(questionnaire)
+                },
                 questionnaire = questionnaire,
                 modifier = modifier,
             )

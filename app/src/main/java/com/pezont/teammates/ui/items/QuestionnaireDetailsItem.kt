@@ -1,0 +1,170 @@
+package com.pezont.teammates.ui.items
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import coil.compose.SubcomposeAsyncImage
+import com.pezont.teammates.TeammatesViewModel
+import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.ui.buttons.LikeButton
+
+@Composable
+fun QuestionnaireDetailsItem(
+    viewModel: TeammatesViewModel,
+    questionnaire: Questionnaire,
+    modifier: Modifier = Modifier,
+) {
+    val authorNickname by produceState(
+        initialValue = "Загрузка...", key1 = questionnaire.authorId
+    ) {
+        value = viewModel.loadAuthorNickname(questionnaire.authorId) ?: ":("
+    }
+
+    val baseUrl = "https://potential-robot-4jg4wjjqp5vv2qx7w-8000.app.github.dev"
+    val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
+
+    var imageLoadingError by remember { mutableStateOf(false) }
+
+    Scaffold(floatingActionButton = {
+        LikeButton(
+            modifier = modifier
+                .wrapContentHeight()
+                .background(Color.Transparent)
+        )
+    }) { paddingValues ->
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                if (!imageLoadingError) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f),
+                        contentAlignment = Alignment.BottomStart
+                    ) {
+                        SubcomposeAsyncImage(model = fixedImagePath,
+                            loading = {
+                                CircularProgressIndicator(
+                                    color = Color.Black, modifier = Modifier.padding(100.dp)
+                                )
+                            },
+                            error = {
+                                imageLoadingError = true
+                            },
+                            contentDescription = "Profile Picture",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(120.dp)
+                                .background(
+                                    brush = Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color.Transparent, Color.Black.copy(alpha = 0.6f)
+                                        )
+                                    )
+                                )
+                                .align(Alignment.BottomCenter)
+                        )
+
+                        Row {
+                            Text(
+                                text = questionnaire.game,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .zIndex(1f)
+                            )
+                            Spacer(Modifier.weight(1f))
+                            Text(
+                                text = authorNickname,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .zIndex(1f)
+                            )
+                        }
+                    }
+                } else {
+                    Row {
+                        Text(
+                            text = questionnaire.game,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .zIndex(1f)
+                        )
+                        Spacer(Modifier.weight(1f))
+                        Text(
+                            text = authorNickname,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .zIndex(1f)
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent)
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = questionnaire.header,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = questionnaire.description,
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+        }
+    }
+}

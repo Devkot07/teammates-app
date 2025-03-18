@@ -41,6 +41,7 @@ import com.pezont.teammates.ui.theme.TeammatesTheme
 @Composable
 fun QuestionnaireItem(
     questionnaire: Questionnaire,
+    navigateToQuestionnaireDetails: () -> Unit,
     modifier: Modifier,
 ) {
 
@@ -50,7 +51,7 @@ fun QuestionnaireItem(
         contentAlignment = Alignment.Center
     ) {
         QuestionnaireCard(
-            {},
+            navigateToQuestionnaireDetails,
             questionnaire = questionnaire,
             modifier = Modifier
                 .widthIn(max = 450.dp)
@@ -81,15 +82,6 @@ fun QuestionnaireCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
     ) {
         Scaffold(
-
-//            floatingActionButton = {
-//                LikeButton(
-//                    modifier = Modifier
-//                        .wrapContentHeight()
-//                        .background(Color.Transparent)
-//                )
-//            }
-
         ) { paddingValues ->
             Column(
                 modifier = Modifier

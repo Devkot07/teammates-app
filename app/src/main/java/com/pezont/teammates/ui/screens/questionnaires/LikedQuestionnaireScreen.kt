@@ -36,6 +36,7 @@ object LikedQuestionnairesDestination : NavigationDestination {
 fun LikedQuestionnairesScreen(
     viewModel: TeammatesViewModel,
     likedQuestionnaires: List<Questionnaire>,
+    navigateToQuestionnaireDetails: () -> Unit,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {}
 ) {
@@ -76,6 +77,8 @@ fun LikedQuestionnairesScreen(
             QuestionnairesPager(
                 questionnaires = likedQuestionnaires,
                 pagerState = pagerState,
+                navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
+                viewModel = viewModel,
                 lastItem = {
                     Box(
                         modifier = Modifier.fillMaxSize(),

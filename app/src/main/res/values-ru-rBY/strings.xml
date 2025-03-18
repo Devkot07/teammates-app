@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Тиммейты</string>
-    <string name="authorization">Authorization</string>
-    <string name="authorization_error_incorrect_login_or_password">Authorization error : Incorrect login or password</string>
-    <string name="authorization_error_authorization_failed">Authorization error : Authorization failed</string>
-    <string name="logout">Logout</string>
-    <string name="error">Error</string>
-    <string name="loading">Loading</string>
-    <string name="please_wait">Please Wait</string>
-    <string name="no_internet_connection">No Internet Connection</string>
-    <string name="retry">Retry</string>
+    <string name="authorization">Авторизация</string>
+    <string name="authorization_error_incorrect_login_or_password">Ошибка авторизации: Неверный логин или пароль</string>
+    <string name="authorization_error_authorization_failed">Ошибка авторизации: Авторизация не удалась</string>
+    <string name="logout">Выйти</string>
+    <string name="error">Ошибка</string>
+    <string name="loading">Загрузка</string>
+    <string name="please_wait">Пожалуйста, подождите</string>
+    <string name="no_internet_connection">Нет подключения к интернету</string>
+    <string name="retry">Повторить</string>
     <string name="welcome">Дарова, </string>
-    <string name="home">Home</string>
-    <string name="favorites">Favorites</string>
-    <string name="profile">Profile</string>
-    <string name="create_questionnaire">Create Questionnaire</string>
-    <string name="user_questionnaires">My Questionnaires</string>
-    <string name="back">Back</string>
-    <string name="entry_information">Entry Information</string>
-    <string name="create">Create</string>
-    <string name="description">Description</string><string name="fill_all_fields">Fill all fields</string>
-    <string name="select_game">Select game</string>
-    <string name="login">Login</string>
-    <string name="something_don_t_work_that_s_all_we_known">Something don\'t work. That\'s all we known</string>
-    <string name="you_haven_t_liked_any_questionnaire">You haven\'t liked any questionnaire</string>
-    <string name="end">end</string>
+    <string name="home">Главная</string>
+    <string name="favorites">Избранное</string>
+    <string name="profile">Профиль</string>
+    <string name="create_questionnaire">Создать анкету</string>
+    <string name="user_questionnaires">Мои анкеты</string>
+    <string name="back">Назад</string>
+    <string name="entry_information">Входная информация</string>
+    <string name="create">Создать</string>
+    <string name="description">Описание</string>
+    <string name="fill_all_fields">Заполните все поля</string>
+    <string name="select_game">Выберите игру</string>
+    <string name="login">Логин</string>
+    <string name="something_don_t_work_that_s_all_we_known">Что-то не работает. Это всё, что нам известно</string>
+    <string name="you_haven_t_liked_any_questionnaire">Вы не добавили ни одной анкеты в избранное</string>
+    <string name="end">Конец</string>
+    <string name="questionnaire">Questionnaire</string>
 </resources>

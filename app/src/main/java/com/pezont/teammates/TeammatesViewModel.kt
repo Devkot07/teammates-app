@@ -132,6 +132,22 @@ class TeammatesViewModel @Inject constructor(
             _teammatesAppState.update { it.copy(isLoading = false) }
         }
     }
+    //TODO useCase
+    fun loadAuthorNickname(authorId: String): String? {
+        return try {
+            "a"
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+
+
+    fun updateSelectedQuestionnaire(questionnaire: Questionnaire) {
+        viewModelScope.launch {
+            _teammatesAppState.update { it.copy(selectedQuestionnaire = questionnaire) }
+        }
+    }
 
     fun logout() {
         viewModelScope.launch {
@@ -144,7 +160,8 @@ class TeammatesViewModel @Inject constructor(
                         isLoading = false,
                         questionnaires = emptyList(),
                         likedQuestionnaires = emptyList(),
-                        userQuestionnaires = emptyList()
+                        userQuestionnaires = emptyList(),
+                        selectedQuestionnaire = Questionnaire()
                     )
                 }
                 _authToastCode.tryEmit(1)
@@ -182,9 +199,7 @@ class TeammatesViewModel @Inject constructor(
 
                     currentState.copy(
                         errorState = ErrorState(
-                            errorCode = errorCode, errorMessage = "Server error: ${
-                                error.response()?.errorBody()?.string() ?: "Unknown"
-                            }"
+                            errorCode = errorCode, errorMessage = "Server error ${error.code()}"
                         )
                     )
                 }
@@ -209,9 +224,11 @@ data class TeammatesUiState(
     val isAuthenticated: Boolean = false,
     val isLoading: Boolean = false,
     val errorState: ErrorState = ErrorState(),
+
     val questionnaires: List<Questionnaire> = emptyList(),
     val likedQuestionnaires: List<Questionnaire> = emptyList(),
-    val userQuestionnaires: List<Questionnaire> = emptyList()
+    val userQuestionnaires: List<Questionnaire> = emptyList(),
+    val selectedQuestionnaire: Questionnaire = Questionnaire(),
 )
 
 

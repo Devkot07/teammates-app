@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
+import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.items.TeammatesLoadingItem
 import com.pezont.teammates.ui.navigation.NavigationDestination
@@ -41,8 +42,10 @@ object UserQuestionnairesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserQuestionnairesScreen(
+    viewModel: TeammatesViewModel,
     userQuestionnaires: List<Questionnaire>,
     onRefresh: () -> Unit,
+    navigateToQuestionnaireDetails: () -> Unit,
     navigateToQuestionnaireCreate: () -> Unit,
     topBar: @Composable () -> Unit = {},
 
@@ -78,6 +81,8 @@ fun UserQuestionnairesScreen(
             QuestionnairesPager(
                 questionnaires = userQuestionnaires,
                 pagerState = pagerState,
+                navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
+                viewModel = viewModel,
                 lastItem = {
                     if (userQuestionnaires.isEmpty()) {
                         TeammatesLoadingItem()

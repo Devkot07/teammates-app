@@ -1,6 +1,5 @@
 package com.pezont.teammates.ui.items
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -38,6 +37,7 @@ object HomeDestination : NavigationDestination {
 fun TeammatesHomeItem(
     viewModel: TeammatesViewModel,
     questionnaires: List<Questionnaire>,
+    navigateToQuestionnaireDetails: () -> Unit,
     onRefresh: () -> Unit,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {}
@@ -73,6 +73,8 @@ fun TeammatesHomeItem(
         ) {
             QuestionnairesPager(
                 questionnaires = questionnaires,
+                navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
+                viewModel = viewModel,
                 pagerState = pagerState,
                 lastItem = {
                     Box(
@@ -88,6 +90,7 @@ fun TeammatesHomeItem(
                     }
                 },
                 modifier = Modifier.fillMaxSize()
+
             )
 
 
@@ -101,18 +104,8 @@ fun TeammatesHomeItem(
                     try {
                         viewModel.loadQuestionnaires(
                             page = newPage
-
                         )
-
-//                    viewModel.tryGetQuestionnaires(
-//                        page = pagerState.currentPage/10 + 1,
-//                    )
-//                    viewModel.getNextFakeQuestionnaires(
-//                        teammatesUiState = teammatesUiState,
-//                        i = pagerState.currentPage / 10 + 1,
-//                    )
                     } finally {
-                        Log.i("LOGIC", "Loading more items")
                         isLoadingMore.value = false
                     }
                 }
