@@ -1,6 +1,8 @@
 package com.pezont.teammates.domain.repository
 
+import com.pezont.teammates.domain.model.LoadAuthorRequest
 import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.domain.model.User
 
 interface UsersRepository {
 
@@ -8,5 +10,11 @@ interface UsersRepository {
         token: String,
         userId: String,
     ): Result<List<Questionnaire>>
+
+    suspend fun loadAuthorProfile(
+        token: String,
+        userId: String,
+        request: LoadAuthorRequest,
+    ): Result<User>
 
 }

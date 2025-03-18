@@ -4,8 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import com.pezont.teammates.data.TeammatesUsersApiService
+import com.pezont.teammates.domain.model.LoadAuthorRequest
 import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.repository.UsersRepository
 import java.io.IOException
 
@@ -35,6 +38,27 @@ class UsersRepositoryImpl(
                 teammatesUsersApiService.loadLikedQuestionnaires(
                     token = "Bearer $token",
                     userId = userId
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun loadAuthorProfile(
+        token: String,
+        userId: String,
+        request: LoadAuthorRequest
+    ): Result<User> {
+        if (!isNetworkAvailable()) return Result.failure(IOException("No internet connection"))
+        return try {
+            Log.i("DEBUG", "$request")
+
+            Result.success(
+                teammatesUsersApiService.loadAuthorProfile(
+                    token = "Bearer $token",
+                    userId = userId,
+                    publicId = request.authorId
                 )
             )
         } catch (e: Exception) {

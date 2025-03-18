@@ -18,9 +18,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,11 +41,15 @@ fun QuestionnaireDetailsItem(
     questionnaire: Questionnaire,
     modifier: Modifier = Modifier,
 ) {
-    val authorNickname by produceState(
-        initialValue = "Загрузка...", key1 = questionnaire.authorId
-    ) {
-        value = viewModel.loadAuthorNickname(questionnaire.authorId) ?: ":("
-    }
+
+    val authorNickname by viewModel.teammatesAppState
+        .collectAsState()
+        .value
+        .selectedAuthor
+        .nickname
+        ?.let { remember { mutableStateOf(it) } }
+        ?: remember { mutableStateOf(":(") }
+
 
     val baseUrl = "https://potential-robot-4jg4wjjqp5vv2qx7w-8000.app.github.dev"
     val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
@@ -76,7 +80,8 @@ fun QuestionnaireDetailsItem(
                             .aspectRatio(1f),
                         contentAlignment = Alignment.BottomStart
                     ) {
-                        SubcomposeAsyncImage(model = fixedImagePath,
+                        SubcomposeAsyncImage(
+                            model = fixedImagePath,
                             loading = {
                                 CircularProgressIndicator(
                                     color = Color.Black, modifier = Modifier.padding(100.dp)

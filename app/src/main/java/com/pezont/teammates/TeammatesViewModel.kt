@@ -8,6 +8,7 @@ import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.usecase.CheckAuthenticationUseCase
 import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
+import com.pezont.teammates.domain.usecase.LoadAuthorProfileUseCase
 import com.pezont.teammates.domain.usecase.LoadLikedQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadUserQuestionnairesUseCase
@@ -40,9 +41,11 @@ class TeammatesViewModel @Inject constructor(
     private val loadUserQuestionnairesUseCase: LoadUserQuestionnairesUseCase,
     private val loadLikedQuestionnairesUseCase: LoadLikedQuestionnairesUseCase,
 
+    private val loadAuthorProfileUseCase: LoadAuthorProfileUseCase,
+
     private val createNewQuestionnaireUseCase: CreateQuestionnaireUseCase,
 
-) : ViewModel() {
+    ) : ViewModel() {
 
     private val _teammatesAppState = MutableStateFlow(TeammatesUiState())
     val teammatesAppState: StateFlow<TeammatesUiState> = _teammatesAppState.asStateFlow()
@@ -132,15 +135,15 @@ class TeammatesViewModel @Inject constructor(
             _teammatesAppState.update { it.copy(isLoading = false) }
         }
     }
-    //TODO useCase
-    fun loadAuthorNickname(authorId: String): String? {
-        return try {
-            "a"
-        } catch (e: Exception) {
-            null
+
+    fun loadAuthorNickname(authorId: String) {
+        _teammatesAppState.update { it.copy(selectedAuthor = User()) }
+        viewModelScope.launch {
+            loadAuthorProfileUseCase(authorId).onSuccess { author ->
+                _teammatesAppState.update { it.copy(selectedAuthor = author) }
+            }.onFailure { handleError(it) }
         }
     }
-
 
 
     fun updateSelectedQuestionnaire(questionnaire: Questionnaire) {
@@ -153,19 +156,21 @@ class TeammatesViewModel @Inject constructor(
         viewModelScope.launch {
             logoutUseCase()
                 .onSuccess {
-                _teammatesAppState.update {
-                    it.copy(
-                        user = User(),
-                        isAuthenticated = false,
-                        isLoading = false,
-                        questionnaires = emptyList(),
-                        likedQuestionnaires = emptyList(),
-                        userQuestionnaires = emptyList(),
-                        selectedQuestionnaire = Questionnaire()
-                    )
+                    _teammatesAppState.update {
+                        it.copy(
+                            user = User(),
+                            isAuthenticated = false,
+                            isLoading = false,
+                            questionnaires = emptyList(),
+                            likedQuestionnaires = emptyList(),
+                            userQuestionnaires = emptyList(),
+                            selectedQuestionnaire = Questionnaire(),
+                            selectedAuthor = User()
+
+                        )
+                    }
+                    _authToastCode.tryEmit(1)
                 }
-                _authToastCode.tryEmit(1)
-            }
         }
     }
 
@@ -228,7 +233,10 @@ data class TeammatesUiState(
     val questionnaires: List<Questionnaire> = emptyList(),
     val likedQuestionnaires: List<Questionnaire> = emptyList(),
     val userQuestionnaires: List<Questionnaire> = emptyList(),
+
     val selectedQuestionnaire: Questionnaire = Questionnaire(),
+    val selectedAuthor: User = User()
+
 )
 
 

@@ -38,6 +38,7 @@ fun QuestionnaireDetailsScreen(
     topBar: @Composable () -> Unit = {},
 
     ) {
+    viewModel.loadAuthorNickname(questionnaire.authorId)
 
     Scaffold(
         topBar = topBar
