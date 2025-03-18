@@ -7,7 +7,7 @@ import okhttp3.MultipartBody
 
 interface QuestionnairesRepository {
 
-    suspend fun getQuestionnairesFromRepo(
+    suspend fun loadQuestionnaires(
         token: String,
         userId: String,
         page: Int?,

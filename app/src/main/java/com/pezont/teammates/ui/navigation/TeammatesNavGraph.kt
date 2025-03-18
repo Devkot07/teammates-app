@@ -8,7 +8,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -50,7 +49,6 @@ fun TeammatesNavGraph(
     paddingValues: PaddingValues,
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
     //TODO SnackBars
     LaunchedEffect(Unit) {
@@ -142,7 +140,7 @@ fun TeammatesNavGraph(
             TeammatesHomeItem(
                 viewModel = viewModel,
                 questionnaires = questionnaires,
-                onRefresh = viewModel::fetchQuestionnaires,
+                onRefresh = viewModel::loadQuestionnaires,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(HomeDestination.titleRes),
@@ -164,7 +162,7 @@ fun TeammatesNavGraph(
 
             LikedQuestionnairesScreen(
                 likedQuestionnaires = likedQuestionnaires,
-                onRefresh = viewModel::fetchLikedQuestionnaires,
+                viewModel = viewModel,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(LikedQuestionnairesDestination.titleRes),
@@ -206,8 +204,7 @@ fun TeammatesNavGraph(
 
         composable(ProfileDestination.route) {
             onTabChange(BottomNavItem.PROFILE)
-            //TODO get user from data
-            val user = teammatesAppState.currentUser
+            val user = teammatesAppState.user
 
             ProfileScreen(
                 navigateToMyQuestionnaires = {

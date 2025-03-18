@@ -1,4 +1,4 @@
-package com.pezont.teammates.data
+package com.pezont.teammates.data.repository
 
 import android.util.Log
 import androidx.datastore.core.DataStore
@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.pezont.teammates.domain.model.User
+import com.pezont.teammates.domain.repository.UserDataRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -16,9 +17,9 @@ import java.io.IOException
 import javax.inject.Inject
 
 
-class UserDataRepository @Inject constructor(
+class UserDataRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
-) {
+) :UserDataRepository {
     private companion object {
         val ACCESS_TOKEN = stringPreferencesKey("access_token")
         val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
@@ -26,7 +27,7 @@ class UserDataRepository @Inject constructor(
         const val TAG = "UserDataRepo"
     }
 
-    val refreshToken: Flow<String> = dataStore.data
+    override val refreshToken: Flow<String> = dataStore.data
         .catch {
             if (it is IOException) {
                 Log.e(TAG, "Error reading preferences.", it)
@@ -37,7 +38,7 @@ class UserDataRepository @Inject constructor(
         }
         .map { data -> data[REFRESH_TOKEN] ?: "0" }
 
-    val accessToken: Flow<String> = dataStore.data
+    override val accessToken: Flow<String> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
                 Log.e(TAG, "Error reading preferences.", exception)
@@ -48,7 +49,7 @@ class UserDataRepository @Inject constructor(
         }
         .map { preferences -> preferences[ACCESS_TOKEN] ?: "0" }
 
-    val user: Flow<User> = dataStore.data
+    override val user: Flow<User> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
                 Log.e(TAG, "Error reading preferences.", exception)
@@ -67,21 +68,21 @@ class UserDataRepository @Inject constructor(
         }
 
 
-    suspend fun saveAccessToken(accessToken: String) {
+    override suspend fun saveAccessToken(newAccessToken: String) {
         dataStore.edit { data ->
-            Log.i(TAG, "Save accessToken: $accessToken")
-            data[ACCESS_TOKEN] = accessToken
+            Log.i(TAG, "Save accessToken: $newAccessToken")
+            data[ACCESS_TOKEN] = newAccessToken
         }
     }
 
-    suspend fun saveRefreshToken(refreshToken: String) {
+    override suspend fun saveRefreshToken(newRefreshToken: String) {
         dataStore.edit { data ->
-            Log.i(TAG, "Save refreshToken: $refreshToken")
-            data[REFRESH_TOKEN] = refreshToken
+            Log.i(TAG, "Save refreshToken: $newRefreshToken")
+            data[REFRESH_TOKEN] = newRefreshToken
         }
     }
 
-    suspend fun saveUser(user: User) {
+    override suspend fun saveUser(user: User) {
         val userJson = Json.encodeToString(user)
         dataStore.edit { data ->
             Log.i(TAG, "Save userJson: $userJson")

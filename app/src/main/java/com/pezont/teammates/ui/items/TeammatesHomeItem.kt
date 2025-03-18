@@ -61,7 +61,6 @@ fun TeammatesHomeItem(
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         delay(1000L)
-                        //TODO clear teammatesUiState.questionnaires
                         onRefresh()
                     } finally {
                         withContext(Dispatchers.Main) {
@@ -100,7 +99,7 @@ fun TeammatesHomeItem(
                     val newPage =
                         if (questionnaires.size % 10 == 0) pagerState.currentPage / 10 + 1 else pagerState.currentPage / 10 + 2
                     try {
-                        viewModel.fetchQuestionnaires(
+                        viewModel.loadQuestionnaires(
                             page = newPage
 
                         )

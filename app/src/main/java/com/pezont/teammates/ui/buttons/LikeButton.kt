@@ -26,8 +26,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun LikeButton(
     modifier: Modifier = Modifier,
+    likeButtonState: Boolean = false,
 ) {
-    var isLiked by remember { mutableStateOf(false) }
+    var isLiked by remember { mutableStateOf(likeButtonState) }
     val scale by animateFloatAsState(
         targetValue = if (isLiked) 1.2f else 1f,
         animationSpec = tween(durationMillis = 300), label = ""
