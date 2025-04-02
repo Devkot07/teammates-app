@@ -13,7 +13,7 @@ object ProfileDestination : NavigationDestination {
 }
 
 @Composable
-fun ProfileScreen(
+fun UserProfileScreen(
     user: User,
     navigateToMyQuestionnaires: () -> Unit,
     logout: () -> Unit,

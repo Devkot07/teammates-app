@@ -47,24 +47,10 @@ import kotlinx.coroutines.launch
 fun TeammatesNavGraph(
     onTabChange: (BottomNavItem) -> Unit,
     navController: NavHostController,
-    viewModel: TeammatesViewModel = hiltViewModel(),
+    viewModel: TeammatesViewModel,
     paddingValues: PaddingValues,
 ) {
     val context = LocalContext.current
-
-    //TODO SnackBars
-    LaunchedEffect(Unit) {
-        launch {
-            viewModel.authToastCode.collect { code ->
-                code?.let { sendAuthToast(it, context) }
-            }
-        }
-        launch {
-            viewModel.questionnairesToastCode.collect { code ->
-                code?.let { sendQuestionnairesToast(it, context) }
-            }
-        }
-    }
 
     val teammatesAppState by viewModel.teammatesAppState.collectAsState()
 

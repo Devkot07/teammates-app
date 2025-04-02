@@ -50,12 +50,8 @@ class TeammatesViewModel @Inject constructor(
     private val _teammatesAppState = MutableStateFlow(TeammatesUiState())
     val teammatesAppState: StateFlow<TeammatesUiState> = _teammatesAppState.asStateFlow()
 
-    private val _authToastCode = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
-    val authToastCode: SharedFlow<Int?> = _authToastCode
-
-    private val _questionnairesToastCode = MutableSharedFlow<Int?>(extraBufferCapacity = 1)
-    val questionnairesToastCode: SharedFlow<Int?> = _questionnairesToastCode
-
+    private val _uiEvent = MutableSharedFlow<UiEvent>(extraBufferCapacity = 1)
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent
 
     init {
         viewModelScope.launch {

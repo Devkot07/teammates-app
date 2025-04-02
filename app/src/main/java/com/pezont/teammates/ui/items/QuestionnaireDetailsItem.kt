@@ -1,6 +1,7 @@
 package com.pezont.teammates.ui.items
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,7 +20,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.SubcomposeAsyncImage
+import com.pezont.teammates.ContentState
+import com.pezont.teammates.TeammatesUiState
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.buttons.LikeButton
@@ -38,17 +41,14 @@ import com.pezont.teammates.ui.buttons.LikeButton
 @Composable
 fun QuestionnaireDetailsItem(
     viewModel: TeammatesViewModel,
+    teammatesAppState: TeammatesUiState,
     questionnaire: Questionnaire,
+    navigateToAuthorProfile: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
-    val authorNickname by viewModel.teammatesAppState
-        .collectAsState()
-        .value
-        .selectedAuthor
-        .nickname
-        ?.let { remember { mutableStateOf(it) } }
-        ?: remember { mutableStateOf(":(") }
+
+    val authorNickname: String = teammatesAppState.selectedAuthor.nickname.toString()
 
 
     val baseUrl = "https://potential-robot-4jg4wjjqp5vv2qx7w-8000.app.github.dev"
@@ -68,46 +68,74 @@ fun QuestionnaireDetailsItem(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                if (!imageLoadingError) {
-                    Box(
+            if (teammatesAppState.contentState != ContentState.LOADED) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 50.dp, end = 50.dp)
+                ) {
+                    CircularProgressIndicator(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f),
-                        contentAlignment = Alignment.BottomStart
-                    ) {
-                        SubcomposeAsyncImage(
-                            model = fixedImagePath,
-                            loading = {
-                                CircularProgressIndicator(
-                                    color = Color.Black, modifier = Modifier.padding(100.dp)
-                                )
-                            },
-                            error = {
-                                imageLoadingError = true
-                            },
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
+                            .size(100.dp)
+                    )
+                }
+
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    if (!imageLoadingError) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(120.dp)
-                                .background(
-                                    brush = Brush.verticalGradient(
-                                        colors = listOf(
-                                            Color.Transparent, Color.Black.copy(alpha = 0.6f)
+                                .aspectRatio(1f),
+                            contentAlignment = Alignment.BottomStart
+                        ) {
+                            SubcomposeAsyncImage(
+                                model = fixedImagePath,
+                                loading = {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.padding(100.dp)
+                                    )
+                                },
+                                error = {
+                                    imageLoadingError = true
+                                },
+                                contentDescription = "Profile Picture",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(120.dp)
+                                    .background(
+                                        brush = Brush.verticalGradient(
+                                            colors = listOf(
+                                                Color.Transparent, Color.Black.copy(alpha = 0.6f)
+                                            )
                                         )
                                     )
-                                )
-                                .align(Alignment.BottomCenter)
-                        )
+                                    .align(Alignment.BottomCenter)
+                            )
 
+                            Row {
+                                Text(
+                                    text = questionnaire.game,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = Color.White,
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .zIndex(1f)
+                                )
+                                Spacer(Modifier.weight(1f))
+                                AuthorNickname(authorNickname, navigateToAuthorProfile)
+                            }
+                        }
+                    } else {
                         Row {
                             Text(
                                 text = questionnaire.game,
@@ -118,58 +146,47 @@ fun QuestionnaireDetailsItem(
                                     .zIndex(1f)
                             )
                             Spacer(Modifier.weight(1f))
-                            Text(
-                                text = authorNickname,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = Color.White,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .zIndex(1f)
-                            )
+                            AuthorNickname(authorNickname, navigateToAuthorProfile)
                         }
                     }
-                } else {
-                    Row {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Transparent)
+                            .padding(16.dp)
+                    ) {
                         Text(
-                            text = questionnaire.game,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.White,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .zIndex(1f)
+                            text = questionnaire.header,
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.primary
                         )
-                        Spacer(Modifier.weight(1f))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = authorNickname,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.White,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .zIndex(1f)
+                            text = questionnaire.description,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.secondary
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Transparent)
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = questionnaire.header,
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = questionnaire.description,
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
             }
+
         }
     }
+}
+
+@Composable
+fun AuthorNickname(authorNickname: String, action: () -> Unit) {
+    Text(
+        text = authorNickname,
+        style = MaterialTheme.typography.bodyLarge,
+        color = Color.White,
+        modifier = Modifier
+            .padding(16.dp)
+            .zIndex(1f)
+            .clickable{
+                action()
+            }
+    )
 }
