@@ -4,11 +4,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.User
-import com.pezont.teammates.ui.items.TeammatesProfile
+import com.pezont.teammates.ui.items.UserProfile
 import com.pezont.teammates.ui.navigation.NavigationDestination
 
-object ProfileDestination : NavigationDestination {
-    override val route = "profile"
+object UserProfileDestination : NavigationDestination {
+    override val route = "user_profile"
     override val titleRes = R.string.profile
 }
 
@@ -22,7 +22,7 @@ fun UserProfileScreen(
     Scaffold(
         topBar = topBar,
     ) { paddingValues ->
-        TeammatesProfile(
+        UserProfile(
             navigateToMyQuestionnaires, logout, user, paddingValues
         )
     }

@@ -66,7 +66,7 @@ fun TeammatesApp() {
         HomeDestination.route,
         LikedQuestionnairesDestination.route,
         QuestionnaireCreateDestination.route,
-        ProfileDestination.route
+        UserProfileDestination.route
     )
 
     var currentTab by remember { mutableStateOf(BottomNavItem.HOME) }
@@ -117,7 +117,7 @@ fun TeammatesApp() {
                             )
 
                             BottomNavItem.PROFILE -> navController.navigate(
-                                ProfileDestination.route
+                                UserProfileDestination.route
                             )
                         }
                     },

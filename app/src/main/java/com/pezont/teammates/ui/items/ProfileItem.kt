@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -36,8 +37,72 @@ import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.theme.TeammatesTheme
 
+//TODO AuthorProfile
 @Composable
-fun TeammatesProfile(
+fun AuthorProfile(
+    navigateToMyQuestionnaires: () -> Unit,
+    logout: () -> Unit,
+
+    user: User,
+
+    paddingValues: PaddingValues
+) {
+
+    val nickname: String = user.nickname ?: ""
+    val description: String = user.description ?: ""
+    val email: String = user.email ?: ""
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+
+
+        ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.Top,
+
+            ) {
+            Spacer(modifier = Modifier.height(10.dp))
+
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            Text(
+                text = "Description: $description",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "Email: $email",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+
+
+
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedButton(onClick = logout) {
+                Text(text = stringResource(R.string.subscribe))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = navigateToMyQuestionnaires
+
+            ) {
+                Text(text = "My questionnaires")
+            }
+        }
+    }
+}
+
+
+@Composable
+fun UserProfile(
     navigateToMyQuestionnaires: () -> Unit,
     logout: () -> Unit,
 
@@ -64,23 +129,16 @@ fun TeammatesProfile(
 
             ) {
             Spacer(modifier = Modifier.height(10.dp))
-            ProfileSection(
+            UserProfileSection(
                 nickname = nickname,
                 email = email,
                 image = painterResource(id = R.drawable.ic_launcher_foreground)
             )
-//            Text(
-//                text = "User Profile",
-//                style = MaterialTheme.typography.headlineSmall,
-//                color = MaterialTheme.colorScheme.primary
-//            )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
-//            Text(
-//                text = "Nickname: $nickname",
-//                style = MaterialTheme.typography.bodyMedium
-//            )
+
             Text(
                 text = "Description: $description",
                 style = MaterialTheme.typography.bodyMedium
@@ -110,9 +168,8 @@ fun TeammatesProfile(
     }
 }
 
-
 @Composable
-fun ProfileSection(
+fun UserProfileSection(
     nickname: String,
     email: String,
 
@@ -152,7 +209,6 @@ fun ProfileSection(
                     color = Color.Gray
                 )
             }
-            //StatSection(modifier = Modifier.weight(7f))
         }
 
     }
@@ -243,9 +299,25 @@ fun ProfileDescription(
 
 @Preview
 @Composable
-fun ProfilePreview() {
+fun AuthorProfilePreview() {
     TeammatesTheme {
-        TeammatesProfile(
+        AuthorProfile(
+            {}, {},
+            User(
+                "Bobi",
+                "111-111-111-111",
+                "bobi@longcorp.com",
+            ),
+            PaddingValues()
+        )
+    }
+}
+
+@Preview
+@Composable
+fun UserProfilePreview() {
+    TeammatesTheme {
+        UserProfile(
             {}, {},
             User(
                 "Bob",
