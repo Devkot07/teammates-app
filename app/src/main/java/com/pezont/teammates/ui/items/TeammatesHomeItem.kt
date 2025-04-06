@@ -1,6 +1,5 @@
 package com.pezont.teammates.ui.items
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,12 +10,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pezont.teammates.ObserveState
 import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
@@ -38,6 +37,7 @@ object HomeDestination : NavigationDestination {
 fun TeammatesHomeItem(
     viewModel: TeammatesViewModel,
     questionnaires: List<Questionnaire>,
+    navigateToQuestionnaireDetails: () -> Unit,
     onRefresh: () -> Unit,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {}
@@ -73,6 +73,8 @@ fun TeammatesHomeItem(
         ) {
             QuestionnairesPager(
                 questionnaires = questionnaires,
+                navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
+                viewModel = viewModel,
                 pagerState = pagerState,
                 lastItem = {
                     Box(
@@ -88,11 +90,12 @@ fun TeammatesHomeItem(
                     }
                 },
                 modifier = Modifier.fillMaxSize()
+
             )
 
 
 
-            LaunchedEffect(pagerState.currentPage) {
+            ObserveState(pagerState.currentPage) {
                 if (!isLoadingMore.value && pagerState.currentPage == questionnaires.size) {
                     isLoadingMore.value = true
 
@@ -101,18 +104,8 @@ fun TeammatesHomeItem(
                     try {
                         viewModel.loadQuestionnaires(
                             page = newPage
-
                         )
-
-//                    viewModel.tryGetQuestionnaires(
-//                        page = pagerState.currentPage/10 + 1,
-//                    )
-//                    viewModel.getNextFakeQuestionnaires(
-//                        teammatesUiState = teammatesUiState,
-//                        i = pagerState.currentPage / 10 + 1,
-//                    )
                     } finally {
-                        Log.i("LOGIC", "Loading more items")
                         isLoadingMore.value = false
                     }
                 }

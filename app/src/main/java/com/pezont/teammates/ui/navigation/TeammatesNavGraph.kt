@@ -3,7 +3,6 @@ package com.pezont.teammates.ui.navigation
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,11 +11,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.pezont.teammates.ObserveAsEvents
+import com.pezont.teammates.ObserveState
 import com.pezont.teammates.TeammatesViewModel
+import com.pezont.teammates.UiEvent
+import com.pezont.teammates.domain.model.AuthState
 import com.pezont.teammates.domain.model.BottomNavItem
 import com.pezont.teammates.ui.TeammatesBackHandler
 import com.pezont.teammates.ui.TeammatesTopAppBar
@@ -24,88 +26,88 @@ import com.pezont.teammates.ui.items.HomeDestination
 import com.pezont.teammates.ui.items.LoadingDestination
 import com.pezont.teammates.ui.items.TeammatesHomeItem
 import com.pezont.teammates.ui.items.TeammatesLoadingItem
-import com.pezont.teammates.ui.screens.ErrorDestination
-import com.pezont.teammates.ui.screens.ErrorScreen
+import com.pezont.teammates.ui.screens.AuthorProfileDestination
+import com.pezont.teammates.ui.screens.AuthorProfileScreen
 import com.pezont.teammates.ui.screens.LoginDestination
 import com.pezont.teammates.ui.screens.LoginScreen
-import com.pezont.teammates.ui.screens.ProfileDestination
-import com.pezont.teammates.ui.screens.ProfileScreen
+import com.pezont.teammates.ui.screens.UserProfileDestination
+import com.pezont.teammates.ui.screens.UserProfileScreen
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesDestination
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesScreen
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateDestination
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateScreen
+import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireDetailsDestination
+import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireDetailsScreen
 import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesDestination
 import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesScreen
-import com.pezont.teammates.ui.sendAuthToast
-import com.pezont.teammates.ui.sendQuestionnairesToast
-import kotlinx.coroutines.launch
-
 
 @Composable
 fun TeammatesNavGraph(
     onTabChange: (BottomNavItem) -> Unit,
     navController: NavHostController,
-    viewModel: TeammatesViewModel = hiltViewModel(),
+    viewModel: TeammatesViewModel,
     paddingValues: PaddingValues,
 ) {
     val context = LocalContext.current
 
-    //TODO SnackBars
-    LaunchedEffect(Unit) {
-        launch {
-            viewModel.authToastCode.collect { code ->
-                code?.let { sendAuthToast(it, context) }
-            }
-        }
-        launch {
-            viewModel.questionnairesToastCode.collect { code ->
-                code?.let { sendQuestionnairesToast(it, context) }
-            }
-        }
-    }
+    val uiState by viewModel.uiState.collectAsState()
 
-    val teammatesAppState by viewModel.teammatesAppState.collectAsState()
-
-
-    var currentTab by remember { mutableStateOf(BottomNavItem.HOME) }
-
-    val currentRoute =
-        navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry).value?.destination?.route
-
-    LaunchedEffect(teammatesAppState) {
-        when {
-            teammatesAppState.errorState.isNetworkError -> {
-                navController.navigate(ErrorDestination.route)
-            }
-
-            teammatesAppState.errorState.errorCode != 0 -> {
-                navController.navigate(ErrorDestination.route)
-            }
-
-            teammatesAppState.isLoading -> {
-                navController.navigate(LoadingDestination.route)
-            }
-
-            !teammatesAppState.isAuthenticated -> {
+    ObserveAsEvents(viewModel.uiEvent) { event ->
+        when (event) {
+            is UiEvent.LoggedOut -> {
                 navController.navigate(LoginDestination.route) {
                     popUpTo(navController.graph.startDestinationId) { inclusive = true }
                 }
             }
 
-            teammatesAppState.isAuthenticated && navController.currentDestination?.route == LoginDestination.route -> {
+            is UiEvent.LoggedIn -> {
                 navController.navigate(HomeDestination.route) {
                     popUpTo(LoginDestination.route) { inclusive = true }
+                }
+            }
+
+            is UiEvent.QuestionnaireCreated -> {
+                navController.navigate(UserQuestionnairesDestination.route) {
+                    popUpTo(HomeDestination.route) { inclusive = false }
                 }
             }
         }
     }
 
+    ObserveState(uiState.authState) { authState ->
+        when (authState) {
+            AuthState.LOADING -> {
+                navController.navigate(LoadingDestination.route)
+            }
+
+            AuthState.UNAUTHENTICATED -> {
+                if (navController.currentDestination?.route != LoginDestination.route) {
+                    navController.navigate(LoginDestination.route)
+                }
+            }
+
+            AuthState.AUTHENTICATED -> {
+                if (navController.currentDestination?.route == LoginDestination.route) {
+                    navController.navigate(HomeDestination.route) {
+                        popUpTo(LoginDestination.route) { inclusive = true }
+                    }
+                }
+            }
+
+            else -> {}
+        }
+    }
+
+    var currentTab by remember { mutableStateOf(BottomNavItem.HOME) }
+    val currentRoute = navController.currentBackStackEntryFlow.collectAsState(
+        initial = navController.currentBackStackEntry
+    ).value?.destination?.route
 
     NavHost(
         navController = navController,
-        startDestination = when {
-            teammatesAppState.isLoading -> LoadingDestination.route
-            teammatesAppState.isAuthenticated -> LoginDestination.route
+        startDestination = when (uiState.authState) {
+            AuthState.LOADING -> LoadingDestination.route
+            AuthState.UNAUTHENTICATED -> LoginDestination.route
             else -> HomeDestination.route
         },
 
@@ -121,26 +123,18 @@ fun TeammatesNavGraph(
             LoginScreen(onTabChange, viewModel)
         }
 
-        composable(ErrorDestination.route) {
-            ErrorScreen(
-                onClick = {
-                    viewModel.clearError()
-                    navController.navigate(HomeDestination.route) {
-                        popUpTo(ErrorDestination.route) { inclusive = true }
-                    }
-                },
-                errorText = teammatesAppState.errorState.errorMessage
-            )
-        }
-
         composable(HomeDestination.route) {
             onTabChange(BottomNavItem.HOME)
-            val questionnaires = teammatesAppState.questionnaires
+            val questionnaires = uiState.questionnaires
 
             TeammatesHomeItem(
                 viewModel = viewModel,
                 questionnaires = questionnaires,
                 onRefresh = viewModel::loadQuestionnaires,
+                navigateToQuestionnaireDetails = {
+                    navController.navigate(QuestionnaireDetailsDestination.route)
+
+                },
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(HomeDestination.titleRes),
@@ -154,15 +148,20 @@ fun TeammatesNavGraph(
                 navController = navController,
                 context = context
             )
+
+
         }
 
         composable(LikedQuestionnairesDestination.route) {
             onTabChange(BottomNavItem.LIKED)
-            val likedQuestionnaires = teammatesAppState.likedQuestionnaires
+            val likedQuestionnaires = uiState.likedQuestionnaires
 
             LikedQuestionnairesScreen(
                 likedQuestionnaires = likedQuestionnaires,
                 viewModel = viewModel,
+                navigateToQuestionnaireDetails = {
+                    navController.navigate(QuestionnaireDetailsDestination.route)
+                },
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(LikedQuestionnairesDestination.titleRes),
@@ -202,25 +201,22 @@ fun TeammatesNavGraph(
             )
         }
 
-        composable(ProfileDestination.route) {
+        composable(UserProfileDestination.route) {
             onTabChange(BottomNavItem.PROFILE)
-            val user = teammatesAppState.user
+            val user = uiState.user
 
-            ProfileScreen(
+            UserProfileScreen(
                 navigateToMyQuestionnaires = {
                     viewModel.loadUserQuestionnaires()
                     navController.navigate(UserQuestionnairesDestination.route)
                 },
                 logout = {
                     viewModel.logout()
-                    navController.navigate(LoginDestination.route) {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                    }
                 },
                 user = user,
                 topBar = {
                     TeammatesTopAppBar(
-                        title = stringResource(ProfileDestination.titleRes),
+                        title = stringResource(UserProfileDestination.titleRes),
                         canNavigateBack = false,
                     )
                 }
@@ -234,7 +230,7 @@ fun TeammatesNavGraph(
         }
 
         composable(UserQuestionnairesDestination.route) {
-            val userQuestionnaires = teammatesAppState.userQuestionnaires
+            val userQuestionnaires = uiState.userQuestionnaires
 
             UserQuestionnairesScreen(
                 navigateToQuestionnaireCreate = {
@@ -243,6 +239,10 @@ fun TeammatesNavGraph(
                 },
                 userQuestionnaires = userQuestionnaires,
                 onRefresh = viewModel::loadUserQuestionnaires,
+                navigateToQuestionnaireDetails = {
+                    navController.navigate(QuestionnaireDetailsDestination.route)
+                },
+                viewModel = viewModel,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(UserQuestionnairesDestination.titleRes),
@@ -256,6 +256,46 @@ fun TeammatesNavGraph(
                 onTabChange = { currentTab = it },
                 navController = navController,
                 context = context
+            )
+        }
+
+        composable(QuestionnaireDetailsDestination.route) {
+            val selectedQuestionnaire = uiState.selectedQuestionnaire
+
+            QuestionnaireDetailsScreen(
+                viewModel = viewModel,
+                uiState = uiState,
+                questionnaire = selectedQuestionnaire,
+
+                navigateToAuthorProfile = {
+                    navController.navigate(AuthorProfileDestination.route)
+                },
+
+                topBar = {
+                    TeammatesTopAppBar(
+                        title = stringResource(QuestionnaireDetailsDestination.titleRes),
+                        canNavigateBack = true,
+                        navigateUp = { navController.navigateUp() },
+                    )
+                }
+            )
+        }
+        composable(AuthorProfileDestination.route) {
+            val selectedAuthor = uiState.selectedAuthor
+            AuthorProfileScreen(
+                navigateToMyQuestionnaires = {
+
+                },
+                logout = {
+                },
+                author = selectedAuthor,
+                topBar = {
+                    TeammatesTopAppBar(
+                        title = selectedAuthor.nickname.toString(),
+                        canNavigateBack = true,
+                        navigateUp = { navController.navigate(HomeDestination.route) }
+                    )
+                }
             )
         }
     }

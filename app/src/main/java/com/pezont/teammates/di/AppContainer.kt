@@ -39,6 +39,7 @@ interface AppContainer {
 
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
+    //TODO hide ip
     private val ip = "potential-robot-4jg4wjjqp5vv2qx7w-"
 
     private val okHttpClient = OkHttpClient.Builder()

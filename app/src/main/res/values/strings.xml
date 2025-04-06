@@ -26,4 +26,13 @@
     <string name="something_don_t_work_that_s_all_we_known">Something don\'t work. That\'s all we known</string>
     <string name="you_haven_t_liked_any_questionnaire">You haven\'t liked any questionnaire</string>
     <string name="end">end</string>
+    <string name="questionnaire">Questionnaire</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="questionnaire_created_successfully">Questionnaire created successfully</string>
+    <string name="network_error_please_check_your_connection">Network error. Please check your connection.</string>
+    <string name="logged_out">Logged out</string>
+    <string name="authentication_error_please_log_in_again">Authentication error. Please log in again.</string>
+    <string name="server_error">Server error</string>
+    <string name="unknown_error_occurred">Unknown error occurred</string>
+    <string name="you_aren_t_logged_in">You aren\'t logged in</string>
 </resources>

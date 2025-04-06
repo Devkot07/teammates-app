@@ -25,10 +25,9 @@ class AuthRepositoryImpl(
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    override suspend fun login(nickname: String, password: String): Result<LoginResponse> {
+    override suspend fun login(request: LoginRequest): Result<LoginResponse> {
         if (!isNetworkAvailable()) return Result.failure(IOException("No internet connection"))
         return try {
-            val request = LoginRequest(nickname, password)
             Result.success(authApiService.login(request))
         } catch (e: Exception) {
             Result.failure(e)
