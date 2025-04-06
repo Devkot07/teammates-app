@@ -24,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,13 +43,28 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TeammatesApp() {
+    val context = LocalContext.current
     val viewModel: TeammatesViewModel = hiltViewModel()
 
-    val navController = rememberNavController()
-
     val scope = rememberCoroutineScope()
-
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val navController = rememberNavController()
+    val currentRoute = navController
+        .currentBackStackEntryFlow
+        .collectAsState(initial = navController.currentBackStackEntry)
+        .value?.destination?.route
+
+    val bottomBarDestinations = listOf(
+        HomeDestination.route,
+        LikedQuestionnairesDestination.route,
+        QuestionnaireCreateDestination.route,
+        UserProfileDestination.route
+    )
+
+    val shouldShowBottomBar = currentRoute in bottomBarDestinations
+
+    var currentTab by remember { mutableStateOf(BottomNavItem.HOME) }
 
     val navigationItemContentList = listOf(
         NavigationItemContent(
@@ -62,19 +78,6 @@ fun TeammatesApp() {
         )
     )
 
-    val bottomBarDestinations = listOf(
-        HomeDestination.route,
-        LikedQuestionnairesDestination.route,
-        QuestionnaireCreateDestination.route,
-        UserProfileDestination.route
-    )
-
-    var currentTab by remember { mutableStateOf(BottomNavItem.HOME) }
-
-    val currentRoute =
-        navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry).value?.destination?.route
-
-    val shouldShowBottomBar = currentRoute in bottomBarDestinations
 
     ObserveAsEvents(
         flow = SnackbarController.events,
@@ -83,7 +86,7 @@ fun TeammatesApp() {
         scope.launch {
             snackbarHostState.currentSnackbarData?.dismiss()
             val result = snackbarHostState.showSnackbar(
-                message = event.message,
+                message = context.getString(event.messageId),
                 actionLabel = event.action?.name,
                 duration = SnackbarDuration.Short
             )

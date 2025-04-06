@@ -31,6 +31,7 @@ fun QuestionnairesPager(
                 navigateToQuestionnaireDetails = {
                     navigateToQuestionnaireDetails()
                     viewModel.updateSelectedQuestionnaire(questionnaire)
+                    viewModel.loadAuthor(questionnaire.authorId)
                 },
                 questionnaire = questionnaire,
                 modifier = modifier,

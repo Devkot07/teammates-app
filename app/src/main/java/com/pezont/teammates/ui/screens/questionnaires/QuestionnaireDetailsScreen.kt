@@ -5,7 +5,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.pezont.teammates.R
-import com.pezont.teammates.TeammatesUiState
+import com.pezont.teammates.UiState
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.items.QuestionnaireDetailsItem
@@ -20,7 +20,7 @@ object QuestionnaireDetailsDestination : NavigationDestination {
 @Composable
 fun QuestionnaireDetailsScreen(
     viewModel: TeammatesViewModel,
-    teammatesAppState: TeammatesUiState,
+    uiState: UiState,
     questionnaire: Questionnaire,
     navigateToAuthorProfile: () -> Unit,
     topBar: @Composable () -> Unit = {},
@@ -30,7 +30,7 @@ fun QuestionnaireDetailsScreen(
     Scaffold(
         topBar = topBar
     ) { innerPadding ->
-        QuestionnaireDetailsItem(viewModel, teammatesAppState, questionnaire,navigateToAuthorProfile, Modifier.padding(innerPadding))
+        QuestionnaireDetailsItem(viewModel, uiState, questionnaire,navigateToAuthorProfile, Modifier.padding(innerPadding))
 
     }
 

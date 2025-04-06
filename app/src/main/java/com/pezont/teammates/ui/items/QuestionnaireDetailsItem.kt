@@ -32,23 +32,23 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.SubcomposeAsyncImage
-import com.pezont.teammates.ContentState
-import com.pezont.teammates.TeammatesUiState
+import com.pezont.teammates.UiState
 import com.pezont.teammates.TeammatesViewModel
+import com.pezont.teammates.domain.model.ContentState
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.buttons.LikeButton
 
 @Composable
 fun QuestionnaireDetailsItem(
     viewModel: TeammatesViewModel,
-    teammatesAppState: TeammatesUiState,
+    uiState: UiState,
     questionnaire: Questionnaire,
     navigateToAuthorProfile: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
 
-    val authorNickname: String = teammatesAppState.selectedAuthor.nickname.toString()
+    val authorNickname: String = uiState.selectedAuthor.nickname.toString()
 
 
     val baseUrl = "https://potential-robot-4jg4wjjqp5vv2qx7w-8000.app.github.dev"
@@ -68,7 +68,7 @@ fun QuestionnaireDetailsItem(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (teammatesAppState.contentState != ContentState.LOADED) {
+            if (uiState.contentState != ContentState.LOADED) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier

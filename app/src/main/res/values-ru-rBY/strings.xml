@@ -28,4 +28,11 @@
     <string name="end">Конец</string>
     <string name="questionnaire">Questionnaire</string>
     <string name="subscribe">Subscribe</string>
+    <string name="questionnaire_created_successfully">Questionnaire created successfully</string>
+    <string name="network_error_please_check_your_connection">Network error. Please check your connection.</string>
+    <string name="logged_out">Logged out</string>
+    <string name="authentication_error_please_log_in_again">Authentication error. Please log in again.</string>
+    <string name="server_error">Server error</string>
+    <string name="unknown_error_occurred">Unknown error occurred</string>
+    <string name="you_aren_t_logged_in">You aren\'t logged in</string>
 </resources>
