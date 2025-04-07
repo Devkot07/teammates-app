@@ -47,7 +47,7 @@ class TeammatesViewModel @Inject constructor(
 
     private val loadAuthorProfileUseCase: LoadAuthorProfileUseCase,
 
-    private val createNewQuestionnaireUseCase: CreateQuestionnaireUseCase,
+    val createNewQuestionnaireUseCase: CreateQuestionnaireUseCase,
 
     ) : ViewModel() {
 
