@@ -10,6 +10,6 @@ interface UserDataRepository {
     val refreshToken: Flow<String>
 
     suspend fun saveUser(user: User)
-    suspend fun saveAccessToken(token: String)
-    suspend fun saveRefreshToken(token: String)
+    suspend fun saveAccessToken(newAccessToken: String)
+    suspend fun saveRefreshToken(newRefreshToken: String)
 }
