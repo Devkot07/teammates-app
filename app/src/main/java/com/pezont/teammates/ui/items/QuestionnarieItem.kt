@@ -56,7 +56,7 @@ fun QuestionnaireItem(
             modifier = Modifier
                 .widthIn(max = 450.dp)
                 .heightIn(max = 800.dp)
-                .padding(top = 16.dp, start = 32.dp, end = 32.dp, bottom = 24.dp)
+                .padding(top = 8.dp, start = 32.dp, end = 32.dp, bottom = 16.dp)
                 .fillMaxSize()
         )
     }
