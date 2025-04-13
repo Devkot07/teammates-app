@@ -76,7 +76,7 @@ class TeammatesViewModel @Inject constructor(
                     user = if (authenticated) loadUserUseCase() else User()
                 )
             }
-            loadLikedQuestionnaires()
+            if (authenticated) loadLikedQuestionnaires()
         }.onFailure { throwable ->
             Log.e(TAG, throwable.toString())
             _uiState.update { it.copy(authState = AuthState.UNAUTHENTICATED) }
