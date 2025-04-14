@@ -32,6 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.SubcomposeAsyncImage
+import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.UiState
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.ContentState
@@ -51,7 +52,7 @@ fun QuestionnaireDetailsItem(
     val authorNickname: String = uiState.selectedAuthor.nickname.toString()
 
 
-    val baseUrl = "https://potential-robot-4jg4wjjqp5vv2qx7w-8000.app.github.dev"
+    val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}"
     val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
 
     var imageLoadingError by remember { mutableStateOf(false) }
@@ -87,7 +88,7 @@ fun QuestionnaireDetailsItem(
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
-                    if (!imageLoadingError) {
+                    if (questionnaire.imagePath.isNotEmpty() && !imageLoadingError) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()

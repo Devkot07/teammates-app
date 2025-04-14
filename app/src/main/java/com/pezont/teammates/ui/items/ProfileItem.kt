@@ -154,11 +154,11 @@ fun UserProfile(
 
 
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = logout) {
+            OutlinedButton(onClick = logout) {
                 Text(text = stringResource(id = R.string.logout))
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
+            OutlinedButton(
                 onClick = navigateToMyQuestionnaires
 
             ) {
