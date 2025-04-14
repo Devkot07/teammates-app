@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -22,6 +24,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+        buildConfigField("String", "BASE_URL", gradleLocalProperties(rootDir, providers).getProperty("BASE_URL"))
+        buildConfigField("String", "PORT_1", gradleLocalProperties(rootDir, providers).getProperty("PORT_1"))
+        buildConfigField("String", "PORT_2", gradleLocalProperties(rootDir, providers).getProperty("PORT_2"))
+        buildConfigField("String", "PORT_3", gradleLocalProperties(rootDir, providers).getProperty("PORT_3"))
+        buildConfigField("String", "END_URL", gradleLocalProperties(rootDir, providers).getProperty("END_URL"))
     }
 
     buildTypes {
@@ -44,6 +52,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 

@@ -9,5 +9,5 @@ class CheckAuthenticationUseCase @Inject constructor(
     private val userDataRepository: UserDataRepository
 ) {
     operator fun invoke(): Flow<Boolean> =
-        userDataRepository.user.map { it.publicId != null }
+        userDataRepository.user.map { it.publicId != "" }
 }

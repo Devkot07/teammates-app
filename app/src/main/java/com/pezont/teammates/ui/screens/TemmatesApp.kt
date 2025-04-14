@@ -17,6 +17,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,10 +51,11 @@ fun TeammatesApp() {
     val snackbarHostState = remember { SnackbarHostState() }
 
     val navController = rememberNavController()
-    val currentRoute = navController
+    val navBackStackEntry by navController
         .currentBackStackEntryFlow
         .collectAsState(initial = navController.currentBackStackEntry)
-        .value?.destination?.route
+
+    val currentRoute = navBackStackEntry?.destination?.route
 
     val bottomBarDestinations = listOf(
         HomeDestination.route,
@@ -61,8 +63,9 @@ fun TeammatesApp() {
         QuestionnaireCreateDestination.route,
         UserProfileDestination.route
     )
-
-    val shouldShowBottomBar = currentRoute in bottomBarDestinations
+    val shouldShowBottomBar by remember(currentRoute) {
+        derivedStateOf { currentRoute in bottomBarDestinations }
+    }
 
     var currentTab by remember { mutableStateOf(BottomNavItem.HOME) }
 

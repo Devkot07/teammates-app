@@ -16,6 +16,7 @@
 package com.pezont.teammates.di
 
 import android.content.Context
+import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.data.repository.AuthRepositoryImpl
 import com.pezont.teammates.data.repository.QuestionnairesRepositoryImpl
 import com.pezont.teammates.domain.repository.AuthRepository
@@ -39,13 +40,13 @@ interface AppContainer {
 
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
-    //TODO hide ip
-    private val ip = "potential-robot-4jg4wjjqp5vv2qx7w-"
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         })
+        .followRedirects(false)
+        .followSslRedirects(false)
         .build()
 
 
@@ -58,26 +59,24 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val authRepository: AuthRepository by lazy {
         val retrofitService =
-            createRetrofit("https://${ip}8100.app.github.dev")
+            createRetrofit("${BuildConfig.BASE_URL}${BuildConfig.PORT_2}${BuildConfig.END_URL}")
                 .create(TeammatesAuthApiService::class.java)
         AuthRepositoryImpl(retrofitService, context)
     }
 
     override val questionnairesRepository: QuestionnairesRepository by lazy {
         val retrofitService =
-            createRetrofit("https://${ip}8000.app.github.dev")
+            createRetrofit("${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}")
                 .create(TeammatesQuestionnairesApiService::class.java)
         QuestionnairesRepositoryImpl(retrofitService, context)
     }
 
     override val usersRepository: UsersRepository by lazy {
         val retrofitService =
-            createRetrofit("https://${ip}8200.app.github.dev")
+            createRetrofit("${BuildConfig.BASE_URL}${BuildConfig.PORT_3}${BuildConfig.END_URL}")
                 .create(TeammatesUsersApiService::class.java)
         UsersRepositoryImpl(retrofitService, context)
     }
-
-
 
 
 }

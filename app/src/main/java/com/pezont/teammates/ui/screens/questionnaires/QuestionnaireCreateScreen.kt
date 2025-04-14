@@ -1,6 +1,5 @@
 package com.pezont.teammates.ui.screens.questionnaires
 
-import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -46,18 +45,15 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.Games
 import com.pezont.teammates.domain.model.QuestionnaireForm
+import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
 import com.pezont.teammates.ui.navigation.NavigationDestination
-import com.pezont.teammates.ui.theme.TeammatesTheme
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
 
 object QuestionnaireCreateDestination : NavigationDestination {
     override val route = "item_create"
@@ -75,6 +71,7 @@ fun QuestionnaireCreateScreen(
         selectedGame: Games,
         image: MultipartBody.Part?
     ) -> Unit,
+    createQuestionnaireUseCase: CreateQuestionnaireUseCase,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {}
 ) {
@@ -237,7 +234,7 @@ fun QuestionnaireCreateScreen(
                                 }
 
                                 else -> {
-                                    val imagePart = selectedImageUri?.asMultipart("image", context)
+                                    val imagePart = selectedImageUri?.let { createQuestionnaireUseCase.uriToSquareCroppedWebpMultipart(it, context) }
                                     navigateToHome()
                                     createNewQuestionnaireAction(
                                         questionnaireForm.header,
@@ -245,6 +242,7 @@ fun QuestionnaireCreateScreen(
                                         questionnaireForm.selectedGame!!,
                                         imagePart
                                     )
+                                    selectedImageUri = null
                                 }
                             }
                         }
@@ -260,22 +258,5 @@ fun QuestionnaireCreateScreen(
     }
 }
 
-// TODO extract
-fun Uri.asMultipart(name: String, context: Context): MultipartBody.Part? {
-    val contentResolver = context.contentResolver
-    val inputStream = contentResolver.openInputStream(this) ?: return null
-    val requestBody = inputStream.readBytes()
-        .toRequestBody(contentResolver.getType(this)?.toMediaTypeOrNull())
-    inputStream.close()
-    return MultipartBody.Part.createFormData(name, this.lastPathSegment, requestBody)
-}
 
-@Preview
-@Composable
-fun PreviewQuestionnaireEntryScreen() {
 
-    TeammatesTheme(darkTheme = true) {
-        QuestionnaireCreateScreen(Modifier, {}, { _, _, _, _ -> }, {})
-    }
-
-}

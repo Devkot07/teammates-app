@@ -67,6 +67,7 @@ fun TeammatesNavGraph(
             }
 
             is UiEvent.QuestionnaireCreated -> {
+                viewModel.loadUserQuestionnaires()
                 navController.navigate(UserQuestionnairesDestination.route) {
                     popUpTo(HomeDestination.route) { inclusive = false }
                 }
@@ -181,11 +182,10 @@ fun TeammatesNavGraph(
             onTabChange(BottomNavItem.CREATE)
             QuestionnaireCreateScreen(
                 navigateToHome = {
-                    navController.navigate(HomeDestination.route) {
-                        popUpTo(HomeDestination.route) { inclusive = false }
-                    }
+                    navController.navigate(LoadingDestination.route)
                 },
                 createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
+                createQuestionnaireUseCase = viewModel.createNewQuestionnaireUseCase,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(QuestionnaireCreateDestination.titleRes),

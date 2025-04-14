@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
+import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.theme.TeammatesTheme
 
@@ -56,7 +57,7 @@ fun QuestionnaireItem(
             modifier = Modifier
                 .widthIn(max = 450.dp)
                 .heightIn(max = 800.dp)
-                .padding(top = 16.dp, start = 32.dp, end = 32.dp, bottom = 24.dp)
+                .padding(top = 8.dp, start = 32.dp, end = 32.dp, bottom = 16.dp)
                 .fillMaxSize()
         )
     }
@@ -69,7 +70,7 @@ fun QuestionnaireCard(
     modifier: Modifier = Modifier
 
 ) {
-    val baseUrl = "https://potential-robot-4jg4wjjqp5vv2qx7w-8000.app.github.dev"
+    val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}"
     val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
 
     Card(

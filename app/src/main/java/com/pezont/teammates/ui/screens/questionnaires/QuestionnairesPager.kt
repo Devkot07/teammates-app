@@ -5,6 +5,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.items.QuestionnaireItem
@@ -23,6 +24,7 @@ fun QuestionnairesPager(
 
     VerticalPager(
         snapPosition = SnapPosition.Center,
+        pageSpacing = 16.dp,
         state = pagerState,
     ) { pageIndex ->
         if (pageIndex < questionnaires.size) {

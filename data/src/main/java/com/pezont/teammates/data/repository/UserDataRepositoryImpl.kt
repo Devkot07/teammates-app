@@ -11,8 +11,6 @@ import com.pezont.teammates.domain.repository.UserDataRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.IOException
 import javax.inject.Inject
 
@@ -23,7 +21,11 @@ class UserDataRepositoryImpl @Inject constructor(
     private companion object {
         val ACCESS_TOKEN = stringPreferencesKey("access_token")
         val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
-        val USER = stringPreferencesKey("user")
+        val USER_NICKNAME = stringPreferencesKey("user_nickname")
+        val USER_PUBLIC_ID = stringPreferencesKey("user_public_id")
+        val USER_EMAIL = stringPreferencesKey("user_email")
+        val USER_DESCRIPTION = stringPreferencesKey("user_description")
+        val USER_IMAGE_PATH = stringPreferencesKey("user_image_path")
         const val TAG = "UserDataRepo"
     }
 
@@ -59,14 +61,20 @@ class UserDataRepositoryImpl @Inject constructor(
             }
         }
         .map { preferences ->
-            val userJson = preferences[USER]
-            if (userJson != null) {
-                Json.decodeFromString<User>(userJson)
-            } else {
-                User()
-            }
-        }
+            val userNickname = preferences[USER_NICKNAME] ?: ""
+            val userPublicId = preferences[USER_PUBLIC_ID] ?: ""
+            val userEmail = preferences[USER_EMAIL] ?: ""
+            val userDescription = preferences[USER_DESCRIPTION] ?: ""
+            val userImagePath = preferences[USER_IMAGE_PATH] ?: ""
 
+            User(
+                nickname = userNickname,
+                publicId = userPublicId,
+                email = userEmail,
+                description = userDescription,
+                imagePath = userImagePath
+            )
+        }
 
     override suspend fun saveAccessToken(newAccessToken: String) {
         dataStore.edit { data ->
@@ -83,14 +91,12 @@ class UserDataRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveUser(user: User) {
-        val userJson = Json.encodeToString(user)
         dataStore.edit { data ->
-            Log.i(TAG, "Save userJson: $userJson")
-            data[USER] = userJson
+            data[USER_NICKNAME] = user.nickname ?: ""
+            data[USER_PUBLIC_ID] = user.publicId ?: ""
+            data[USER_EMAIL] = user.email ?: ""
+            data[USER_DESCRIPTION] = user.description ?: ""
+            data[USER_IMAGE_PATH] = user.imagePath ?: ""
         }
     }
-
-
 }
-
-
