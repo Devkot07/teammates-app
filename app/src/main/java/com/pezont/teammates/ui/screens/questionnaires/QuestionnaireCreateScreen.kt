@@ -64,6 +64,7 @@ object QuestionnaireCreateDestination : NavigationDestination {
 @Composable
 fun QuestionnaireCreateScreen(
     modifier: Modifier = Modifier,
+    navigateToHome: () -> Unit,
     createNewQuestionnaireAction: (
         header: String,
         description: String,
@@ -233,13 +234,15 @@ fun QuestionnaireCreateScreen(
                                 }
 
                                 else -> {
-                                    val imagePart = selectedImageUri?.let { createQuestionnaireUseCase.uriToMultipart(it, context) }
+                                    val imagePart = selectedImageUri?.let { createQuestionnaireUseCase.uriToSquareCroppedWebpMultipart(it, context) }
+                                    navigateToHome()
                                     createNewQuestionnaireAction(
                                         questionnaireForm.header,
                                         questionnaireForm.description,
                                         questionnaireForm.selectedGame!!,
                                         imagePart
                                     )
+                                    selectedImageUri = null
                                 }
                             }
                         }
