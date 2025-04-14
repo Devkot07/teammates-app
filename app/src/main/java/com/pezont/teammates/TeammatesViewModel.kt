@@ -148,8 +148,7 @@ class TeammatesViewModel @Inject constructor(
                 Log.i(TAG, result.toString())
                 _uiState.update {
                     it.copy(
-                        userQuestionnaires = result,
-                        contentState = ContentState.LOADED
+                        userQuestionnaires = result, contentState = ContentState.LOADED
                     )
                 }
             }.onFailure { throwable ->
@@ -172,28 +171,26 @@ class TeammatesViewModel @Inject constructor(
                 image = image
             ).onSuccess {
                 _uiState.update { it.copy(contentState = ContentState.LOADED) }
-                _uiEvent.tryEmit(UiEvent.QuestionnaireCreated)
                 SnackbarController.sendEvent(SnackbarEvent(R.string.questionnaire_created_successfully))
             }.onFailure { throwable ->
                 _uiState.update { it.copy(contentState = ContentState.ERROR) }
                 handleError(throwable)
             }
+            _uiEvent.tryEmit(UiEvent.QuestionnaireCreated)
         }
     }
 
     fun loadAuthor(authorId: String) {
         _uiState.update {
             it.copy(
-                selectedAuthor = User(),
-                contentState = ContentState.LOADING
+                selectedAuthor = User(), contentState = ContentState.LOADING
             )
         }
         viewModelScope.launch {
             loadAuthorProfileUseCase(authorId).onSuccess { author ->
                 _uiState.update {
                     it.copy(
-                        selectedAuthor = author,
-                        contentState = ContentState.LOADED
+                        selectedAuthor = author, contentState = ContentState.LOADED
                     )
                 }
             }.onFailure { throwable ->
@@ -212,8 +209,7 @@ class TeammatesViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             _uiState.update { it.copy(authState = AuthState.LOADING) }
-            logoutUseCase()
-                .onSuccess {
+            logoutUseCase().onSuccess {
                     _uiState.update {
                         it.copy(
                             user = User(),
@@ -228,8 +224,7 @@ class TeammatesViewModel @Inject constructor(
                     }
                     _uiEvent.tryEmit(UiEvent.LoggedOut)
                     SnackbarController.sendEvent(SnackbarEvent(R.string.logged_out))
-                }
-                .onFailure { throwable ->
+                }.onFailure { throwable ->
                     _uiState.update { it.copy(authState = AuthState.AUTHENTICATED) }
                     handleError(throwable)
                 }
@@ -241,20 +236,40 @@ class TeammatesViewModel @Inject constructor(
         viewModelScope.launch {
             when (error) {
                 is IOException -> {
-                    SnackbarController.sendEvent(
-                        SnackbarEvent(R.string.network_error_please_check_your_connection)
-                    )
+                    when (error) {
+                        is java.net.UnknownHostException -> {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(R.string.no_internet_connection)
+                            )
+                        }
+                        is java.net.SocketTimeoutException -> {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(R.string.connection_timeout)
+                            )
+                        }
+                        is java.net.ConnectException -> {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(R.string.server_unavailable)
+                            )
+                        }
+                        else -> {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(R.string.network_error_please_check_your_connection)
+                            )
+                        }
+                    }
                 }
 
                 is HttpException -> {
                     Log.e(TAG, "http error: $error")
-                    val errorCode = error.code()
+                    val errorBody = error.response()?.errorBody()?.string()
 
-                    if (errorCode == 401) {
-                        viewModelScope.launch {
-
-                            logoutUseCase()
-                                .onSuccess {
+                    when {
+                        errorBody?.contains(
+                            "Not authenticated",
+                            ignoreCase = true
+                        ) == true || error.code() == 401 -> {
+                            logoutUseCase().onSuccess {
                                     _uiState.update {
                                         it.copy(
                                             user = User(),
@@ -273,16 +288,44 @@ class TeammatesViewModel @Inject constructor(
                                     _uiState.update { it.copy(authState = AuthState.AUTHENTICATED) }
                                     handleError(throwable)
                                 }
+                        }
+
+                        error.code() == 400 -> {
                             SnackbarController.sendEvent(
-                                SnackbarEvent(R.string.authentication_error_please_log_in_again)
+                                SnackbarEvent(R.string.invalid_request_error)
                             )
                         }
-                        return@launch
-                    }
 
-                    SnackbarController.sendEvent(
-                        SnackbarEvent(R.string.server_error)
-                    )
+                        error.code() == 401 -> {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(R.string.authorization_error_authorization_failed)
+                            )
+                        }
+
+                        error.code() == 403 -> {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(R.string.access_denied_error)
+                            )
+                        }
+
+                        error.code() == 404 -> {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(R.string.resource_not_found_error)
+                            )
+                        }
+
+                        error.code() in 500..599 -> {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(R.string.server_error_please_try_again_later)
+                            )
+                        }
+
+                        else -> {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(R.string.server_communication_error)
+                            )
+                        }
+                    }
                 }
 
                 else -> {

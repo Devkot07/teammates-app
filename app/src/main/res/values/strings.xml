@@ -35,4 +35,13 @@
     <string name="server_error">Server error</string>
     <string name="unknown_error_occurred">Unknown error occurred</string>
     <string name="you_aren_t_logged_in">You aren\'t logged in</string>
+
+    <string name="connection_timeout">Connection timed out. Please try again.</string>
+    <string name="server_unavailable">Server is unavailable. Please try again later.</string>
+
+    <string name="invalid_request_error">Invalid request. Please check your input and try again.</string>
+    <string name="access_denied_error">Access denied. You do not have permission to perform this action.</string>
+    <string name="resource_not_found_error">Requested resource not found.</string>
+    <string name="server_error_please_try_again_later">Server error. Please try again later.</string>
+    <string name="server_communication_error">An error occurred while communicating with the server.</string>
 </resources>

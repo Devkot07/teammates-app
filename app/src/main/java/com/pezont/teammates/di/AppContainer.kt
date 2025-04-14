@@ -45,6 +45,8 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         .addInterceptor(HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         })
+        .followRedirects(false)
+        .followSslRedirects(false)
         .build()
 
 
@@ -75,8 +77,6 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
                 .create(TeammatesUsersApiService::class.java)
         UsersRepositoryImpl(retrofitService, context)
     }
-
-
 
 
 }
