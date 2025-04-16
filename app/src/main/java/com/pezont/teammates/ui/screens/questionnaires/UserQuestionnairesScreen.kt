@@ -78,7 +78,7 @@ fun UserQuestionnairesScreen(
                 }
             }
         ) {
-            QuestionnairesPager(
+            QuestionnairesVerticalPager(
                 questionnaires = userQuestionnaires,
                 pagerState = pagerState,
                 navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,

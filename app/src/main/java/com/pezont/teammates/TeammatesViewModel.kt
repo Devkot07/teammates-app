@@ -8,6 +8,8 @@ import com.pezont.teammates.domain.model.ContentState
 import com.pezont.teammates.domain.model.Games
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
+import com.pezont.teammates.domain.model.ValidationError
+import com.pezont.teammates.domain.model.ValidationResult
 import com.pezont.teammates.domain.usecase.CheckAuthenticationUseCase
 import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
 import com.pezont.teammates.domain.usecase.LoadAuthorProfileUseCase
@@ -160,23 +162,45 @@ class TeammatesViewModel @Inject constructor(
     }
 
     fun createNewQuestionnaire(
-        header: String, description: String, selectedGame: Games, image: MultipartBody.Part?
+        header: String,
+        description: String,
+        selectedGame: Games?,
+        image: MultipartBody.Part?,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
     ) {
         viewModelScope.launch {
-            _uiState.update { it.copy(contentState = ContentState.LOADING) }
-            createNewQuestionnaireUseCase(
-                header = header,
-                selectedGame = selectedGame,
-                description = description,
-                image = image
-            ).onSuccess {
-                _uiState.update { it.copy(contentState = ContentState.LOADED) }
-                SnackbarController.sendEvent(SnackbarEvent(R.string.questionnaire_created_successfully))
-            }.onFailure { throwable ->
-                _uiState.update { it.copy(contentState = ContentState.ERROR) }
-                handleError(throwable)
+            val validationResult = createNewQuestionnaireUseCase.validateQuestionnaireForm(
+                header,
+                description,
+                selectedGame
+            )
+
+            when (validationResult) {
+                is ValidationResult.Error -> {
+                    val messageRes = validationResult.errorCode.toMessageRes()
+                    SnackbarController.sendEvent(SnackbarEvent(messageRes))
+                    onError()
+                }
+                ValidationResult.Success -> {
+                    _uiState.update { it.copy(contentState = ContentState.LOADING) }
+                    createNewQuestionnaireUseCase(
+                        header = header,
+                        selectedGame = selectedGame!!,
+                        description = description,
+                        image = image
+                    ).onSuccess {
+                        _uiState.update { it.copy(contentState = ContentState.LOADED) }
+                        SnackbarController.sendEvent(SnackbarEvent(R.string.questionnaire_created_successfully))
+                        _uiEvent.tryEmit(UiEvent.QuestionnaireCreated)
+                        onSuccess()
+                    }.onFailure { throwable ->
+                        _uiState.update { it.copy(contentState = ContentState.ERROR) }
+                        handleError(throwable)
+                        onError()
+                    }
+                }
             }
-            _uiEvent.tryEmit(UiEvent.QuestionnaireCreated)
         }
     }
 
@@ -341,6 +365,14 @@ class TeammatesViewModel @Inject constructor(
         const val TAG: String = "ViewModel"
     }
 }
+
+fun ValidationError.toMessageRes(): Int = when (this) {
+    ValidationError.HEADER_TOO_SHORT -> R.string.the_header_must_contain_at_least_3_characters
+    ValidationError.HEADER_TOO_LONG -> R.string.the_maximum_length_of_the_header_is_80_characters
+    ValidationError.DESCRIPTION_TOO_LONG -> R.string.the_maximum_length_of_the_description_is_300_characters
+    ValidationError.GAME_NOT_SELECTED -> R.string.please_select_a_game
+}
+
 
 data class UiState(
     val user: User = User(),

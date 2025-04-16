@@ -1,6 +1,7 @@
 package com.pezont.teammates.ui.screens.questionnaires
 
 import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.runtime.Composable
@@ -12,7 +13,7 @@ import com.pezont.teammates.ui.items.QuestionnaireItem
 
 
 @Composable
-fun QuestionnairesPager(
+fun QuestionnairesVerticalPager(
     pagerState: PagerState,
     questionnaires: List<Questionnaire>,
     navigateToQuestionnaireDetails: () -> Unit,
@@ -25,6 +26,37 @@ fun QuestionnairesPager(
     VerticalPager(
         snapPosition = SnapPosition.Center,
         pageSpacing = 16.dp,
+        state = pagerState,
+    ) { pageIndex ->
+        if (pageIndex < questionnaires.size) {
+            val questionnaire = questionnaires[pageIndex]
+            QuestionnaireItem(
+                navigateToQuestionnaireDetails = {
+                    navigateToQuestionnaireDetails()
+                    viewModel.updateSelectedQuestionnaire(questionnaire)
+                    viewModel.loadAuthor(questionnaire.authorId)
+                },
+                questionnaire = questionnaire,
+                modifier = modifier,
+            )
+        } else lastItem()
+    }
+}
+
+@Composable
+fun QuestionnairesHorizontalPager(
+    pagerState: PagerState,
+    questionnaires: List<Questionnaire>,
+    navigateToQuestionnaireDetails: () -> Unit,
+    viewModel: TeammatesViewModel,
+    lastItem: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+
+
+    HorizontalPager(
+        snapPosition = SnapPosition.Center,
+        pageSpacing = 18.dp,
         state = pagerState,
     ) { pageIndex ->
         if (pageIndex < questionnaires.size) {

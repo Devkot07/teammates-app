@@ -138,7 +138,7 @@ fun QuestionnaireCard(
                         Text(
                             modifier = Modifier.fillMaxWidth(),
                             text = questionnaire.header,
-                            style = MaterialTheme.typography.headlineSmall,
+                            style = MaterialTheme.typography.headlineMedium,
                             color = Color.Black
                         )
                         Spacer(modifier = Modifier.height(4.dp))

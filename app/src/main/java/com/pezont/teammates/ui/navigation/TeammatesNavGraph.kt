@@ -181,11 +181,9 @@ fun TeammatesNavGraph(
         composable(QuestionnaireCreateDestination.route) {
             onTabChange(BottomNavItem.CREATE)
             QuestionnaireCreateScreen(
-                navigateToHome = {
-                    navController.navigate(LoadingDestination.route)
-                },
                 createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
                 createQuestionnaireUseCase = viewModel.createNewQuestionnaireUseCase,
+                uiState = uiState,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(QuestionnaireCreateDestination.titleRes),
@@ -260,6 +258,7 @@ fun TeammatesNavGraph(
         }
 
         composable(QuestionnaireDetailsDestination.route) {
+            val user = uiState.user
             val selectedQuestionnaire = uiState.selectedQuestionnaire
 
             QuestionnaireDetailsScreen(
@@ -268,7 +267,10 @@ fun TeammatesNavGraph(
                 questionnaire = selectedQuestionnaire,
 
                 navigateToAuthorProfile = {
-                    navController.navigate(AuthorProfileDestination.route)
+                    if (user.publicId == selectedQuestionnaire.authorId)
+                        navController.navigate(UserProfileDestination.route)
+                    else
+                        navController.navigate(AuthorProfileDestination.route)
                 },
 
                 topBar = {

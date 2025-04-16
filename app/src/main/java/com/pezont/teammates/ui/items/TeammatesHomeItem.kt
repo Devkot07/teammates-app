@@ -20,7 +20,7 @@ import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.navigation.NavigationDestination
-import com.pezont.teammates.ui.screens.questionnaires.QuestionnairesPager
+import com.pezont.teammates.ui.screens.questionnaires.QuestionnairesVerticalPager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -71,7 +71,7 @@ fun TeammatesHomeItem(
                 }
             }
         ) {
-            QuestionnairesPager(
+            QuestionnairesVerticalPager(
                 questionnaires = questionnaires,
                 navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
                 viewModel = viewModel,

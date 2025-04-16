@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import com.pezont.teammates.domain.model.Games
 import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.domain.model.ValidationError
+import com.pezont.teammates.domain.model.ValidationResult
 import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.domain.repository.UserDataRepository
 import kotlinx.coroutines.flow.first
@@ -38,6 +40,21 @@ class CreateQuestionnaireUseCase @Inject constructor(
                 authorId = user.publicId,
                 image = image,
             ).getOrThrow()
+        }
+    }
+
+    //TODO potential problems
+    fun validateQuestionnaireForm(
+        header: String,
+        description: String,
+        selectedGame: Games?
+    ): ValidationResult {
+        return when {
+            header.length < 3 -> ValidationResult.Error(ValidationError.HEADER_TOO_SHORT)
+            header.length > 63 -> ValidationResult.Error(ValidationError.HEADER_TOO_LONG)
+            description.length > 2000 -> ValidationResult.Error(ValidationError.DESCRIPTION_TOO_LONG)
+            selectedGame == null -> ValidationResult.Error(ValidationError.GAME_NOT_SELECTED)
+            else -> ValidationResult.Success
         }
     }
 

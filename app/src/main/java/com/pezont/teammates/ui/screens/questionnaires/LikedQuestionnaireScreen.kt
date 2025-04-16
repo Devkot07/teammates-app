@@ -73,7 +73,7 @@ fun LikedQuestionnairesScreen(
                 }
             }
         ) {
-            QuestionnairesPager(
+            QuestionnairesVerticalPager(
                 questionnaires = likedQuestionnaires,
                 pagerState = pagerState,
                 navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
