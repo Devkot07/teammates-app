@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -33,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.BuildConfig
-import com.pezont.teammates.UiState
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.ContentState
 import com.pezont.teammates.domain.model.Questionnaire
@@ -42,15 +40,12 @@ import com.pezont.teammates.ui.buttons.LikeButton
 @Composable
 fun QuestionnaireDetailsItem(
     viewModel: TeammatesViewModel,
-    uiState: UiState,
+    authorNickname: String,
+    contentState: ContentState,
     questionnaire: Questionnaire,
     navigateToAuthorProfile: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
-
-    val authorNickname: String = uiState.selectedAuthor.nickname.toString()
-
 
     val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}"
     val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
@@ -69,7 +64,7 @@ fun QuestionnaireDetailsItem(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (uiState.contentState == ContentState.LOADING)
+            if (contentState == ContentState.LOADING)
                 LoadingItem()
             else {
                 Column(

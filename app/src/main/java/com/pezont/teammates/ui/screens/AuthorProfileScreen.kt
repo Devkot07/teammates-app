@@ -1,33 +1,62 @@
 package com.pezont.teammates.ui.screens
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
+import com.pezont.teammates.TeammatesViewModel
+import com.pezont.teammates.domain.model.ContentState
+import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.items.AuthorProfile
-import com.pezont.teammates.ui.items.UserProfile
+import com.pezont.teammates.ui.items.LoadingItem
 import com.pezont.teammates.ui.navigation.NavigationDestination
+import com.pezont.teammates.ui.screens.questionnaires.QuestionnairesHorizontalRow
 
 object AuthorProfileDestination : NavigationDestination {
     override val route = "author_profile"
     override val titleRes = R.string.profile
 }
 
-//TODO Screen
 @Composable
 fun AuthorProfileScreen(
+    viewModel: TeammatesViewModel,
+    contentState: ContentState,
     author: User,
-    navigateToMyQuestionnaires: () -> Unit,
-    logout: () -> Unit,
+    authorQuestionnaires: List<Questionnaire>,
+    starAction: () -> Unit,
+    navigateToQuestionnaireDetails: () -> Unit,
     topBar: @Composable () -> Unit = {},
+    modifier: Modifier,
 ) {
     Scaffold(
         topBar = topBar,
     ) { paddingValues ->
-        AuthorProfile(
-            navigateToMyQuestionnaires, logout, author, paddingValues
-        )
-        // TODO Horizontal Pager
+        Column (
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            if (contentState == ContentState.LOADING)
+                LoadingItem()
+            else {
+                AuthorProfile(
+                    starAction, author
+                )
+                Spacer(modifier.height(8.dp))
+                QuestionnairesHorizontalRow(
+                    authorQuestionnaires,
+                    navigateToQuestionnaireDetails,
+                    viewModel,
+                    )
+            }
+        }
     }
 }
 

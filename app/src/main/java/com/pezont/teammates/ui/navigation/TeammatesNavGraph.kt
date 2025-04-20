@@ -283,20 +283,24 @@ fun TeammatesNavGraph(
         }
         composable(AuthorProfileDestination.route) {
             val selectedAuthor = uiState.selectedAuthor
+            val selectedAuthorQuestionnaires = uiState.selectedAuthorQuestionnaires
             AuthorProfileScreen(
-                navigateToMyQuestionnaires = {
-
-                },
-                logout = {
-                },
+                viewModel = viewModel,
+                contentState = uiState.contentState,
+                starAction = {},
                 author = selectedAuthor,
+                authorQuestionnaires = selectedAuthorQuestionnaires,
                 topBar = {
                     TeammatesTopAppBar(
                         title = selectedAuthor.nickname.toString(),
                         canNavigateBack = true,
                         navigateUp = { navController.navigate(HomeDestination.route) }
                     )
-                }
+                },
+                navigateToQuestionnaireDetails = {
+                    navController.navigate(QuestionnaireDetailsDestination.route)
+                },
+                modifier = Modifier
             )
         }
     }

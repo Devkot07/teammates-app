@@ -15,24 +15,32 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.theme.TeammatesTheme
@@ -40,62 +48,103 @@ import com.pezont.teammates.ui.theme.TeammatesTheme
 //TODO AuthorProfile
 @Composable
 fun AuthorProfile(
-    navigateToMyQuestionnaires: () -> Unit,
-    logout: () -> Unit,
-
-    user: User,
-
-    paddingValues: PaddingValues
+    starAction: () -> Unit,
+    author: User,
 ) {
-
-    val nickname: String = user.nickname ?: ""
-    val description: String = user.description ?: ""
-    val email: String = user.email ?: ""
-
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-
-
-        ) {
+            .wrapContentSize()
+    ) {
         Column(
-            modifier = Modifier.padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.Top,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier
+                    .size(250.dp)
 
             ) {
-            Spacer(modifier = Modifier.height(10.dp))
-
-
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            Text(
-                text = "Description: $description",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "Email: $email",
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-
-
-
-
-
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedButton(onClick = logout) {
-                Text(text = stringResource(R.string.subscribe))
+                SubcomposeAsyncImage(
+                    model = author.imagePath,
+                    loading = {
+                        CircularProgressIndicator(Modifier.padding(16.dp))
+                    },
+                    error = {
+                        Icon(
+                            imageVector = Icons.Default.Error,
+                            contentDescription = "Error",
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    },
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .size(250.dp)
+                        .aspectRatio(1f)
+                        .border(width = 1.dp, color = Color.LightGray, shape = CircleShape)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = navigateToMyQuestionnaires
 
+            if (author.description != null) {
+                ProfileInfoRow(
+                    icon = Icons.Outlined.Description,
+                    value = author.description!!,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            OutlinedButton(
+                onClick = starAction,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = ShapeDefaults.Small,
+                contentPadding = PaddingValues(vertical = 12.dp)
             ) {
-                Text(text = "My questionnaires")
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.subscribe),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
+        }
+    }
+}
+
+@Composable
+fun ProfileInfoRow(
+    icon: ImageVector,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(24.dp)
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
@@ -105,10 +154,7 @@ fun AuthorProfile(
 fun UserProfile(
     navigateToMyQuestionnaires: () -> Unit,
     logout: () -> Unit,
-
     user: User,
-
-
     paddingValues: PaddingValues
 ) {
 
@@ -180,16 +226,15 @@ fun UserProfileSection(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-
-        ) {
-            RoundImage(
-                image = image,
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Image(
+                painter = image,
+                contentDescription = null,
                 modifier = Modifier
                     .size(150.dp)
-                //.weight()
+                    .aspectRatio(1f)
+                    .border(width = 1.dp, color = Color.LightGray, shape = CircleShape)
+                    .clip(CircleShape)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(
@@ -215,104 +260,6 @@ fun UserProfileSection(
 }
 
 
-@Composable
-fun RoundImage(
-    image: Painter,
-    modifier: Modifier = Modifier
-) {
-    Image(
-        painter = image,
-        contentDescription = null,
-        modifier = modifier
-            .aspectRatio(1f, matchHeightConstraintsFirst = true)
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = CircleShape
-            )
-            .padding(3.dp)
-            .clip(CircleShape)
-    )
-}
-
-@Composable
-fun ProfileDescription(
-    displayName: String,
-    description: String,
-    url: String,
-    followedBy: List<String>,
-    otherCount: Int
-) {
-    val letterSpacing = 0.5.sp
-    val lineHeight = 20.sp
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-
-    ) {
-        Text(
-            text = displayName,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = letterSpacing,
-            lineHeight = lineHeight
-        )
-        Text(
-            text = description,
-            letterSpacing = letterSpacing,
-            lineHeight = lineHeight
-        )
-        Text(
-            text = url,
-            color = Color(0xFF00FFC2),
-            letterSpacing = letterSpacing,
-            lineHeight = lineHeight
-        )
-        if (followedBy.isNotEmpty()) {
-            Text(
-                text = buildAnnotatedString {
-                    val boldStyle = SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                    append("Followed by ")
-                    followedBy.forEachIndexed { index, name ->
-                        pushStyle(boldStyle)
-                        append(name)
-                        pop()
-                        if (index < followedBy.size - 1) {
-                            append(", ")
-                        }
-                    }
-                    if (otherCount > 2) {
-                        append(" and ")
-                        pushStyle(boldStyle)
-                        append("$otherCount others")
-                    }
-                },
-                letterSpacing = letterSpacing,
-                lineHeight = lineHeight
-            )
-        }
-    }
-}
-
-
-@Preview
-@Composable
-fun AuthorProfilePreview() {
-    TeammatesTheme {
-        AuthorProfile(
-            {}, {},
-            User(
-                "Bobi",
-                "111-111-111-111",
-                "bobi@longcorp.com",
-            ),
-            PaddingValues()
-        )
-    }
-}
-
 @Preview
 @Composable
 fun UserProfilePreview() {
@@ -328,5 +275,6 @@ fun UserProfilePreview() {
         )
     }
 }
+
 
 

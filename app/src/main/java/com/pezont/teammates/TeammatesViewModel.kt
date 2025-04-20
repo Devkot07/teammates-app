@@ -164,28 +164,6 @@ class TeammatesViewModel @Inject constructor(
         }
     }
 
-    private fun loadAuthorQuestionnaires() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(contentState = ContentState.LOADING) }
-            loadQuestionnairesUseCase(
-                game = null,
-                limit = 100,
-                authorId = uiState.value.selectedAuthor.publicId
-            ).onSuccess { result ->
-                Log.i(TAG, result.toString())
-                _uiState.update {
-                    it.copy(
-                        selectedAuthorQuestionnaires = result, contentState = ContentState.LOADED
-                    )
-                }
-            }.onFailure { throwable ->
-                Log.e(TAG, throwable.toString())
-                _uiState.update { it.copy(contentState = ContentState.ERROR) }
-                handleError(throwable)
-            }
-        }
-    }
-
     fun createNewQuestionnaire(
         header: String,
         description: String,
@@ -231,24 +209,32 @@ class TeammatesViewModel @Inject constructor(
 
     fun loadAuthor(authorId: String) {
         if (uiState.value.selectedAuthor.publicId != authorId) {
-            _uiState.update {
-                it.copy(
-                    selectedAuthor = User(), contentState = ContentState.LOADING
-                )
-            }
             viewModelScope.launch {
+                _uiState.update { it.copy(selectedAuthor = User(), contentState = ContentState.LOADING) }
                 loadAuthorProfileUseCase(authorId).onSuccess { author ->
-                    _uiState.update {
-                        it.copy(
-                            selectedAuthor = author, //contentState = ContentState.LOADED
-                        )
+                    _uiState.update { it.copy(selectedAuthor = author) }
+                    loadQuestionnairesUseCase(
+                        game = null,
+                        limit = 100,
+                        authorId = author.publicId
+                    ).onSuccess { result ->
+                        Log.i(TAG, result.toString())
+                        _uiState.update {
+                            it.copy(
+                                selectedAuthorQuestionnaires = result,
+                                contentState = ContentState.LOADED
+                            )
+                        }
+                    }.onFailure { throwable ->
+                        Log.e(TAG, throwable.toString())
+                        _uiState.update { it.copy(contentState = ContentState.ERROR) }
+                        handleError(throwable)
                     }
                 }.onFailure { throwable ->
                     _uiState.update { it.copy(contentState = ContentState.ERROR) }
                     handleError(throwable)
                 }
             }
-            loadAuthorQuestionnaires()
         }
     }
 
@@ -269,8 +255,9 @@ class TeammatesViewModel @Inject constructor(
                             questionnaires = emptyList(),
                             likedQuestionnaires = emptyList(),
                             userQuestionnaires = emptyList(),
-                            selectedQuestionnaire = Questionnaire(),
                             selectedAuthor = User(),
+                            selectedQuestionnaire = Questionnaire(),
+                            selectedAuthorQuestionnaires = emptyList(),
                             contentState = ContentState.INITIAL
                         )
                     }
