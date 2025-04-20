@@ -33,6 +33,9 @@ import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import retrofit2.HttpException
 import java.io.IOException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -161,6 +164,28 @@ class TeammatesViewModel @Inject constructor(
         }
     }
 
+    private fun loadAuthorQuestionnaires() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(contentState = ContentState.LOADING) }
+            loadQuestionnairesUseCase(
+                game = null,
+                limit = 100,
+                authorId = uiState.value.selectedAuthor.publicId
+            ).onSuccess { result ->
+                Log.i(TAG, result.toString())
+                _uiState.update {
+                    it.copy(
+                        selectedAuthorQuestionnaires = result, contentState = ContentState.LOADED
+                    )
+                }
+            }.onFailure { throwable ->
+                Log.e(TAG, throwable.toString())
+                _uiState.update { it.copy(contentState = ContentState.ERROR) }
+                handleError(throwable)
+            }
+        }
+    }
+
     fun createNewQuestionnaire(
         header: String,
         description: String,
@@ -205,22 +230,25 @@ class TeammatesViewModel @Inject constructor(
     }
 
     fun loadAuthor(authorId: String) {
-        _uiState.update {
-            it.copy(
-                selectedAuthor = User(), contentState = ContentState.LOADING
-            )
-        }
-        viewModelScope.launch {
-            loadAuthorProfileUseCase(authorId).onSuccess { author ->
-                _uiState.update {
-                    it.copy(
-                        selectedAuthor = author, contentState = ContentState.LOADED
-                    )
-                }
-            }.onFailure { throwable ->
-                _uiState.update { it.copy(contentState = ContentState.ERROR) }
-                handleError(throwable)
+        if (uiState.value.selectedAuthor.publicId != authorId) {
+            _uiState.update {
+                it.copy(
+                    selectedAuthor = User(), contentState = ContentState.LOADING
+                )
             }
+            viewModelScope.launch {
+                loadAuthorProfileUseCase(authorId).onSuccess { author ->
+                    _uiState.update {
+                        it.copy(
+                            selectedAuthor = author, //contentState = ContentState.LOADED
+                        )
+                    }
+                }.onFailure { throwable ->
+                    _uiState.update { it.copy(contentState = ContentState.ERROR) }
+                    handleError(throwable)
+                }
+            }
+            loadAuthorQuestionnaires()
         }
     }
 
@@ -261,17 +289,17 @@ class TeammatesViewModel @Inject constructor(
             when (error) {
                 is IOException -> {
                     when (error) {
-                        is java.net.UnknownHostException -> {
+                        is UnknownHostException -> {
                             SnackbarController.sendEvent(
                                 SnackbarEvent(R.string.no_internet_connection)
                             )
                         }
-                        is java.net.SocketTimeoutException -> {
+                        is SocketTimeoutException -> {
                             SnackbarController.sendEvent(
                                 SnackbarEvent(R.string.connection_timeout)
                             )
                         }
-                        is java.net.ConnectException -> {
+                        is ConnectException -> {
                             SnackbarController.sendEvent(
                                 SnackbarEvent(R.string.server_unavailable)
                             )
@@ -301,8 +329,9 @@ class TeammatesViewModel @Inject constructor(
                                             questionnaires = emptyList(),
                                             likedQuestionnaires = emptyList(),
                                             userQuestionnaires = emptyList(),
-                                            selectedQuestionnaire = Questionnaire(),
                                             selectedAuthor = User(),
+                                            selectedQuestionnaire = Questionnaire(),
+                                            selectedAuthorQuestionnaires = emptyList(),
                                             contentState = ContentState.INITIAL
                                         )
                                     }
@@ -383,9 +412,11 @@ data class UiState(
     val likedQuestionnaires: List<Questionnaire> = emptyList(),
     val userQuestionnaires: List<Questionnaire> = emptyList(),
 
+    val selectedAuthor: User = User(),
     val selectedQuestionnaire: Questionnaire = Questionnaire(),
-    val selectedAuthor: User = User()
-)
+    val selectedAuthorQuestionnaires: List<Questionnaire> = emptyList(),
+
+    )
 
 sealed class UiEvent {
     data object QuestionnaireCreated : UiEvent()

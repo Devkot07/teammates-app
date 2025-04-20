@@ -157,6 +157,87 @@ fun QuestionnaireCard(
 }
 
 
+
+@Composable
+fun QuestionnaireCompactItem(
+    questionnaire: Questionnaire,
+    navigateToQuestionnaireDetails: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}"
+    val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
+
+    Card(
+        modifier = modifier
+            .height(200.dp)
+            .clickable { navigateToQuestionnaireDetails() },
+        shape = ShapeDefaults.Large,
+        elevation = CardDefaults.cardElevation(0.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.secondary)
+                .padding(8.dp)
+        ) {
+            SubcomposeAsyncImage(
+                model = fixedImagePath,
+                loading = { LoadingItem() },
+                error = {
+                    Icon(
+                        imageVector = Icons.Default.Error,
+                        contentDescription = "Error"
+                    )
+                },
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .aspectRatio(1f)
+                    .clip(ShapeDefaults.Small)
+                    .border(1.dp, Color.Gray, ShapeDefaults.Small),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = questionnaire.header,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 5,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    modifier = Modifier.align(Alignment.End),
+                    text = questionnaire.game,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun QuestionnaireCompactItemPreview() {
+    TeammatesTheme(darkTheme = true) {
+        QuestionnaireCompactItem(
+            questionnaire = Questionnaire("Some f\nme f\nme f\n f f f \n f f \nheader", "Cool Game", "", "1", "1", "https"),
+            navigateToQuestionnaireDetails = {}
+        )
+    }
+}
+
+
+
+
+
 @Preview
 @Composable
 fun QuestionnaireCardPreview() {
