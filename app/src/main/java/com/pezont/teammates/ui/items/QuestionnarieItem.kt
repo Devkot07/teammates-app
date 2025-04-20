@@ -10,20 +10,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,18 +46,18 @@ fun QuestionnaireItem(
 ) {
 
     Box(
-        modifier = modifier
-            .padding(bottom = 8.dp),
-        contentAlignment = Alignment.Center
-    ) {
+        modifier = modifier ,
+        contentAlignment = Alignment.Center,
+
+        ) {
         QuestionnaireCard(
             navigateToQuestionnaireDetails,
             questionnaire = questionnaire,
             modifier = Modifier
+                .wrapContentSize()
                 .widthIn(max = 450.dp)
                 .heightIn(max = 800.dp)
                 .padding(top = 8.dp, start = 32.dp, end = 32.dp, bottom = 16.dp)
-                .fillMaxSize()
         )
     }
 }
@@ -74,98 +73,87 @@ fun QuestionnaireCard(
     val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
 
     Card(
-        modifier = modifier.clickable {
-            navigateToQuestionnaireDetails()
-        }
-
-        ,
+        modifier = modifier
+            .wrapContentHeight()
+            .clickable {
+                navigateToQuestionnaireDetails()
+            },
         shape = ShapeDefaults.Large,
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
     ) {
-        Scaffold(
-        ) { paddingValues ->
-            Column(
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.secondary)
+                .padding(16.dp)
+        ) {
+
+
+            Box(
                 modifier = Modifier
-                    .padding(paddingValues = paddingValues)
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.secondary)
-                    .padding(16.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Log.i("Image", fixedImagePath)
+                SubcomposeAsyncImage(
+                    model = fixedImagePath,
+                    loading = { LoadingItem() },
+                    error = {
+                        Icon(
+                            imageVector = Icons.Default.Error,
+                            contentDescription = "Error"
+                        )
+                    },
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .clip(ShapeDefaults.Medium)
+                        .border(2.dp, Color.Gray, ShapeDefaults.Medium),
+                    contentScale = ContentScale.Crop
+                )
+
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.Top
             ) {
 
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Top,
                 ) {
-                    Log.i("Image", fixedImagePath)
-                    SubcomposeAsyncImage(
-                        model = fixedImagePath,
-                        loading = {
-                            CircularProgressIndicator(
-                                color = Color.Black,
-                                modifier = Modifier
-                                    .padding(100.dp)
-                            )
-                        },
-                        error = {
-                            Icon(
-                                imageVector = Icons.Default.Error,
-                                contentDescription = "Error"
-                            )
-                        },
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .aspectRatio(1f)
-                            .clip(ShapeDefaults.Medium)
-                            .border(2.dp, Color.Gray, ShapeDefaults.Medium),
-                        contentScale = ContentScale.Crop
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = questionnaire.header,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.Black
                     )
-
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.Top
-                ) {
-
-
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.Top,
-                    ) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = questionnaire.header,
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = Color.Black
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = questionnaire.game,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
-                        )
-                    }
-                }
-
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = questionnaire.game,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
                 }
             }
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
         }
     }
-
 }
 
 

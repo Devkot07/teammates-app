@@ -69,20 +69,9 @@ fun QuestionnaireDetailsItem(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (uiState.contentState != ContentState.LOADED) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 50.dp, end = 50.dp)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(100.dp)
-                    )
-                }
-
-            } else {
+            if (uiState.contentState == ContentState.LOADING)
+                LoadingItem()
+            else {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
