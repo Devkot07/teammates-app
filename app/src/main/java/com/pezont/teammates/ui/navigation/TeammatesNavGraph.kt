@@ -181,8 +181,7 @@ fun TeammatesNavGraph(
         composable(QuestionnaireCreateDestination.route) {
             onTabChange(BottomNavItem.CREATE)
             QuestionnaireCreateScreen(
-                createNewQuestionnaireAction = viewModel::createNewQuestionnaire,
-                createQuestionnaireUseCase = viewModel.createNewQuestionnaireUseCase,
+                viewModel = viewModel,
                 uiState = uiState,
                 topBar = {
                     TeammatesTopAppBar(

@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pezont.teammates.R
+import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.UiState
 import com.pezont.teammates.domain.model.ContentState
 import com.pezont.teammates.domain.model.Games
@@ -67,15 +68,7 @@ object QuestionnaireCreateDestination : NavigationDestination {
 fun QuestionnaireCreateScreen(
     modifier: Modifier = Modifier,
     uiState: UiState,
-    createNewQuestionnaireAction: (
-        header: String,
-        description: String,
-        selectedGame: Games?,
-        image: MultipartBody.Part?,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) -> Unit,
-    createQuestionnaireUseCase: CreateQuestionnaireUseCase,
+    viewModel: TeammatesViewModel,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {}
 ) {
@@ -215,21 +208,21 @@ fun QuestionnaireCreateScreen(
                     OutlinedButton(
                         onClick = {
                             val imagePart = selectedImageUri?.let {
-                                createQuestionnaireUseCase.uriToSquareCroppedWebpMultipart(
+                                viewModel.createNewQuestionnaireUseCase.uriToSquareCroppedWebpMultipart(
                                     it,
                                     context
                                 )
                             }
-                            createNewQuestionnaireAction(
+                            viewModel.createNewQuestionnaire(
                                 questionnaireForm.header,
                                 questionnaireForm.description,
                                 questionnaireForm.selectedGame,
                                 imagePart,
-                                {
+                                onSuccess = {
                                     selectedImageUri = null
                                     questionnaireForm = QuestionnaireForm("", "", null)
                                 },
-                                {}
+                                onError = {}
 
                             )
                         },
