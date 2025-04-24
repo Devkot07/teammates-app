@@ -2,6 +2,10 @@ package com.pezont.teammates.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,8 +28,8 @@ import com.pezont.teammates.ui.TeammatesBackHandler
 import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.items.HomeDestination
 import com.pezont.teammates.ui.items.LoadingDestination
-import com.pezont.teammates.ui.items.TeammatesHomeItem
 import com.pezont.teammates.ui.items.LoadingItem
+import com.pezont.teammates.ui.items.TeammatesHomeItem
 import com.pezont.teammates.ui.screens.AuthorProfileDestination
 import com.pezont.teammates.ui.screens.AuthorProfileScreen
 import com.pezont.teammates.ui.screens.LoginDestination
@@ -212,9 +216,18 @@ fun TeammatesNavGraph(
                 },
                 user = user,
                 topBar = {
+                    //TODO actions
                     TeammatesTopAppBar(
                         title = stringResource(UserProfileDestination.titleRes),
                         canNavigateBack = false,
+                        action = { IconButton(onClick = {
+
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = null
+                            )
+                        } }
                     )
                 }
             )

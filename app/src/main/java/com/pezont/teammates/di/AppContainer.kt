@@ -51,6 +51,7 @@ class DefaultAppContainer @Inject constructor(
         val loggingInterceptor = HttpLoggingInterceptor { message ->
             if (message.isNotBlank() &&
                 (!message.contains(":", ignoreCase = true)
+                        || message.trim().startsWith("<")
                         || message.trim().startsWith("{")
                         || message.trim().startsWith("["))
             ) {

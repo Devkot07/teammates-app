@@ -24,8 +24,6 @@ import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.User
+import com.pezont.teammates.ui.buttons.TeammatesButton
 import com.pezont.teammates.ui.theme.TeammatesTheme
 
 //TODO AuthorProfile
@@ -96,25 +95,14 @@ fun AuthorProfile(
                 )
             }
 
-            OutlinedButton(
+            TeammatesButton(
                 onClick = starAction,
+                text = stringResource(R.string.subscribe),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                shape = ShapeDefaults.Small,
-                contentPadding = PaddingValues(vertical = 12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.subscribe),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+                imageVector = Icons.Filled.Add
+            )
         }
     }
 }
@@ -196,20 +184,12 @@ fun UserProfile(
 
 
 
-
-
+            Spacer(modifier = Modifier.height(16.dp))
+            TeammatesButton(onClick = logout,text = stringResource(R.string.logout))
 
             Spacer(modifier = Modifier.height(16.dp))
-            OutlinedButton(onClick = logout) {
-                Text(text = stringResource(id = R.string.logout))
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedButton(
-                onClick = navigateToMyQuestionnaires
 
-            ) {
-                Text(text = "My questionnaires")
-            }
+            TeammatesButton(onClick = navigateToMyQuestionnaires, text = "My questionnaires")
         }
     }
 }

@@ -1,11 +1,11 @@
 package com.pezont.teammates.ui.screens.questionnaires
 
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,13 +16,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -53,6 +52,8 @@ import com.pezont.teammates.UiState
 import com.pezont.teammates.domain.model.ContentState
 import com.pezont.teammates.domain.model.Games
 import com.pezont.teammates.domain.model.QuestionnaireForm
+import com.pezont.teammates.ui.TeammatesDropdownMenu
+import com.pezont.teammates.ui.buttons.TeammatesButton
 import com.pezont.teammates.ui.items.LoadingItem
 import com.pezont.teammates.ui.navigation.NavigationDestination
 
@@ -90,7 +91,7 @@ fun QuestionnaireCreateScreen(
     ) { innerPadding ->
 
 
-        if (uiState.contentState != ContentState.LOADED && uiState.contentState != ContentState.INITIAL) {
+        if (uiState.contentState == ContentState.LOADING) {
             LoadingItem()
         } else {
             Column(
@@ -152,7 +153,8 @@ fun QuestionnaireCreateScreen(
                     ),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     label = { Text(stringResource(R.string.header)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = ShapeDefaults.Small
                 )
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -166,7 +168,8 @@ fun QuestionnaireCreateScreen(
                     ),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     label = { Text(stringResource(R.string.description)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = ShapeDefaults.Small
                 )
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -174,36 +177,41 @@ fun QuestionnaireCreateScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Box(modifier = Modifier.wrapContentWidth()) {
-                        OutlinedButton(
-                            onClick = { isDropdownExpanded = true },
-                            modifier = Modifier.wrapContentWidth()
-                        ) {
-                            Text(
-                                text = questionnaireForm.selectedGame?.nameOfGame
-                                    ?: stringResource(R.string.select_game)
-                            )
-                        }
+                    Column(
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
 
-                        DropdownMenu(
-                            expanded = isDropdownExpanded,
-                            onDismissRequest = { isDropdownExpanded = false },
-                            modifier = Modifier.wrapContentWidth()
-                        ) {
-                            Games.entries.forEach { game ->
-                                DropdownMenuItem(
-                                    onClick = {
-                                        questionnaireForm.selectedGame = game
-                                        isDropdownExpanded = false
-                                    },
-                                    text = { Text(text = game.nameOfGame) }
-                                )
-                            }
-                        }
+                    ) {
+                        TeammatesButton(
+                            onClick = { isDropdownExpanded = true },
+                            text = questionnaireForm.selectedGame?.nameOfGame
+                                ?: stringResource(R.string.select_game),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                        )
+                        Spacer(Modifier.height(16.dp))
+
+
+                        TeammatesDropdownMenu(
+                            isExpanded = isDropdownExpanded,
+                            items = Games.entries,
+                            onItemSelected = { selected ->
+                                isDropdownExpanded = false
+                                questionnaireForm.selectedGame = selected
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentSize(Alignment.TopStart)
+                        )
                     }
 
-                    Spacer(modifier = Modifier.width(10.dp))
-                    OutlinedButton(
+                    Spacer(modifier = Modifier.width(24.dp))
+                    TeammatesButton(
+                        enabled = (questionnaireForm.header.isNotEmpty() && questionnaireForm.description.isNotEmpty() && questionnaireForm.selectedGame != null),
                         onClick = {
                             val imagePart = selectedImageUri?.let {
                                 viewModel.createNewQuestionnaireUseCase.uriToSquareCroppedWebpMultipart(
@@ -224,15 +232,16 @@ fun QuestionnaireCreateScreen(
 
                             )
                         },
-                        modifier = Modifier.wrapContentWidth()
-                    ) { Text(text = stringResource(R.string.create)) }
-                    Spacer(modifier = Modifier.height(20.dp))
-
+                        text = stringResource(R.string.create),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .height(56.dp)
+                    )
                 }
             }
         }
     }
 }
-
 
 
