@@ -16,20 +16,23 @@
 package com.pezont.teammates.di
 
 import android.content.Context
+import android.util.Log
 import com.pezont.teammates.BuildConfig
-import com.pezont.teammates.data.repository.AuthRepositoryImpl
-import com.pezont.teammates.data.repository.QuestionnairesRepositoryImpl
-import com.pezont.teammates.domain.repository.AuthRepository
-import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.data.TeammatesAuthApiService
 import com.pezont.teammates.data.TeammatesQuestionnairesApiService
 import com.pezont.teammates.data.TeammatesUsersApiService
+import com.pezont.teammates.data.interceptor.TokenRefreshInterceptor
+import com.pezont.teammates.data.repository.AuthRepositoryImpl
+import com.pezont.teammates.data.repository.QuestionnairesRepositoryImpl
 import com.pezont.teammates.data.repository.UsersRepositoryImpl
+import com.pezont.teammates.domain.repository.AuthRepository
+import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.domain.repository.UsersRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Inject
 
 
 interface AppContainer {
@@ -39,41 +42,78 @@ interface AppContainer {
 }
 
 
-class DefaultAppContainer(private val context: Context) : AppContainer {
+class DefaultAppContainer @Inject constructor(
+    private val context: Context,
+    tokenRefreshInterceptor: TokenRefreshInterceptor
+) : AppContainer {
 
-    private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(HttpLoggingInterceptor().apply {
+    private fun createBaseOkHttpClientBuilder(): OkHttpClient.Builder {
+        val loggingInterceptor = HttpLoggingInterceptor { message ->
+            if (message.isNotBlank() &&
+                (!message.contains(":", ignoreCase = true)
+                        || message.trim().startsWith("{")
+                        || message.trim().startsWith("["))
+            ) {
+                Log.i("OkHttp", message)
+            }
+        }.apply {
             level = HttpLoggingInterceptor.Level.BODY
-        })
-        .followRedirects(false)
-        .followSslRedirects(false)
-        .build()
+        }
 
 
-    private fun createRetrofit(baseUrl: String): Retrofit = Retrofit.Builder()
-        .addConverterFactory(GsonConverterFactory.create())
-        .client(okHttpClient)
-        .baseUrl(baseUrl)
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .followRedirects(false)
+            .followSslRedirects(false)
+    }
+
+    private val okHttpClient = createBaseOkHttpClientBuilder()
+        .addInterceptor(tokenRefreshInterceptor)
         .build()
+
+    private val authOkHttpClient = createBaseOkHttpClientBuilder().build()
+
+
+    private fun createRetrofit(baseUrl: String, client: OkHttpClient): Retrofit {
+        Log.d(
+            "AppContainer",
+            "Creating retrofit with client: ${client.hashCode()}, isAuthClient: ${client == authOkHttpClient}"
+        )
+        return Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .baseUrl(baseUrl)
+            .build()
+    }
 
 
     override val authRepository: AuthRepository by lazy {
         val retrofitService =
-            createRetrofit("${BuildConfig.BASE_URL}${BuildConfig.PORT_2}${BuildConfig.END_URL}")
+            createRetrofit(
+                "${BuildConfig.BASE_URL}${BuildConfig.PORT_2}${BuildConfig.END_URL}",
+                authOkHttpClient
+            )
                 .create(TeammatesAuthApiService::class.java)
         AuthRepositoryImpl(retrofitService, context)
     }
 
     override val questionnairesRepository: QuestionnairesRepository by lazy {
         val retrofitService =
-            createRetrofit("${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}")
+            createRetrofit(
+                "${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}",
+                okHttpClient
+            )
+
                 .create(TeammatesQuestionnairesApiService::class.java)
         QuestionnairesRepositoryImpl(retrofitService, context)
     }
 
     override val usersRepository: UsersRepository by lazy {
         val retrofitService =
-            createRetrofit("${BuildConfig.BASE_URL}${BuildConfig.PORT_3}${BuildConfig.END_URL}")
+            createRetrofit(
+                "${BuildConfig.BASE_URL}${BuildConfig.PORT_3}${BuildConfig.END_URL}",
+                okHttpClient
+            )
                 .create(TeammatesUsersApiService::class.java)
         UsersRepositoryImpl(retrofitService, context)
     }

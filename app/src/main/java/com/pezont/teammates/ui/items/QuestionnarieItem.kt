@@ -97,7 +97,6 @@ fun QuestionnaireCard(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Log.i("Image", fixedImagePath)
                 SubcomposeAsyncImage(
                     model = fixedImagePath,
                     loading = { LoadingItem() },

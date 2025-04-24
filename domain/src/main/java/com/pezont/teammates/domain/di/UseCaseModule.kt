@@ -12,10 +12,13 @@ import com.pezont.teammates.domain.usecase.LoadUserUseCase
 import com.pezont.teammates.domain.usecase.LoadUserQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoginUseCase
 import com.pezont.teammates.domain.usecase.LogoutUseCase
+import com.pezont.teammates.domain.usecase.UpdateTokensUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -80,5 +83,19 @@ object UseCaseModule {
         userDataRepository: UserDataRepository
     ): CreateQuestionnaireUseCase {
         return CreateQuestionnaireUseCase(questionnairesRepository, userDataRepository)
+    }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object SingletonUseCaseModule {
+
+    @Provides
+    @Singleton
+    fun provideUpdateTokensUseCase(
+        authRepository: AuthRepository,
+        userDataRepository: UserDataRepository
+    ): UpdateTokensUseCase {
+        return UpdateTokensUseCase(authRepository, userDataRepository)
     }
 }
