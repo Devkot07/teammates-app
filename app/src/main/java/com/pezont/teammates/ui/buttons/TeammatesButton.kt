@@ -31,7 +31,7 @@ fun TeammatesButton(
         modifier = modifier,
         enabled = enabled,
         shape = ShapeDefaults.Small,
-        contentPadding = PaddingValues(12.dp)
+        contentPadding = PaddingValues(horizontal = 12.dp)
     ) {
         if (imageVector != null) {
             Icon(imageVector = imageVector, contentDescription = null)

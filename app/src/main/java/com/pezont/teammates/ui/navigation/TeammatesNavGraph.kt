@@ -2,10 +2,6 @@ package com.pezont.teammates.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -211,25 +207,8 @@ fun TeammatesNavGraph(
                     viewModel.loadUserQuestionnaires()
                     navController.navigate(UserQuestionnairesDestination.route)
                 },
-                logout = {
-                    viewModel.logout()
-                },
+                viewModel = viewModel,
                 user = user,
-                topBar = {
-                    //TODO actions
-                    TeammatesTopAppBar(
-                        title = stringResource(UserProfileDestination.titleRes),
-                        canNavigateBack = false,
-                        action = { IconButton(onClick = {
-
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = null
-                            )
-                        } }
-                    )
-                }
             )
             TeammatesBackHandler(
                 currentRoute = currentRoute,
@@ -284,7 +263,6 @@ fun TeammatesNavGraph(
                     else
                         navController.navigate(AuthorProfileDestination.route)
                 },
-
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(QuestionnaireDetailsDestination.titleRes),
@@ -305,7 +283,7 @@ fun TeammatesNavGraph(
                 authorQuestionnaires = selectedAuthorQuestionnaires,
                 topBar = {
                     TeammatesTopAppBar(
-                        title = selectedAuthor.nickname.toString(),
+                        title = selectedAuthor.nickname?: "",
                         canNavigateBack = true,
                         navigateUp = { navController.navigate(HomeDestination.route) }
                     )

@@ -22,7 +22,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
@@ -52,7 +51,7 @@ import com.pezont.teammates.UiState
 import com.pezont.teammates.domain.model.ContentState
 import com.pezont.teammates.domain.model.Games
 import com.pezont.teammates.domain.model.QuestionnaireForm
-import com.pezont.teammates.ui.TeammatesDropdownMenu
+import com.pezont.teammates.ui.GamesDropdownMenu
 import com.pezont.teammates.ui.buttons.TeammatesButton
 import com.pezont.teammates.ui.items.LoadingItem
 import com.pezont.teammates.ui.navigation.NavigationDestination
@@ -105,19 +104,21 @@ fun QuestionnaireCreateScreen(
 
                 ) {
                 if (selectedImageUri == null) {
-                    OutlinedButton(
+                    TeammatesButton(
+                        text = "Select Image",
                         onClick = {
                             imagePickerLauncher.launch("image/*")
                         },
                         modifier = Modifier.wrapContentWidth()
-                    ) { Text(text = "Select Image") }
+                    )
                 } else {
-                    OutlinedButton(
+                    TeammatesButton(
+                        text = "Delete Image",
                         onClick = {
                             selectedImageUri = null
                         },
                         modifier = Modifier.wrapContentWidth()
-                    ) { Text(text = "Delete Image") }
+                    )
                 }
 
 
@@ -185,21 +186,28 @@ fun QuestionnaireCreateScreen(
                             .weight(1f)
 
                     ) {
+                        val buttonText = if (isDropdownExpanded) {
+                            stringResource(R.string.close)
+                        } else {
+                            questionnaireForm.selectedGame?.nameOfGame
+                                ?: stringResource(R.string.select_game)
+                        }
+
                         TeammatesButton(
-                            onClick = { isDropdownExpanded = true },
-                            text = questionnaireForm.selectedGame?.nameOfGame
-                                ?: stringResource(R.string.select_game),
+                            onClick = { isDropdownExpanded = !isDropdownExpanded },
+                            text = buttonText,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp)
                         )
+
                         Spacer(Modifier.height(16.dp))
 
 
-                        TeammatesDropdownMenu(
-                            isExpanded = isDropdownExpanded,
-                            items = Games.entries,
-                            onItemSelected = { selected ->
+                        GamesDropdownMenu(
+                            expanded = isDropdownExpanded,
+                            games = Games.entries,
+                            onGameSelected = { selected ->
                                 isDropdownExpanded = false
                                 questionnaireForm.selectedGame = selected
                             },

@@ -1,5 +1,6 @@
 package com.pezont.teammates.ui
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,8 +26,7 @@ fun TeammatesTopAppBar(
     canNavigateBack: Boolean,
     navigateUp: () -> Unit = {},
 
-    action: @Composable () -> Unit = {}
-
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
         title = {
@@ -49,6 +49,6 @@ fun TeammatesTopAppBar(
                 }
             }
         },
-        actions = { action() }
+        actions = actions
     )
 }

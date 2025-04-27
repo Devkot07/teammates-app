@@ -50,4 +50,6 @@
     <string name="the_maximum_length_of_the_header_is_80_characters">The maximum length of the header is 80 characters</string>
     <string name="the_maximum_length_of_the_description_is_300_characters">The maximum length of the description is 300 characters</string>
     <string name="please_select_a_game">Please select a game</string>
+    <string name="close">Close</string>
+    <string name="edit_information">Edit information</string>
 </resources>

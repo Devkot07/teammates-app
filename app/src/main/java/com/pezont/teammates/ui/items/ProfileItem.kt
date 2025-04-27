@@ -141,7 +141,6 @@ fun ProfileInfoRow(
 @Composable
 fun UserProfile(
     navigateToMyQuestionnaires: () -> Unit,
-    logout: () -> Unit,
     user: User,
     paddingValues: PaddingValues
 ) {
@@ -181,11 +180,6 @@ fun UserProfile(
                 text = "Email: $email",
                 style = MaterialTheme.typography.bodyMedium
             )
-
-
-
-            Spacer(modifier = Modifier.height(16.dp))
-            TeammatesButton(onClick = logout,text = stringResource(R.string.logout))
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -245,7 +239,7 @@ fun UserProfileSection(
 fun UserProfilePreview() {
     TeammatesTheme {
         UserProfile(
-            {}, {},
+            {},
             User(
                 "Bob",
                 "111-111-111-111",
