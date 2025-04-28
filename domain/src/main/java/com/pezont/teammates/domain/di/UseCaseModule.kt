@@ -20,6 +20,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+//TODO Optimize
 @Module
 @InstallIn(ViewModelComponent::class)
 object UseCaseModule {
