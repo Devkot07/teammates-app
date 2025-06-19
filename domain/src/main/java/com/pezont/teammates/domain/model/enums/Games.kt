@@ -1,4 +1,4 @@
-package com.pezont.teammates.domain.model
+package com.pezont.teammates.domain.model.enums
 
 enum class Games(val nameOfGame: String) {
     CS2("CS2"),

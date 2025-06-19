@@ -3,9 +3,9 @@ package com.pezont.teammates
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pezont.teammates.domain.model.AuthState
-import com.pezont.teammates.domain.model.ContentState
-import com.pezont.teammates.domain.model.Games
+import com.pezont.teammates.domain.model.enums.AuthState
+import com.pezont.teammates.domain.model.enums.ContentState
+import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.ValidationError

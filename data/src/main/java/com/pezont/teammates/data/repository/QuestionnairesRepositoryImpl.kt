@@ -6,7 +6,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.pezont.teammates.data.TeammatesQuestionnairesApiService
 import com.pezont.teammates.domain.repository.QuestionnairesRepository
-import com.pezont.teammates.domain.model.Games
+import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.CreateQuestionnaireRequest
 import okhttp3.MultipartBody

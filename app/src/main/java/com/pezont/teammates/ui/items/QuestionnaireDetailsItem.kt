@@ -33,7 +33,7 @@ import androidx.compose.ui.zIndex
 import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.TeammatesViewModel
-import com.pezont.teammates.domain.model.ContentState
+import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.buttons.LikeButton
 

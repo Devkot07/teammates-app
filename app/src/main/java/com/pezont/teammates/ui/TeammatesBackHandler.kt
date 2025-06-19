@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.pezont.teammates.domain.model.BottomNavItem
+import com.pezont.teammates.domain.model.enums.BottomNavItem
 import com.pezont.teammates.ui.items.HomeDestination
 import com.pezont.teammates.ui.screens.UserProfileDestination
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesDestination

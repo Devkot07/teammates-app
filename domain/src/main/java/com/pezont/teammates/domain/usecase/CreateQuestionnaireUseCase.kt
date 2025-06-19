@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import com.pezont.teammates.domain.model.Games
+import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.ValidationError
 import com.pezont.teammates.domain.model.ValidationResult

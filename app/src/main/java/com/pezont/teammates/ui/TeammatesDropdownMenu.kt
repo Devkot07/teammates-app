@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.pezont.teammates.domain.model.Games
+import com.pezont.teammates.domain.model.enums.Games
 
 @Composable
 fun TeammatesDropdownMenu(

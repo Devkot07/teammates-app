@@ -1,6 +1,6 @@
 package com.pezont.teammates.domain.model.form
 
-import com.pezont.teammates.domain.model.Games
+import com.pezont.teammates.domain.model.enums.Games
 
 data class QuestionnaireForm(
     var header: String,

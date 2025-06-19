@@ -35,7 +35,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesViewModel
-import com.pezont.teammates.domain.model.BottomNavItem
+import com.pezont.teammates.domain.model.enums.BottomNavItem
 import com.pezont.teammates.domain.model.Credentials
 import com.pezont.teammates.ui.buttons.TeammatesButton
 import com.pezont.teammates.ui.navigation.NavigationDestination

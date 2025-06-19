@@ -1,6 +1,6 @@
 package com.pezont.teammates.domain.repository
 
-import com.pezont.teammates.domain.model.Games
+import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.model.Questionnaire
 import okhttp3.MultipartBody
 

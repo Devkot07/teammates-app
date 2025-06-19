@@ -48,9 +48,9 @@ import coil.request.ImageRequest
 import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.UiState
-import com.pezont.teammates.domain.model.ContentState
-import com.pezont.teammates.domain.model.Games
-import com.pezont.teammates.domain.model.QuestionnaireForm
+import com.pezont.teammates.domain.model.enums.ContentState
+import com.pezont.teammates.domain.model.enums.Games
+import com.pezont.teammates.domain.model.form.QuestionnaireForm
 import com.pezont.teammates.ui.GamesDropdownMenu
 import com.pezont.teammates.ui.buttons.TeammatesButton
 import com.pezont.teammates.ui.items.LoadingItem
