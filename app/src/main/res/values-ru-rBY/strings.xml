@@ -51,4 +51,7 @@
     <string name="please_select_a_game">Please select a game</string>
     <string name="close">Close</string>
     <string name="edit_information">Edit information</string>
+    <string name="the_maximum_length_of_the_nickname_is_20_characters">The maximum length of the nickname is 20 characters</string>
+    <string name="the_nickname_must_contain_at_least_3_characters">The nickname must contain at least 3 characters</string>
+    <string name="information_update_successfully">Information update successfully</string>
 </resources>

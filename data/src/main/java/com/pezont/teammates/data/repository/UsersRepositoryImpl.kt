@@ -8,6 +8,7 @@ import android.util.Log
 import com.pezont.teammates.data.TeammatesUsersApiService
 import com.pezont.teammates.domain.model.LoadAuthorRequest
 import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.domain.model.UpdateUserProfileRequest
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.repository.UsersRepository
 import java.io.IOException
@@ -59,6 +60,27 @@ class UsersRepositoryImpl(
                     token = "Bearer $token",
                     userId = userId,
                     publicId = request.authorId
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateUserProfile(
+        token: String,
+        userId: String,
+        request: UpdateUserProfileRequest
+    ): Result<User> {
+        if (!isNetworkAvailable()) return Result.failure(IOException("No internet connection"))
+        return try {
+            Log.i("DEBUG", "$request")
+
+            Result.success(
+                teammatesUsersApiService.updateUserProfile(
+                    token = "Bearer $token",
+                    userId = userId,
+                    request = request
                 )
             )
         } catch (e: Exception) {

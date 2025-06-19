@@ -99,4 +99,26 @@ class UserDataRepositoryImpl @Inject constructor(
             data[USER_IMAGE_PATH] = user.imagePath ?: ""
         }
     }
+
+    override suspend fun updateUserProfile(
+        nickname: String?,
+        description: String?,
+        imagePath: String?
+    ) {
+        dataStore.edit { data ->
+            nickname?.let {
+                Log.i(TAG, "Update nickname: $nickname")
+                data[USER_NICKNAME] = it
+            }
+            description?.let {
+                Log.i(TAG, "Update description: $description")
+                data[USER_DESCRIPTION] = it
+            }
+            imagePath?.let {
+                Log.i(TAG, "Update imagePath: $imagePath")
+                data[USER_IMAGE_PATH] = it
+            }
+        }
+    }
+
 }

@@ -19,6 +19,7 @@ import com.pezont.teammates.domain.usecase.LoadUserQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadUserUseCase
 import com.pezont.teammates.domain.usecase.LoginUseCase
 import com.pezont.teammates.domain.usecase.LogoutUseCase
+import com.pezont.teammates.domain.usecase.UpdateUserProfileUseCase
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,6 +54,8 @@ class TeammatesViewModel @Inject constructor(
     private val loadAuthorProfileUseCase: LoadAuthorProfileUseCase,
 
     val createNewQuestionnaireUseCase: CreateQuestionnaireUseCase,
+
+    val updateUserProfileUseCase: UpdateUserProfileUseCase,
 
     ) : ViewModel() {
 
@@ -185,6 +188,7 @@ class TeammatesViewModel @Inject constructor(
                     SnackbarController.sendEvent(SnackbarEvent(messageRes))
                     onError()
                 }
+
                 ValidationResult.Success -> {
                     _uiState.update { it.copy(contentState = ContentState.LOADING) }
                     createNewQuestionnaireUseCase(
@@ -207,10 +211,57 @@ class TeammatesViewModel @Inject constructor(
         }
     }
 
+    fun updateUserProfile(
+        nickname: String,
+        description: String,
+        image: MultipartBody.Part?,
+        onSuccess: () -> Unit,
+    ) {
+        viewModelScope.launch {
+
+
+            val validationResult = updateUserProfileUseCase.validateUserProfileForm(nickname, description)
+            when (validationResult) {
+                is ValidationResult.Error -> {
+                    val messageRes = validationResult.errorCode.toMessageRes()
+                    SnackbarController.sendEvent(SnackbarEvent(messageRes))
+                }
+
+                ValidationResult.Success -> {
+                    _uiState.update { it.copy(contentState = ContentState.LOADING) }
+                     updateUserProfileUseCase(
+                        nickname = nickname,
+                        description = description
+                    ).onSuccess { user ->
+                        if (image != null) {
+                            updateUserProfileUseCase.updateUserAvatar(image)
+
+                        }
+
+                        _uiState.update { it.copy(contentState = ContentState.LOADED, user = uiState.value.user.copy(nickname = user.nickname, description = user.description, imagePath = user.imagePath)) }
+                        SnackbarController.sendEvent(SnackbarEvent(R.string.information_update_successfully))
+                        _uiEvent.tryEmit(UiEvent.UserProfileUpdated)
+                        onSuccess()
+                    }.onFailure { throwable ->
+                        _uiState.update { it.copy(contentState = ContentState.ERROR) }
+                        handleError(throwable)
+                    }
+                }
+            }
+
+        }
+
+    }
+
     fun loadAuthor(authorId: String) {
         if (uiState.value.selectedAuthor.publicId != authorId) {
             viewModelScope.launch {
-                _uiState.update { it.copy(selectedAuthor = User(), contentState = ContentState.LOADING) }
+                _uiState.update {
+                    it.copy(
+                        selectedAuthor = User(),
+                        contentState = ContentState.LOADING
+                    )
+                }
                 loadAuthorProfileUseCase(authorId).onSuccess { author ->
                     _uiState.update { it.copy(selectedAuthor = author) }
                     loadQuestionnairesUseCase(
@@ -239,34 +290,32 @@ class TeammatesViewModel @Inject constructor(
     }
 
     fun updateSelectedQuestionnaire(questionnaire: Questionnaire) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(selectedQuestionnaire = questionnaire) }
-        }
+        _uiState.update { it.copy(selectedQuestionnaire = questionnaire) }
     }
 
     fun logout() {
         viewModelScope.launch {
             _uiState.update { it.copy(authState = AuthState.LOADING) }
             logoutUseCase().onSuccess {
-                    _uiState.update {
-                        it.copy(
-                            user = User(),
-                            authState = AuthState.UNAUTHENTICATED,
-                            questionnaires = emptyList(),
-                            likedQuestionnaires = emptyList(),
-                            userQuestionnaires = emptyList(),
-                            selectedAuthor = User(),
-                            selectedQuestionnaire = Questionnaire(),
-                            selectedAuthorQuestionnaires = emptyList(),
-                            contentState = ContentState.INITIAL
-                        )
-                    }
-                    _uiEvent.tryEmit(UiEvent.LoggedOut)
-                    SnackbarController.sendEvent(SnackbarEvent(R.string.logged_out))
-                }.onFailure { throwable ->
-                    _uiState.update { it.copy(authState = AuthState.AUTHENTICATED) }
-                    handleError(throwable)
+                _uiState.update {
+                    it.copy(
+                        user = User(),
+                        authState = AuthState.UNAUTHENTICATED,
+                        questionnaires = emptyList(),
+                        likedQuestionnaires = emptyList(),
+                        userQuestionnaires = emptyList(),
+                        selectedAuthor = User(),
+                        selectedQuestionnaire = Questionnaire(),
+                        selectedAuthorQuestionnaires = emptyList(),
+                        contentState = ContentState.INITIAL
+                    )
                 }
+                _uiEvent.tryEmit(UiEvent.LoggedOut)
+                SnackbarController.sendEvent(SnackbarEvent(R.string.logged_out))
+            }.onFailure { throwable ->
+                _uiState.update { it.copy(authState = AuthState.AUTHENTICATED) }
+                handleError(throwable)
+            }
         }
     }
 
@@ -281,16 +330,19 @@ class TeammatesViewModel @Inject constructor(
                                 SnackbarEvent(R.string.no_internet_connection)
                             )
                         }
+
                         is SocketTimeoutException -> {
                             SnackbarController.sendEvent(
                                 SnackbarEvent(R.string.connection_timeout)
                             )
                         }
+
                         is ConnectException -> {
                             SnackbarController.sendEvent(
                                 SnackbarEvent(R.string.server_unavailable)
                             )
                         }
+
                         else -> {
                             SnackbarController.sendEvent(
                                 SnackbarEvent(R.string.network_error_please_check_your_connection)
@@ -309,21 +361,21 @@ class TeammatesViewModel @Inject constructor(
                             ignoreCase = true
                         ) == true || error.code() == 401 -> {
                             logoutUseCase().onSuccess {
-                                    _uiState.update {
-                                        it.copy(
-                                            user = User(),
-                                            authState = AuthState.UNAUTHENTICATED,
-                                            questionnaires = emptyList(),
-                                            likedQuestionnaires = emptyList(),
-                                            userQuestionnaires = emptyList(),
-                                            selectedAuthor = User(),
-                                            selectedQuestionnaire = Questionnaire(),
-                                            selectedAuthorQuestionnaires = emptyList(),
-                                            contentState = ContentState.INITIAL
-                                        )
-                                    }
-                                    _uiEvent.tryEmit(UiEvent.LoggedOut)
+                                _uiState.update {
+                                    it.copy(
+                                        user = User(),
+                                        authState = AuthState.UNAUTHENTICATED,
+                                        questionnaires = emptyList(),
+                                        likedQuestionnaires = emptyList(),
+                                        userQuestionnaires = emptyList(),
+                                        selectedAuthor = User(),
+                                        selectedQuestionnaire = Questionnaire(),
+                                        selectedAuthorQuestionnaires = emptyList(),
+                                        contentState = ContentState.INITIAL
+                                    )
                                 }
+                                _uiEvent.tryEmit(UiEvent.LoggedOut)
+                            }
                                 .onFailure { throwable ->
                                     _uiState.update { it.copy(authState = AuthState.AUTHENTICATED) }
                                     handleError(throwable)
@@ -383,10 +435,13 @@ class TeammatesViewModel @Inject constructor(
 }
 
 fun ValidationError.toMessageRes(): Int = when (this) {
+
     ValidationError.HEADER_TOO_SHORT -> R.string.the_header_must_contain_at_least_3_characters
     ValidationError.HEADER_TOO_LONG -> R.string.the_maximum_length_of_the_header_is_80_characters
     ValidationError.DESCRIPTION_TOO_LONG -> R.string.the_maximum_length_of_the_description_is_300_characters
     ValidationError.GAME_NOT_SELECTED -> R.string.please_select_a_game
+    ValidationError.NICKNAME_TOO_SHORT -> R.string.the_nickname_must_contain_at_least_3_characters
+    ValidationError.NICKNAME_TOO_LONG -> R.string.the_maximum_length_of_the_nickname_is_20_characters
 }
 
 
@@ -406,6 +461,7 @@ data class UiState(
     )
 
 sealed class UiEvent {
+    data object UserProfileUpdated : UiEvent()
     data object QuestionnaireCreated : UiEvent()
     data object LoggedOut : UiEvent()
     data object LoggedIn : UiEvent()

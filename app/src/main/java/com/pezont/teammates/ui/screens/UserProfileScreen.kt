@@ -31,6 +31,7 @@ object UserProfileDestination : NavigationDestination {
 fun UserProfileScreen(
     user: User,
     navigateToMyQuestionnaires: () -> Unit,
+    navigateToUserProfileEditScreen: () -> Unit,
     viewModel: TeammatesViewModel
 ) {
     Scaffold(
@@ -46,11 +47,13 @@ fun UserProfileScreen(
                     }
 
                 ),
-                //TODO Editing
                 DropdownItem(
                     text = stringResource(R.string.edit_information),
                     icon = Icons.Filled.ModeEditOutline,
-                    onClick = { showDropDownMenu = false }
+                    onClick = {
+                        navigateToUserProfileEditScreen()
+                        showDropDownMenu = false
+                    }
                 ),
             )
             TeammatesTopAppBar(

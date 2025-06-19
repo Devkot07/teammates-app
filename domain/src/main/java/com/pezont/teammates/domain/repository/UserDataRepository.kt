@@ -12,4 +12,5 @@ interface UserDataRepository {
     suspend fun saveUser(user: User)
     suspend fun saveAccessToken(newAccessToken: String)
     suspend fun saveRefreshToken(newRefreshToken: String)
+    suspend fun updateUserProfile(nickname: String? = null, description: String? = null, imagePath: String? = null)
 }

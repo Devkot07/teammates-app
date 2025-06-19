@@ -6,6 +6,8 @@ sealed class ValidationResult {
 }
 
 enum class ValidationError {
+    NICKNAME_TOO_SHORT,
+    NICKNAME_TOO_LONG,
     HEADER_TOO_SHORT,
     HEADER_TOO_LONG,
     DESCRIPTION_TOO_LONG,

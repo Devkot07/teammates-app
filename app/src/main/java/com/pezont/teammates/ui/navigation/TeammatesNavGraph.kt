@@ -18,8 +18,8 @@ import com.pezont.teammates.ObserveAsEvents
 import com.pezont.teammates.ObserveState
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.UiEvent
-import com.pezont.teammates.domain.model.AuthState
-import com.pezont.teammates.domain.model.BottomNavItem
+import com.pezont.teammates.domain.model.enums.AuthState
+import com.pezont.teammates.domain.model.enums.BottomNavItem
 import com.pezont.teammates.ui.TeammatesBackHandler
 import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.items.HomeDestination
@@ -31,6 +31,8 @@ import com.pezont.teammates.ui.screens.AuthorProfileScreen
 import com.pezont.teammates.ui.screens.LoginDestination
 import com.pezont.teammates.ui.screens.LoginScreen
 import com.pezont.teammates.ui.screens.UserProfileDestination
+import com.pezont.teammates.ui.screens.UserProfileEditDestination
+import com.pezont.teammates.ui.screens.UserProfileEditScreen
 import com.pezont.teammates.ui.screens.UserProfileScreen
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesDestination
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesScreen
@@ -69,6 +71,12 @@ fun TeammatesNavGraph(
             is UiEvent.QuestionnaireCreated -> {
                 viewModel.loadUserQuestionnaires()
                 navController.navigate(UserQuestionnairesDestination.route) {
+                    popUpTo(HomeDestination.route) { inclusive = false }
+                }
+            }
+
+            is UiEvent.UserProfileUpdated -> {
+                navController.navigate(UserProfileDestination.route) {
                     popUpTo(HomeDestination.route) { inclusive = false }
                 }
             }
@@ -207,6 +215,9 @@ fun TeammatesNavGraph(
                     viewModel.loadUserQuestionnaires()
                     navController.navigate(UserQuestionnairesDestination.route)
                 },
+                navigateToUserProfileEditScreen = {
+                    navController.navigate(UserProfileEditDestination.route)
+                },
                 viewModel = viewModel,
                 user = user,
             )
@@ -216,6 +227,34 @@ fun TeammatesNavGraph(
                 navController = navController,
                 context = context
             )
+        }
+
+        composable(UserProfileEditDestination.route) {
+            val user = uiState.user
+
+
+
+            UserProfileEditScreen(
+                uiState = uiState,
+                user = user,
+                viewModel = viewModel,
+                topBar = {
+                    TeammatesTopAppBar(
+                        title = stringResource(UserProfileEditDestination.titleRes),
+                        canNavigateBack = true,
+                        navigateUp = { navController.navigateUp() },
+                    )
+                },
+                navigateUp = { navController.navigateUp() }
+
+            )
+            TeammatesBackHandler(
+                currentRoute = currentRoute,
+                onTabChange = { currentTab = it },
+                navController = navController,
+                context = context
+            )
+
         }
 
         composable(UserQuestionnairesDestination.route) {
@@ -283,7 +322,7 @@ fun TeammatesNavGraph(
                 authorQuestionnaires = selectedAuthorQuestionnaires,
                 topBar = {
                     TeammatesTopAppBar(
-                        title = selectedAuthor.nickname?: "",
+                        title = selectedAuthor.nickname ?: "",
                         canNavigateBack = true,
                         navigateUp = { navController.navigate(HomeDestination.route) }
                     )
