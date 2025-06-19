@@ -47,7 +47,7 @@ fun QuestionnaireDetailsItem(
     modifier: Modifier = Modifier,
 ) {
 
-    val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}"
+    val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}/questionnaire"
     val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
 
     var imageLoadingError by remember { mutableStateOf(false) }
