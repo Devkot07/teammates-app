@@ -1,10 +1,8 @@
 package com.pezont.teammates.domain.model
 
 import com.google.gson.annotations.SerializedName
-import kotlinx.serialization.Serializable
 
 
-@Serializable
 data class LoginResponse(
     @SerializedName("user")
     val user: User,
