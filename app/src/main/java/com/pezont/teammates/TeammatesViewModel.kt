@@ -3,13 +3,13 @@ package com.pezont.teammates
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pezont.teammates.domain.model.enums.AuthState
-import com.pezont.teammates.domain.model.enums.ContentState
-import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.ValidationError
 import com.pezont.teammates.domain.model.ValidationResult
+import com.pezont.teammates.domain.model.enums.AuthState
+import com.pezont.teammates.domain.model.enums.ContentState
+import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.usecase.CheckAuthenticationUseCase
 import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
 import com.pezont.teammates.domain.usecase.LoadAuthorProfileUseCase
@@ -218,9 +218,8 @@ class TeammatesViewModel @Inject constructor(
         onSuccess: () -> Unit,
     ) {
         viewModelScope.launch {
-
-
-            val validationResult = updateUserProfileUseCase.validateUserProfileForm(nickname, description)
+            val validationResult =
+                updateUserProfileUseCase.validateUserProfileForm(nickname, description)
             when (validationResult) {
                 is ValidationResult.Error -> {
                     val messageRes = validationResult.errorCode.toMessageRes()
@@ -229,17 +228,43 @@ class TeammatesViewModel @Inject constructor(
 
                 ValidationResult.Success -> {
                     _uiState.update { it.copy(contentState = ContentState.LOADING) }
-                     updateUserProfileUseCase(
+                    updateUserProfileUseCase(
                         nickname = nickname,
                         description = description
                     ).onSuccess { user ->
                         if (image != null) {
                             updateUserProfileUseCase.updateUserAvatar(image)
+                                .onSuccess { newImagePath ->
+                                    _uiState.update {
+                                        it.copy(
+                                            contentState = ContentState.LOADED,
+                                            user = uiState.value.user.copy(
+                                                nickname = user.nickname,
+                                                description = user.description,
+                                                imagePath = newImagePath.imagePath
+                                            )
+                                        )
+                                    }
+                                    SnackbarController.sendEvent(SnackbarEvent(R.string.photo_update))
+                                }.onFailure { throwable ->
+                                _uiState.update { it.copy(contentState = ContentState.ERROR) }
+                                handleError(throwable)
+                                return@onFailure
+                            }
+                        } else {
 
+                            _uiState.update {
+                                it.copy(
+                                    contentState = ContentState.LOADED,
+                                    user = uiState.value.user.copy(
+                                        nickname = user.nickname,
+                                        description = user.description,
+                                        imagePath = user.imagePath
+                                    )
+                                )
+                            }
+                            SnackbarController.sendEvent(SnackbarEvent(R.string.information_update_successfully))
                         }
-
-                        _uiState.update { it.copy(contentState = ContentState.LOADED, user = uiState.value.user.copy(nickname = user.nickname, description = user.description, imagePath = user.imagePath)) }
-                        SnackbarController.sendEvent(SnackbarEvent(R.string.information_update_successfully))
                         _uiEvent.tryEmit(UiEvent.UserProfileUpdated)
                         onSuccess()
                     }.onFailure { throwable ->
@@ -248,9 +273,7 @@ class TeammatesViewModel @Inject constructor(
                     }
                 }
             }
-
         }
-
     }
 
     fun loadAuthor(authorId: String) {

@@ -2,8 +2,10 @@ package com.pezont.teammates.domain.repository
 
 import com.pezont.teammates.domain.model.LoadAuthorRequest
 import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.domain.model.UpdateUserProfilePhotoResponse
 import com.pezont.teammates.domain.model.UpdateUserProfileRequest
 import com.pezont.teammates.domain.model.User
+import okhttp3.MultipartBody
 
 interface UsersRepository {
 
@@ -23,5 +25,11 @@ interface UsersRepository {
         userId: String,
         request: UpdateUserProfileRequest,
     ): Result<User>
+
+    suspend fun updateUserProfilePhoto(
+        token: String,
+        userId: String,
+        image: MultipartBody.Part
+    ): Result<UpdateUserProfilePhotoResponse>
 
 }

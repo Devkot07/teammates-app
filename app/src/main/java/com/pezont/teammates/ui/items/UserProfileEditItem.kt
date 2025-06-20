@@ -54,7 +54,6 @@ import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.form.UserProfileForm
 import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.screens.UserProfileEditDestination
-import okhttp3.MultipartBody
 
 
 @Composable
@@ -64,6 +63,7 @@ fun UserProfileEditItem(
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit,
 ) {
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
     var userProfileForm by remember {
@@ -84,7 +84,6 @@ fun UserProfileEditItem(
         }
     )
 
-    var imagePart: MultipartBody.Part? = null
 
     val model: Any? =
         if (selectedImageUri != null) ImageRequest.Builder(LocalContext.current)
@@ -100,13 +99,19 @@ fun UserProfileEditItem(
                 navigateUp = navigateUp,
                 actions = {
                     IconButton(onClick = {
+                        // TODO extract
+                        val imagePart = selectedImageUri?.let {
+                            viewModel.createNewQuestionnaireUseCase.uriToSquareCroppedWebpMultipart(
+                                it,
+                                context
+                            )
+                        }
                         viewModel.updateUserProfile(
                             userProfileForm.nickname,
                             userProfileForm.description,
                             imagePart
                         ) {
                             selectedImageUri = null
-                            imagePart = null
                             userProfileForm = UserProfileForm(
                                 user.nickname ?: "",
                                 user.email ?: "",

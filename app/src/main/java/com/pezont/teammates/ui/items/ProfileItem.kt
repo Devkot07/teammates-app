@@ -1,6 +1,5 @@
 package com.pezont.teammates.ui.items
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,15 +29,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
+import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.buttons.TeammatesButton
@@ -149,6 +147,8 @@ fun UserProfile(
     val description: String = user.description ?: ""
     val email: String = user.email ?: ""
 
+    val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_3}${BuildConfig.END_URL}"
+    val fixedImagePath = user.imagePath?.replace("http://localhost:8200", baseUrl)?:""
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -165,7 +165,7 @@ fun UserProfile(
             UserProfileSection(
                 nickname = nickname,
                 email = email,
-                image = painterResource(id = R.drawable.ic_launcher_foreground)
+                imagePath = fixedImagePath
             )
 
 
@@ -194,16 +194,23 @@ fun UserProfileSection(
     email: String,
 
     modifier: Modifier = Modifier,
-    image: Painter
+    imagePath: String
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            Image(
-                painter = image,
-                contentDescription = null,
+            SubcomposeAsyncImage(
+                model = imagePath,
+                loading = { LoadingItem() },
+                error = {
+                    Icon(
+                        imageVector = Icons.Default.Error,
+                        contentDescription = "Error"
+                    )
+                },
+                contentDescription = "Profile Picture",
                 modifier = Modifier
                     .size(150.dp)
                     .aspectRatio(1f)
