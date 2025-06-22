@@ -24,7 +24,7 @@ import com.pezont.teammates.ui.TeammatesBackHandler
 import com.pezont.teammates.ui.TeammatesTopAppBar
 import com.pezont.teammates.ui.items.HomeDestination
 import com.pezont.teammates.ui.items.LoadingDestination
-import com.pezont.teammates.ui.items.LoadingItem
+import com.pezont.teammates.ui.items.LoadingItemWithText
 import com.pezont.teammates.ui.items.TeammatesHomeItem
 import com.pezont.teammates.ui.screens.AuthorProfileDestination
 import com.pezont.teammates.ui.screens.AuthorProfileScreen
@@ -125,7 +125,7 @@ fun TeammatesNavGraph(
 //        exitTransition = { fadeOut(animationSpec = tween(500)) },
     ) {
         composable(LoadingDestination.route) {
-            LoadingItem()
+            LoadingItemWithText()
         }
 
         composable(LoginDestination.route) {

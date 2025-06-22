@@ -11,7 +11,7 @@ import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.UiState
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.User
-import com.pezont.teammates.ui.items.LoadingItem
+import com.pezont.teammates.ui.items.LoadingItemWithText
 import com.pezont.teammates.ui.items.UserProfileEditItem
 import com.pezont.teammates.ui.navigation.NavigationDestination
 
@@ -35,7 +35,7 @@ fun UserProfileEditScreen(
         Scaffold(
             topBar = topBar,
         ) { paddingValues ->
-            LoadingItem(
+            LoadingItemWithText(
                 modifier = modifier
                     .fillMaxSize()
                     .padding(paddingValues)

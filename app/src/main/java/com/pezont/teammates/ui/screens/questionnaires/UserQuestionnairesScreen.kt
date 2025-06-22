@@ -24,7 +24,7 @@ import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.buttons.TeammatesButton
-import com.pezont.teammates.ui.items.LoadingItem
+import com.pezont.teammates.ui.items.LoadingItemWithText
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +83,7 @@ fun UserQuestionnairesScreen(
                 viewModel = viewModel,
                 lastItem = {
                     if (userQuestionnaires.isEmpty()) {
-                        LoadingItem()
+                        LoadingItemWithText()
                     } else {
                         CreateButton(navigateToQuestionnaireCreate)
                     }

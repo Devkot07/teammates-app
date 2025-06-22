@@ -32,14 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.BuildConfig
-import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.buttons.LikeButton
 
 @Composable
 fun QuestionnaireDetailsItem(
-    viewModel: TeammatesViewModel,
+    // viewModel: TeammatesViewModel,
     authorNickname: String,
     contentState: ContentState,
     questionnaire: Questionnaire,
@@ -65,7 +64,7 @@ fun QuestionnaireDetailsItem(
                 .padding(paddingValues)
         ) {
             if (contentState == ContentState.LOADING)
-                LoadingItem()
+                LoadingItemWithText()
             else {
                 Column(
                     modifier = Modifier

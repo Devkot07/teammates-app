@@ -30,7 +30,19 @@ fun LoadingItem(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
+    ) {
+        Box(
+            modifier = Modifier.padding(50.dp)
+        ) { CircularProgressIndicator(modifier = Modifier.size(100.dp)) }
+    }
+}
 
+@Composable
+fun LoadingItemWithText(modifier: Modifier = Modifier) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.fillMaxSize()
     ) {
         Box(
             modifier = Modifier
@@ -41,7 +53,6 @@ fun LoadingItem(modifier: Modifier = Modifier) {
                     .size(100.dp)
             )
         }
-
         Text(
             modifier = Modifier
                 .padding(top = 16.dp),
@@ -57,5 +68,13 @@ fun LoadingItem(modifier: Modifier = Modifier) {
 fun LoadingItemPreview() {
     TeammatesTheme{
         LoadingItem()
+    }
+}
+
+@Preview
+@Composable
+fun LoadingItemWithTextPreview() {
+    TeammatesTheme{
+        LoadingItemWithText()
     }
 }

@@ -81,7 +81,7 @@ fun TeammatesHomeItem(
                             .padding(32.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        LoadingItem()
+                        LoadingItemWithText()
                     }
                 },
                 modifier = Modifier.fillMaxSize()

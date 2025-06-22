@@ -15,7 +15,7 @@ import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.items.AuthorProfile
-import com.pezont.teammates.ui.items.LoadingItem
+import com.pezont.teammates.ui.items.LoadingItemWithText
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.screens.questionnaires.QuestionnairesHorizontalRow
 
@@ -44,7 +44,7 @@ fun AuthorProfileScreen(
                 .padding(paddingValues)
         ) {
             if (contentState == ContentState.LOADING)
-                LoadingItem()
+                LoadingItemWithText()
             else {
                 AuthorProfile(
                     starAction, author

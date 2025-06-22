@@ -53,7 +53,7 @@ import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.model.form.QuestionnaireForm
 import com.pezont.teammates.ui.GamesDropdownMenu
 import com.pezont.teammates.ui.buttons.TeammatesButton
-import com.pezont.teammates.ui.items.LoadingItem
+import com.pezont.teammates.ui.items.LoadingItemWithText
 import com.pezont.teammates.ui.navigation.NavigationDestination
 
 object QuestionnaireCreateDestination : NavigationDestination {
@@ -91,7 +91,7 @@ fun QuestionnaireCreateScreen(
 
 
         if (uiState.contentState == ContentState.LOADING) {
-            LoadingItem()
+            LoadingItemWithText()
         } else {
             Column(
                 modifier = modifier

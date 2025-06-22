@@ -31,7 +31,7 @@ fun QuestionnaireDetailsScreen(
         topBar = topBar
     ) { innerPadding ->
         val authorNickname = uiState.selectedAuthor.nickname?: ""
-        QuestionnaireDetailsItem(viewModel, authorNickname, uiState.contentState, questionnaire,navigateToAuthorProfile, Modifier.padding(innerPadding))
+        QuestionnaireDetailsItem( authorNickname, uiState.contentState, questionnaire,navigateToAuthorProfile, Modifier.padding(innerPadding))
 
     }
 
