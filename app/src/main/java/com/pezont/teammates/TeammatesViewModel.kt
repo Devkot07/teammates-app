@@ -19,6 +19,7 @@ import com.pezont.teammates.domain.usecase.LoadUserQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadUserUseCase
 import com.pezont.teammates.domain.usecase.LoginUseCase
 import com.pezont.teammates.domain.usecase.LogoutUseCase
+import com.pezont.teammates.domain.usecase.PrepareImageForUploadUseCase
 import com.pezont.teammates.domain.usecase.UpdateUserProfileUseCase
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
@@ -39,6 +40,8 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
 
+
+//TODO crushing viewModel
 @HiltViewModel
 class TeammatesViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
@@ -56,6 +59,8 @@ class TeammatesViewModel @Inject constructor(
     val createNewQuestionnaireUseCase: CreateQuestionnaireUseCase,
 
     val updateUserProfileUseCase: UpdateUserProfileUseCase,
+
+    val prepareImageForUploadUseCase: PrepareImageForUploadUseCase,
 
     ) : ViewModel() {
 

@@ -98,28 +98,28 @@ fun UserProfileEditItem(
                 canNavigateBack = true,
                 navigateUp = navigateUp,
                 actions = {
-                    IconButton(onClick = {
-                        // TODO extract
-                        val imagePart = selectedImageUri?.let {
-                            viewModel.createNewQuestionnaireUseCase.uriToSquareCroppedWebpMultipart(
-                                it,
-                                context
-                            )
+                    IconButton(
+                        onClick = {
+                            val imagePart = selectedImageUri?.let {
+                                viewModel.prepareImageForUploadUseCase(
+                                    it,
+                                    context
+                                )
+                            }
+                            viewModel.updateUserProfile(
+                                userProfileForm.nickname,
+                                userProfileForm.description,
+                                imagePart
+                            ) {
+                                selectedImageUri = null
+                                userProfileForm = UserProfileForm(
+                                    user.nickname ?: "",
+                                    user.email ?: "",
+                                    user.description ?: ""
+                                )
+                            }
                         }
-                        viewModel.updateUserProfile(
-                            userProfileForm.nickname,
-                            userProfileForm.description,
-                            imagePart
-                        ) {
-                            selectedImageUri = null
-                            userProfileForm = UserProfileForm(
-                                user.nickname ?: "",
-                                user.email ?: "",
-                                 user.description ?: ""
-                            )
-
-                        }
-                    }) { Icon(Icons.Filled.Check, null) }
+                    ) { Icon(Icons.Filled.Check, null) }
                 }
             )
         }

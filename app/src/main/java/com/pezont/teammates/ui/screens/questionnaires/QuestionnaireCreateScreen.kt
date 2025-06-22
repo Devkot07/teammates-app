@@ -222,7 +222,7 @@ fun QuestionnaireCreateScreen(
                         enabled = (questionnaireForm.header.isNotEmpty() && questionnaireForm.description.isNotEmpty() && questionnaireForm.selectedGame != null),
                         onClick = {
                             val imagePart = selectedImageUri?.let {
-                                viewModel.createNewQuestionnaireUseCase.uriToSquareCroppedWebpMultipart(
+                                viewModel.prepareImageForUploadUseCase(
                                     it,
                                     context
                                 )
