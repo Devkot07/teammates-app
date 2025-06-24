@@ -46,15 +46,14 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pezont.teammates.R
-import com.pezont.teammates.viewmodel.TeammatesViewModel
-import com.pezont.teammates.viewmodel.UiState
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.model.form.QuestionnaireForm
 import com.pezont.teammates.ui.components.GamesDropdownMenu
-import com.pezont.teammates.ui.components.TeammatesButton
 import com.pezont.teammates.ui.components.LoadingItemWithText
+import com.pezont.teammates.ui.components.TeammatesButton
 import com.pezont.teammates.ui.navigation.NavigationDestination
+import com.pezont.teammates.viewmodel.TeammatesViewModel
 
 object QuestionnaireCreateDestination : NavigationDestination {
     override val route = "item_create"
@@ -65,7 +64,7 @@ object QuestionnaireCreateDestination : NavigationDestination {
 @Composable
 fun QuestionnaireCreateScreen(
     modifier: Modifier = Modifier,
-    uiState: UiState,
+    contentState: ContentState,
     viewModel: TeammatesViewModel,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {}
@@ -90,7 +89,7 @@ fun QuestionnaireCreateScreen(
     ) { innerPadding ->
 
 
-        if (uiState.contentState == ContentState.LOADING) {
+        if (contentState == ContentState.LOADING) {
             LoadingItemWithText()
         } else {
             Column(
