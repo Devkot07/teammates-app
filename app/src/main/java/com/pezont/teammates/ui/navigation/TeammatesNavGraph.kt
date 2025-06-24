@@ -16,32 +16,32 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.pezont.teammates.ObserveAsEvents
 import com.pezont.teammates.ObserveState
-import com.pezont.teammates.TeammatesViewModel
-import com.pezont.teammates.UiEvent
+import com.pezont.teammates.viewmodel.TeammatesViewModel
+import com.pezont.teammates.viewmodel.UiEvent
 import com.pezont.teammates.domain.model.enums.AuthState
 import com.pezont.teammates.domain.model.enums.BottomNavItem
-import com.pezont.teammates.ui.TeammatesBackHandler
-import com.pezont.teammates.ui.TeammatesTopAppBar
-import com.pezont.teammates.ui.items.HomeDestination
-import com.pezont.teammates.ui.items.LoadingDestination
-import com.pezont.teammates.ui.items.LoadingItemWithText
-import com.pezont.teammates.ui.items.TeammatesHomeItem
-import com.pezont.teammates.ui.screens.AuthorProfileDestination
-import com.pezont.teammates.ui.screens.AuthorProfileScreen
-import com.pezont.teammates.ui.screens.LoginDestination
-import com.pezont.teammates.ui.screens.LoginScreen
-import com.pezont.teammates.ui.screens.UserProfileDestination
-import com.pezont.teammates.ui.screens.UserProfileEditDestination
-import com.pezont.teammates.ui.screens.UserProfileEditScreen
-import com.pezont.teammates.ui.screens.UserProfileScreen
-import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesDestination
-import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesScreen
-import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateDestination
-import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireCreateScreen
-import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireDetailsDestination
-import com.pezont.teammates.ui.screens.questionnaires.QuestionnaireDetailsScreen
-import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesDestination
-import com.pezont.teammates.ui.screens.questionnaires.UserQuestionnairesScreen
+import com.pezont.teammates.ui.components.TeammatesBackHandler
+import com.pezont.teammates.ui.components.TeammatesTopAppBar
+import com.pezont.teammates.ui.screen.HomeDestination
+import com.pezont.teammates.ui.components.LoadingDestination
+import com.pezont.teammates.ui.components.LoadingItemWithText
+import com.pezont.teammates.ui.screen.TeammatesHomeScreen
+import com.pezont.teammates.ui.screen.author.AuthorProfileDestination
+import com.pezont.teammates.ui.screen.author.AuthorProfileScreen
+import com.pezont.teammates.ui.screen.LoginDestination
+import com.pezont.teammates.ui.screen.LoginScreen
+import com.pezont.teammates.ui.screen.user.UserProfileDestination
+import com.pezont.teammates.ui.screen.user.UserProfileEditDestination
+import com.pezont.teammates.ui.screen.user.UserProfileEditScreen
+import com.pezont.teammates.ui.screen.user.UserProfileScreen
+import com.pezont.teammates.ui.screen.questionnaire.LikedQuestionnairesDestination
+import com.pezont.teammates.ui.screen.questionnaire.LikedQuestionnairesScreen
+import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireCreateDestination
+import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireCreateScreen
+import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireDetailsDestination
+import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireDetailsScreen
+import com.pezont.teammates.ui.screen.questionnaire.UserQuestionnairesDestination
+import com.pezont.teammates.ui.screen.questionnaire.UserQuestionnairesScreen
 
 @Composable
 fun TeammatesNavGraph(
@@ -136,7 +136,7 @@ fun TeammatesNavGraph(
             onTabChange(BottomNavItem.HOME)
             val questionnaires = uiState.questionnaires
 
-            TeammatesHomeItem(
+            TeammatesHomeScreen(
                 viewModel = viewModel,
                 questionnaires = questionnaires,
                 onRefresh = viewModel::loadQuestionnaires,

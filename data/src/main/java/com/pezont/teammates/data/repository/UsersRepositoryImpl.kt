@@ -5,7 +5,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
-import com.pezont.teammates.data.TeammatesUsersApiService
+import com.pezont.teammates.data.api.TeammatesUsersApiService
 import com.pezont.teammates.domain.model.LoadAuthorRequest
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.UpdateUserProfilePhotoResponse

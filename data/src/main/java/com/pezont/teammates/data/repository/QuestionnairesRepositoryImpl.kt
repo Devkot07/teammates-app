@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.pezont.teammates.data.TeammatesQuestionnairesApiService
+import com.pezont.teammates.data.api.TeammatesQuestionnairesApiService
 import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.model.Questionnaire

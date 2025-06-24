@@ -6,9 +6,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.pezont.teammates.BuildConfig
-import com.pezont.teammates.data.TeammatesAuthApiService
-import com.pezont.teammates.data.TeammatesQuestionnairesApiService
-import com.pezont.teammates.data.TeammatesUsersApiService
+import com.pezont.teammates.data.api.TeammatesAuthApiService
+import com.pezont.teammates.data.api.TeammatesQuestionnairesApiService
+import com.pezont.teammates.data.api.TeammatesUsersApiService
 import com.pezont.teammates.data.interceptor.TokenRefreshInterceptor
 import com.pezont.teammates.data.repository.AuthRepositoryImpl
 import com.pezont.teammates.data.repository.QuestionnairesRepositoryImpl
