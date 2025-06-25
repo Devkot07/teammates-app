@@ -16,7 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.pezont.teammates.ObserveState
+import com.pezont.teammates.ui.ObserveState
 import com.pezont.teammates.R
 import com.pezont.teammates.viewmodel.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire

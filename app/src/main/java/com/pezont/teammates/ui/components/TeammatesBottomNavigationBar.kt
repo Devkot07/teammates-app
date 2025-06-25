@@ -1,4 +1,4 @@
-package com.pezont.teammates.ui
+package com.pezont.teammates.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.HorizontalDivider

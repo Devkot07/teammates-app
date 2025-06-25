@@ -3,7 +3,7 @@
     <string name="app_name">Тиммейты</string>
     <string name="authorization">Авторизация</string>
     <string name="authorization_error_incorrect_login_or_password">Ошибка авторизации: Неверный логин или пароль</string>
-    <string name="authorization_error_authorization_failed">Ошибка авторизации: Авторизация не удалась</string>
+    <string name="authorization_failed">Авторизация не удалась</string>
     <string name="logout">Выйти</string>
     <string name="error">Ошибка</string>
     <string name="loading">Загрузка</string>

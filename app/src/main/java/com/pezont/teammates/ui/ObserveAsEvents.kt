@@ -1,4 +1,4 @@
-package com.pezont.teammates
+package com.pezont.teammates.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

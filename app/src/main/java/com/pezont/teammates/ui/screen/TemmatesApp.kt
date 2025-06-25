@@ -30,9 +30,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.pezont.teammates.ObserveAsEvents
+import com.pezont.teammates.ui.ObserveAsEvents
 import com.pezont.teammates.R
-import com.pezont.teammates.ui.TeammatesBottomNavigationBar
+import com.pezont.teammates.ui.components.TeammatesBottomNavigationBar
 import com.pezont.teammates.viewmodel.TeammatesViewModel
 import com.pezont.teammates.domain.model.enums.BottomNavItem
 import com.pezont.teammates.ui.navigation.TeammatesNavGraph
