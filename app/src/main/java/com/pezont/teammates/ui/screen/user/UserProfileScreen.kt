@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.pezont.teammates.R
-import com.pezont.teammates.viewmodel.TeammatesViewModel
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.components.Dots
 import com.pezont.teammates.ui.components.DropdownItem
@@ -21,6 +20,7 @@ import com.pezont.teammates.ui.components.TeammatesDropdownMenu
 import com.pezont.teammates.ui.components.TeammatesTopAppBar
 import com.pezont.teammates.ui.items.UserProfile
 import com.pezont.teammates.ui.navigation.NavigationDestination
+import com.pezont.teammates.viewmodel.AuthViewModel
 
 object UserProfileDestination : NavigationDestination {
     override val route = "user_profile"
@@ -32,7 +32,7 @@ fun UserProfileScreen(
     user: User,
     navigateToMyQuestionnaires: () -> Unit,
     navigateToUserProfileEditScreen: () -> Unit,
-    viewModel: TeammatesViewModel
+    authViewModel: AuthViewModel
 ) {
     Scaffold(
         topBar = {
@@ -42,7 +42,7 @@ fun UserProfileScreen(
                     text = stringResource(R.string.logout),
                     icon = Icons.AutoMirrored.Filled.Logout,
                     onClick = {
-                        viewModel.logout()
+                        authViewModel.logout()
                         showDropDownMenu = false
                     }
 

@@ -11,29 +11,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.pezont.teammates.ObserveAsEvents
-import com.pezont.teammates.ObserveState
-import com.pezont.teammates.viewmodel.TeammatesViewModel
-import com.pezont.teammates.viewmodel.UiEvent
 import com.pezont.teammates.domain.model.enums.AuthState
 import com.pezont.teammates.domain.model.enums.BottomNavItem
+import com.pezont.teammates.ui.ObserveAsEvents
+import com.pezont.teammates.ui.ObserveState
+import com.pezont.teammates.ui.components.LoadingDestination
+import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.components.TeammatesBackHandler
 import com.pezont.teammates.ui.components.TeammatesTopAppBar
 import com.pezont.teammates.ui.screen.HomeDestination
-import com.pezont.teammates.ui.components.LoadingDestination
-import com.pezont.teammates.ui.components.LoadingItemWithText
+import com.pezont.teammates.ui.screen.LoginDestination
+import com.pezont.teammates.ui.screen.LoginScreen
 import com.pezont.teammates.ui.screen.TeammatesHomeScreen
 import com.pezont.teammates.ui.screen.author.AuthorProfileDestination
 import com.pezont.teammates.ui.screen.author.AuthorProfileScreen
-import com.pezont.teammates.ui.screen.LoginDestination
-import com.pezont.teammates.ui.screen.LoginScreen
-import com.pezont.teammates.ui.screen.user.UserProfileDestination
-import com.pezont.teammates.ui.screen.user.UserProfileEditDestination
-import com.pezont.teammates.ui.screen.user.UserProfileEditScreen
-import com.pezont.teammates.ui.screen.user.UserProfileScreen
 import com.pezont.teammates.ui.screen.questionnaire.LikedQuestionnairesDestination
 import com.pezont.teammates.ui.screen.questionnaire.LikedQuestionnairesScreen
 import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireCreateDestination
@@ -42,6 +37,14 @@ import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireDetailsDestinat
 import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireDetailsScreen
 import com.pezont.teammates.ui.screen.questionnaire.UserQuestionnairesDestination
 import com.pezont.teammates.ui.screen.questionnaire.UserQuestionnairesScreen
+import com.pezont.teammates.ui.screen.user.UserProfileDestination
+import com.pezont.teammates.ui.screen.user.UserProfileEditDestination
+import com.pezont.teammates.ui.screen.user.UserProfileEditScreen
+import com.pezont.teammates.ui.screen.user.UserProfileScreen
+import com.pezont.teammates.viewmodel.AuthUiEvent
+import com.pezont.teammates.viewmodel.AuthViewModel
+import com.pezont.teammates.viewmodel.TeammatesViewModel
+import com.pezont.teammates.viewmodel.UiEvent
 
 @Composable
 fun TeammatesNavGraph(
@@ -52,32 +55,42 @@ fun TeammatesNavGraph(
 ) {
     val context = LocalContext.current
 
-    val authState by viewModel.authState.collectAsState()
+
+    val authViewModel: AuthViewModel = hiltViewModel()
+    val authState by authViewModel.authState.collectAsState()
+
+
     val contentState by viewModel.contentState.collectAsState()
     val questionnaires by viewModel.questionnaires.collectAsState()
     val likedQuestionnaires by viewModel.likedQuestionnaires.collectAsState()
     val userQuestionnaires by viewModel.userQuestionnaires.collectAsState()
 
 
-    val selectedAuthor  by viewModel.selectedAuthor.collectAsState()
+    val selectedAuthor by viewModel.selectedAuthor.collectAsState()
     val selectedQuestionnaire by viewModel.selectedQuestionnaire.collectAsState()
     val selectedAuthorQuestionnaires by viewModel.selectedAuthorQuestionnaires.collectAsState()
 
-    //val uiState by viewModel.uiState.collectAsState()
 
-    ObserveAsEvents(viewModel.uiEvent) { event ->
+
+    ObserveAsEvents(authViewModel.authUiEvent) { event ->
         when (event) {
-            is UiEvent.LoggedOut -> {
+            is AuthUiEvent.LoggedOut -> {
                 navController.navigate(LoginDestination.route) {
                     popUpTo(navController.graph.startDestinationId) { inclusive = true }
                 }
             }
 
-            is UiEvent.LoggedIn -> {
+            is AuthUiEvent.LoggedIn -> {
                 navController.navigate(HomeDestination.route) {
                     popUpTo(LoginDestination.route) { inclusive = true }
                 }
             }
+        }
+    }
+
+    ObserveAsEvents(viewModel.uiEvent) { event ->
+        when (event) {
+
 
             is UiEvent.QuestionnaireCreated -> {
                 viewModel.loadUserQuestionnaires()
@@ -140,7 +153,7 @@ fun TeammatesNavGraph(
         }
 
         composable(LoginDestination.route) {
-            LoginScreen(onTabChange, viewModel)
+            LoginScreen(onTabChange, authViewModel)
         }
 
         composable(HomeDestination.route) {
@@ -227,7 +240,7 @@ fun TeammatesNavGraph(
                 navigateToUserProfileEditScreen = {
                     navController.navigate(UserProfileEditDestination.route)
                 },
-                viewModel = viewModel,
+                authViewModel = authViewModel,
                 user = user,
             )
             TeammatesBackHandler(

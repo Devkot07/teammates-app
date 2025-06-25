@@ -11,31 +11,23 @@ import com.pezont.teammates.domain.model.ValidationResult
 import com.pezont.teammates.domain.model.enums.AuthState
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.enums.Games
-import com.pezont.teammates.domain.usecase.CheckAuthenticationUseCase
 import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
 import com.pezont.teammates.domain.usecase.LoadAuthorProfileUseCase
 import com.pezont.teammates.domain.usecase.LoadLikedQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadUserQuestionnairesUseCase
-import com.pezont.teammates.domain.usecase.LoadUserUseCase
-import com.pezont.teammates.domain.usecase.LoginUseCase
 import com.pezont.teammates.domain.usecase.LogoutUseCase
 import com.pezont.teammates.domain.usecase.PrepareImageForUploadUseCase
 import com.pezont.teammates.domain.usecase.UpdateUserProfileUseCase
 import com.pezont.teammates.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
+import com.pezont.teammates.utils.ErrorHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
-import retrofit2.HttpException
-import java.io.IOException
-import java.net.ConnectException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 import javax.inject.Inject
 
 
@@ -45,11 +37,7 @@ class TeammatesViewModel @Inject constructor(
 
     private val stateManager: StateManager,
 
-    private val loginUseCase: LoginUseCase,
     private val logoutUseCase: LogoutUseCase,
-    private val checkAuthenticationUseCase: CheckAuthenticationUseCase,
-
-    private val loadUserUseCase: LoadUserUseCase,
 
     private val loadQuestionnairesUseCase: LoadQuestionnairesUseCase,
     private val loadUserQuestionnairesUseCase: LoadUserQuestionnairesUseCase,
@@ -67,7 +55,6 @@ class TeammatesViewModel @Inject constructor(
 
     val user = stateManager.user
 
-    val authState = stateManager.authState
     val contentState = stateManager.contentState
 
     val questionnaires = stateManager.questionnaires
@@ -84,43 +71,10 @@ class TeammatesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            checkAuthentication()
+            if (stateManager.authState.value == AuthState.AUTHENTICATED) loadLikedQuestionnaires()
         }
     }
 
-    private suspend fun checkAuthentication() {
-        stateManager.updateAuthState(AuthState.LOADING)
-        runCatching {
-            checkAuthenticationUseCase().first()
-        }.onSuccess { authenticated ->
-            val newAuthState =
-                if (authenticated) AuthState.AUTHENTICATED else AuthState.UNAUTHENTICATED
-            stateManager.updateUser(if (authenticated) loadUserUseCase() else User())
-            stateManager.updateAuthState(newAuthState)
-
-            if (authenticated) loadLikedQuestionnaires()
-        }.onFailure { throwable ->
-            Log.e(TAG, throwable.toString())
-            stateManager.updateAuthState(AuthState.UNAUTHENTICATED)
-        }
-    }
-
-
-    fun login(nickname: String, password: String) {
-        viewModelScope.launch {
-            stateManager.updateAuthState(AuthState.LOADING)
-            loginUseCase(nickname, password).onSuccess {
-                stateManager.updateUser(loadUserUseCase())
-                stateManager.updateAuthState(AuthState.AUTHENTICATED)
-
-                _uiEvent.tryEmit(UiEvent.LoggedIn)
-            }.onFailure { throwable ->
-                Log.e(TAG, throwable.toString())
-                stateManager.updateAuthState(AuthState.UNAUTHENTICATED)
-                SnackbarController.sendEvent(SnackbarEvent(R.string.you_aren_t_logged_in))
-            }
-        }
-    }
 
 
     fun loadQuestionnaires(game: Games? = null, page: Int = 1) {
@@ -313,129 +267,21 @@ class TeammatesViewModel @Inject constructor(
         stateManager.updateSelectedQuestionnaire(questionnaire)
     }
 
-    fun logout() {
-        viewModelScope.launch {
-            stateManager.updateAuthState(AuthState.LOADING)
-            logoutUseCase().onSuccess {
-                stateManager.updateUser(User())
-                stateManager.updateAuthState(AuthState.UNAUTHENTICATED)
-                stateManager.updateContentState(ContentState.INITIAL)
-                stateManager.updateQuestionnaires(emptyList())
-                stateManager.updateLikedQuestionnaires(emptyList())
-                stateManager.updateUserQuestionnaires(emptyList())
+    private suspend fun handleError(error: Throwable) {
+        ErrorHandler.handleError(error) {
+            viewModelScope.launch {
+                stateManager.updateAuthState(AuthState.LOADING)
+                logoutUseCase().onSuccess {
+                    stateManager.updateUser(User())
+                    stateManager.updateAuthState(AuthState.UNAUTHENTICATED)
+                    stateManager.updateContentState(ContentState.INITIAL)
+                    stateManager.updateQuestionnaires(emptyList())
+                    stateManager.updateLikedQuestionnaires(emptyList())
+                    stateManager.updateUserQuestionnaires(emptyList())
 
-                stateManager.updateSelectedAuthor(User())
-                stateManager.updateSelectedQuestionnaire(Questionnaire())
-                stateManager.updateSelectedAuthorQuestionnaires(emptyList())
-
-                _uiEvent.tryEmit(UiEvent.LoggedOut)
-                SnackbarController.sendEvent(SnackbarEvent(R.string.logged_out))
-            }.onFailure { throwable ->
-                stateManager.updateAuthState(AuthState.AUTHENTICATED)
-                handleError(throwable)
-            }
-        }
-    }
-
-    private fun handleError(error: Throwable?) {
-        Log.e(TAG, "error: $error")
-        viewModelScope.launch {
-            when (error) {
-                is IOException -> {
-                    when (error) {
-                        is UnknownHostException -> {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(R.string.no_internet_connection)
-                            )
-                        }
-
-                        is SocketTimeoutException -> {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(R.string.connection_timeout)
-                            )
-                        }
-
-                        is ConnectException -> {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(R.string.server_unavailable)
-                            )
-                        }
-
-                        else -> {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(R.string.network_error_please_check_your_connection)
-                            )
-                        }
-                    }
-                }
-
-                is HttpException -> {
-                    Log.e(TAG, "http error: $error")
-                    val errorBody = error.response()?.errorBody()?.string()
-
-                    when {
-                        errorBody?.contains(
-                            "Not authenticated",
-                            ignoreCase = true
-                        ) == true || error.code() == 401 -> {
-                            logoutUseCase().onSuccess {
-                                stateManager.updateUser(User())
-                                stateManager.updateAuthState(AuthState.UNAUTHENTICATED)
-                                stateManager.updateContentState(ContentState.INITIAL)
-                                stateManager.updateQuestionnaires(emptyList())
-                                stateManager.updateLikedQuestionnaires(emptyList())
-                                stateManager.updateUserQuestionnaires(emptyList())
-
-                                stateManager.updateSelectedAuthor(User())
-                                stateManager.updateSelectedQuestionnaire(Questionnaire())
-                                stateManager.updateSelectedAuthorQuestionnaires(emptyList())
-
-                                _uiEvent.tryEmit(UiEvent.LoggedOut)
-                            }
-                        }
-
-                        error.code() == 400 -> {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(R.string.invalid_request_error)
-                            )
-                        }
-
-                        error.code() == 401 -> {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(R.string.authorization_error_authorization_failed)
-                            )
-                        }
-
-                        error.code() == 403 -> {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(R.string.access_denied_error)
-                            )
-                        }
-
-                        error.code() == 404 -> {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(R.string.resource_not_found_error)
-                            )
-                        }
-
-                        error.code() in 500..599 -> {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(R.string.server_error_please_try_again_later)
-                            )
-                        }
-
-                        else -> {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(R.string.server_communication_error)
-                            )
-                        }
-                    }
-                }
-
-                else -> {
-                    SnackbarController.sendEvent(
-                        SnackbarEvent(R.string.unknown_error_occurred)
-                    )
+                    stateManager.updateSelectedAuthor(User())
+                    stateManager.updateSelectedQuestionnaire(Questionnaire())
+                    stateManager.updateSelectedAuthorQuestionnaires(emptyList())
                 }
             }
         }
@@ -460,6 +306,4 @@ fun ValidationError.toMessageRes(): Int = when (this) {
 sealed class UiEvent {
     data object UserProfileUpdated : UiEvent()
     data object QuestionnaireCreated : UiEvent()
-    data object LoggedOut : UiEvent()
-    data object LoggedIn : UiEvent()
 }

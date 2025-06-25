@@ -34,12 +34,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
-import com.pezont.teammates.viewmodel.TeammatesViewModel
 import com.pezont.teammates.domain.model.enums.BottomNavItem
 import com.pezont.teammates.domain.model.Credentials
 import com.pezont.teammates.ui.components.TeammatesButton
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
+import com.pezont.teammates.viewmodel.AuthViewModel
 
 object LoginDestination : NavigationDestination {
     override val route = "login"
@@ -120,7 +120,7 @@ fun PasswordField(
 @Composable
 fun LoginScreen(
     onTabChange: (BottomNavItem) -> Unit,
-    viewModel: TeammatesViewModel,
+    authViewModel: AuthViewModel,
     modifier: Modifier = Modifier
 ) {
     var credentials by remember { mutableStateOf(Credentials()) }
@@ -150,14 +150,14 @@ fun LoginScreen(
         PasswordField(
             value = credentials.pwd,
             onChange = { data -> credentials = credentials.copy(pwd = data) },
-            submit = { tryLogin(onTabChange, credentials, viewModel) },
+            submit = { tryLogin(onTabChange, credentials, authViewModel) },
             modifier = Modifier.wrapContentWidth(Alignment.CenterHorizontally)
         )
         Spacer(modifier = Modifier.height(30.dp))
 
         TeammatesButton(
             text = stringResource(R.string.login),
-            onClick = { tryLogin(onTabChange, credentials, viewModel) },
+            onClick = { tryLogin(onTabChange, credentials, authViewModel) },
             enabled = credentials.isNotEmpty(),
             modifier = Modifier.wrapContentWidth(Alignment.CenterHorizontally)
         )
@@ -167,11 +167,11 @@ fun LoginScreen(
 fun tryLogin(
     onTabChange: (BottomNavItem) -> Unit,
     credentials: Credentials,
-    viewModel: TeammatesViewModel
+    authViewModel: AuthViewModel
 ) {
     if (credentials.isNotEmpty()) {
         onTabChange(BottomNavItem.HOME)
-        viewModel.login(credentials.login, credentials.pwd)
+        authViewModel.login(credentials.login, credentials.pwd)
     } else {
         SnackbarEvent(R.string.fill_all_fields)
     }
