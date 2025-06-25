@@ -2,6 +2,12 @@ package com.pezont.teammates.utils
 
 import android.util.Log
 import com.pezont.teammates.R
+import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.domain.model.User
+import com.pezont.teammates.domain.model.enums.AuthState
+import com.pezont.teammates.domain.model.enums.ContentState
+import com.pezont.teammates.domain.usecase.LogoutUseCase
+import com.pezont.teammates.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import com.pezont.teammates.viewmodel.TeammatesViewModel.Companion.TAG
@@ -10,9 +16,15 @@ import java.io.IOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object ErrorHandler {
-    suspend fun handleError(error: Throwable, onLogout: () -> Unit = {}) {
+@Singleton
+class ErrorHandler @Inject constructor(
+    private val logoutUseCase: LogoutUseCase, private val stateManager: StateManager
+) {
+
+    suspend fun handleError(error: Throwable) {
         Log.e(TAG, "error: $error")
         when (error) {
             is IOException -> {
@@ -56,13 +68,26 @@ object ErrorHandler {
                     }
 
                     errorBody?.contains(
-                        "Not authenticated",
-                        ignoreCase = true
+                        "Not authenticated", ignoreCase = true
                     ) == true || error.code() == 401 -> {
                         SnackbarController.sendEvent(
                             SnackbarEvent(R.string.authorization_failed)
                         )
-                        onLogout()
+
+                        stateManager.updateAuthState(AuthState.LOADING)
+                        logoutUseCase().onSuccess {
+                            stateManager.updateUser(User())
+                            stateManager.updateAuthState(AuthState.UNAUTHENTICATED)
+                            stateManager.updateContentState(ContentState.INITIAL)
+                            stateManager.updateQuestionnaires(emptyList())
+                            stateManager.updateLikedQuestionnaires(emptyList())
+                            stateManager.updateUserQuestionnaires(emptyList())
+
+                            stateManager.updateSelectedAuthor(User())
+                            stateManager.updateSelectedQuestionnaire(Questionnaire())
+                            stateManager.updateSelectedAuthorQuestionnaires(emptyList())
+                        }
+
                     }
 
                     error.code() == 403 -> {
@@ -97,7 +122,5 @@ object ErrorHandler {
                 )
             }
         }
-
     }
-
 }

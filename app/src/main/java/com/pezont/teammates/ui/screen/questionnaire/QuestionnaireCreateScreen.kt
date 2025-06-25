@@ -53,7 +53,7 @@ import com.pezont.teammates.ui.components.GamesDropdownMenu
 import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.components.TeammatesButton
 import com.pezont.teammates.ui.navigation.NavigationDestination
-import com.pezont.teammates.viewmodel.TeammatesViewModel
+import com.pezont.teammates.viewmodel.QuestionnairesViewModel
 
 object QuestionnaireCreateDestination : NavigationDestination {
     override val route = "item_create"
@@ -65,7 +65,7 @@ object QuestionnaireCreateDestination : NavigationDestination {
 fun QuestionnaireCreateScreen(
     modifier: Modifier = Modifier,
     contentState: ContentState,
-    viewModel: TeammatesViewModel,
+    questionnairesViewModel: QuestionnairesViewModel,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {}
 ) {
@@ -221,12 +221,9 @@ fun QuestionnaireCreateScreen(
                         enabled = (questionnaireForm.header.isNotEmpty() && questionnaireForm.description.isNotEmpty() && questionnaireForm.selectedGame != null),
                         onClick = {
                             val imagePart = selectedImageUri?.let {
-                                viewModel.prepareImageForUploadUseCase(
-                                    it,
-                                    context
-                                )
+                                questionnairesViewModel.prepareImageForUploadUseCase(it, context)
                             }
-                            viewModel.createNewQuestionnaire(
+                            questionnairesViewModel.createNewQuestionnaire(
                                 questionnaireForm.header,
                                 questionnaireForm.description,
                                 questionnaireForm.selectedGame,

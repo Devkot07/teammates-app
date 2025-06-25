@@ -8,15 +8,9 @@ import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.ValidationError
 import com.pezont.teammates.domain.model.ValidationResult
-import com.pezont.teammates.domain.model.enums.AuthState
 import com.pezont.teammates.domain.model.enums.ContentState
-import com.pezont.teammates.domain.model.enums.Games
-import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
 import com.pezont.teammates.domain.usecase.LoadAuthorProfileUseCase
-import com.pezont.teammates.domain.usecase.LoadLikedQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadQuestionnairesUseCase
-import com.pezont.teammates.domain.usecase.LoadUserQuestionnairesUseCase
-import com.pezont.teammates.domain.usecase.LogoutUseCase
 import com.pezont.teammates.domain.usecase.PrepareImageForUploadUseCase
 import com.pezont.teammates.domain.usecase.UpdateUserProfileUseCase
 import com.pezont.teammates.state.StateManager
@@ -37,15 +31,13 @@ class TeammatesViewModel @Inject constructor(
 
     private val stateManager: StateManager,
 
-    private val logoutUseCase: LogoutUseCase,
+    private val errorHandler: ErrorHandler,
+
 
     private val loadQuestionnairesUseCase: LoadQuestionnairesUseCase,
-    private val loadUserQuestionnairesUseCase: LoadUserQuestionnairesUseCase,
-    private val loadLikedQuestionnairesUseCase: LoadLikedQuestionnairesUseCase,
 
     private val loadAuthorProfileUseCase: LoadAuthorProfileUseCase,
 
-    val createNewQuestionnaireUseCase: CreateQuestionnaireUseCase,
 
     val updateUserProfileUseCase: UpdateUserProfileUseCase,
 
@@ -57,9 +49,6 @@ class TeammatesViewModel @Inject constructor(
 
     val contentState = stateManager.contentState
 
-    val questionnaires = stateManager.questionnaires
-    val likedQuestionnaires = stateManager.likedQuestionnaires
-    val userQuestionnaires = stateManager.userQuestionnaires
 
     val selectedAuthor = stateManager.selectedAuthor
     val selectedQuestionnaire = stateManager.selectedQuestionnaire
@@ -69,103 +58,6 @@ class TeammatesViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<UiEvent>(extraBufferCapacity = 1)
     val uiEvent: SharedFlow<UiEvent> = _uiEvent
 
-    init {
-        viewModelScope.launch {
-            if (stateManager.authState.value == AuthState.AUTHENTICATED) loadLikedQuestionnaires()
-        }
-    }
-
-
-
-    fun loadQuestionnaires(game: Games? = null, page: Int = 1) {
-        viewModelScope.launch {
-            loadQuestionnairesUseCase(
-                page = page, game = game, authorId = null
-            ).onSuccess { result ->
-                Log.i(TAG, result.toString())
-                if (page == 1) {
-                    stateManager.updateQuestionnaires(result)
-                } else {
-                    stateManager.updateQuestionnaires(questionnaires.value + result)
-                }
-            }.onFailure { throwable ->
-                Log.e(TAG, throwable.toString())
-                stateManager.updateContentState(ContentState.ERROR)
-                handleError(throwable)
-            }
-        }
-    }
-
-    suspend fun loadLikedQuestionnaires() {
-        loadLikedQuestionnairesUseCase().onSuccess { result ->
-            Log.i(TAG, result.toString())
-            stateManager.updateLikedQuestionnaires(result)
-        }.onFailure { throwable ->
-            Log.e(TAG, throwable.toString())
-            stateManager.updateContentState(ContentState.ERROR)
-            handleError(throwable)
-        }
-    }
-
-    fun loadUserQuestionnaires() {
-        viewModelScope.launch {
-            stateManager.updateContentState(ContentState.LOADING)
-            loadUserQuestionnairesUseCase(game = null).onSuccess { result ->
-                Log.i(TAG, result.toString())
-                stateManager.updateUserQuestionnaires(result)
-                stateManager.updateContentState(ContentState.LOADED)
-
-            }.onFailure { throwable ->
-                Log.e(TAG, throwable.toString())
-                stateManager.updateContentState(ContentState.ERROR)
-                handleError(throwable)
-            }
-        }
-    }
-
-    fun createNewQuestionnaire(
-        header: String,
-        description: String,
-        selectedGame: Games?,
-        image: MultipartBody.Part?,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
-        viewModelScope.launch {
-            val validationResult = createNewQuestionnaireUseCase.validateQuestionnaireForm(
-                header,
-                description,
-                selectedGame
-            )
-
-            when (validationResult) {
-                is ValidationResult.Error -> {
-                    val messageRes = validationResult.errorCode.toMessageRes()
-                    SnackbarController.sendEvent(SnackbarEvent(messageRes))
-                    onError()
-                }
-
-                ValidationResult.Success -> {
-                    stateManager.updateContentState(ContentState.LOADING)
-                    createNewQuestionnaireUseCase(
-                        header = header,
-                        selectedGame = selectedGame!!,
-                        description = description,
-                        image = image
-                    ).onSuccess {
-                        stateManager.updateContentState(ContentState.LOADED)
-                        SnackbarController.sendEvent(SnackbarEvent(R.string.questionnaire_created_successfully))
-                        _uiEvent.tryEmit(UiEvent.QuestionnaireCreated)
-                        onSuccess()
-                    }.onFailure { throwable ->
-                        stateManager.updateContentState(ContentState.ERROR)
-                        handleError(throwable)
-                        onError()
-                    }
-                }
-            }
-        }
-    }
 
     fun updateUserProfile(
         nickname: String,
@@ -203,7 +95,7 @@ class TeammatesViewModel @Inject constructor(
                                     SnackbarController.sendEvent(SnackbarEvent(R.string.photo_update))
                                 }.onFailure { throwable ->
                                     stateManager.updateContentState(ContentState.ERROR)
-                                    handleError(throwable)
+                                    errorHandler.handleError(throwable)
                                     return@onFailure
                                 }
                         } else {
@@ -223,7 +115,7 @@ class TeammatesViewModel @Inject constructor(
                         onSuccess()
                     }.onFailure { throwable ->
                         stateManager.updateContentState(ContentState.ERROR)
-                        handleError(throwable)
+                        errorHandler.handleError(throwable)
                     }
                 }
             }
@@ -253,11 +145,11 @@ class TeammatesViewModel @Inject constructor(
                         Log.e(TAG, throwable.toString())
 
                         stateManager.updateContentState(ContentState.ERROR)
-                        handleError(throwable)
+                        errorHandler.handleError(throwable)
                     }
                 }.onFailure { throwable ->
                     stateManager.updateContentState(ContentState.ERROR)
-                    handleError(throwable)
+                    errorHandler.handleError(throwable)
                 }
             }
         }
@@ -267,25 +159,6 @@ class TeammatesViewModel @Inject constructor(
         stateManager.updateSelectedQuestionnaire(questionnaire)
     }
 
-    private suspend fun handleError(error: Throwable) {
-        ErrorHandler.handleError(error) {
-            viewModelScope.launch {
-                stateManager.updateAuthState(AuthState.LOADING)
-                logoutUseCase().onSuccess {
-                    stateManager.updateUser(User())
-                    stateManager.updateAuthState(AuthState.UNAUTHENTICATED)
-                    stateManager.updateContentState(ContentState.INITIAL)
-                    stateManager.updateQuestionnaires(emptyList())
-                    stateManager.updateLikedQuestionnaires(emptyList())
-                    stateManager.updateUserQuestionnaires(emptyList())
-
-                    stateManager.updateSelectedAuthor(User())
-                    stateManager.updateSelectedQuestionnaire(Questionnaire())
-                    stateManager.updateSelectedAuthorQuestionnaires(emptyList())
-                }
-            }
-        }
-    }
 
     companion object {
         const val TAG: String = "ViewModel"
@@ -305,5 +178,4 @@ fun ValidationError.toMessageRes(): Int = when (this) {
 
 sealed class UiEvent {
     data object UserProfileUpdated : UiEvent()
-    data object QuestionnaireCreated : UiEvent()
 }

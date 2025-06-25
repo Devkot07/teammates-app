@@ -24,28 +24,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.pezont.teammates.ui.ObserveAsEvents
 import com.pezont.teammates.R
-import com.pezont.teammates.ui.components.TeammatesBottomNavigationBar
-import com.pezont.teammates.viewmodel.TeammatesViewModel
 import com.pezont.teammates.domain.model.enums.BottomNavItem
+import com.pezont.teammates.ui.ObserveAsEvents
+import com.pezont.teammates.ui.components.TeammatesBottomNavigationBar
+import com.pezont.teammates.ui.navigation.NavigationItemContent
 import com.pezont.teammates.ui.navigation.TeammatesNavGraph
 import com.pezont.teammates.ui.screen.questionnaire.LikedQuestionnairesDestination
 import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireCreateDestination
 import com.pezont.teammates.ui.screen.user.UserProfileDestination
 import com.pezont.teammates.ui.snackbar.SnackbarController
+import com.pezont.teammates.viewmodel.AuthViewModel
+import com.pezont.teammates.viewmodel.QuestionnairesViewModel
+import com.pezont.teammates.viewmodel.TeammatesViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun TeammatesApp() {
     val context = LocalContext.current
+
     val viewModel: TeammatesViewModel = hiltViewModel()
+    val authViewModel: AuthViewModel = hiltViewModel()
+    val questionnairesViewModel: QuestionnairesViewModel = hiltViewModel()
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -138,12 +143,11 @@ fun TeammatesApp() {
             onTabChange = { currentTab = it },
             navController = navController,
             viewModel = viewModel,
-            paddingValues = paddingValues
+            authViewModel = authViewModel,
+            questionnairesViewModel = questionnairesViewModel,
+            paddingValues = paddingValues,
         )
     }
-
 }
 
-data class NavigationItemContent(
-    val bottomNavItem: BottomNavItem, val icon: ImageVector, val text: String
-)
+

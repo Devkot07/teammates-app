@@ -18,11 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.pezont.teammates.ui.ObserveState
 import com.pezont.teammates.R
-import com.pezont.teammates.viewmodel.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.components.TeammatesTextItem
 import com.pezont.teammates.ui.navigation.NavigationDestination
+import com.pezont.teammates.viewmodel.QuestionnairesViewModel
+import com.pezont.teammates.viewmodel.TeammatesViewModel
 import kotlinx.coroutines.launch
 
 object LikedQuestionnairesDestination : NavigationDestination {
@@ -34,6 +35,7 @@ object LikedQuestionnairesDestination : NavigationDestination {
 @Composable
 fun LikedQuestionnairesScreen(
     viewModel: TeammatesViewModel,
+    questionnairesViewModel: QuestionnairesViewModel,
     likedQuestionnaires: List<Questionnaire>,
     navigateToQuestionnaireDetails: () -> Unit,
     topBar: @Composable () -> Unit = {},
@@ -56,7 +58,7 @@ fun LikedQuestionnairesScreen(
             if (!isLoadingMore && pagerState.currentPage == likedQuestionnaires.size) {
                 isLoadingMore = true
                 coroutineScope.launch {
-                    viewModel.loadLikedQuestionnaires()
+                    questionnairesViewModel.loadLikedQuestionnaires()
                     isLoadingMore = false
                 }
             }
@@ -68,7 +70,7 @@ fun LikedQuestionnairesScreen(
             onRefresh = {
                 isRefreshing = true
                 coroutineScope.launch {
-                    viewModel.loadLikedQuestionnaires()
+                    questionnairesViewModel.loadLikedQuestionnaires()
                     isRefreshing = false
                 }
             }

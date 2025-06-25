@@ -11,7 +11,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -43,6 +42,8 @@ import com.pezont.teammates.ui.screen.user.UserProfileEditScreen
 import com.pezont.teammates.ui.screen.user.UserProfileScreen
 import com.pezont.teammates.viewmodel.AuthUiEvent
 import com.pezont.teammates.viewmodel.AuthViewModel
+import com.pezont.teammates.viewmodel.QuestionnaireUiEvent
+import com.pezont.teammates.viewmodel.QuestionnairesViewModel
 import com.pezont.teammates.viewmodel.TeammatesViewModel
 import com.pezont.teammates.viewmodel.UiEvent
 
@@ -52,18 +53,18 @@ fun TeammatesNavGraph(
     navController: NavHostController,
     viewModel: TeammatesViewModel,
     paddingValues: PaddingValues,
+    authViewModel: AuthViewModel,
+    questionnairesViewModel: QuestionnairesViewModel,
 ) {
     val context = LocalContext.current
 
-
-    val authViewModel: AuthViewModel = hiltViewModel()
     val authState by authViewModel.authState.collectAsState()
 
-
     val contentState by viewModel.contentState.collectAsState()
-    val questionnaires by viewModel.questionnaires.collectAsState()
-    val likedQuestionnaires by viewModel.likedQuestionnaires.collectAsState()
-    val userQuestionnaires by viewModel.userQuestionnaires.collectAsState()
+
+    val questionnaires by questionnairesViewModel.questionnaires.collectAsState()
+    val likedQuestionnaires by questionnairesViewModel.likedQuestionnaires.collectAsState()
+    val userQuestionnaires by questionnairesViewModel.userQuestionnaires.collectAsState()
 
 
     val selectedAuthor by viewModel.selectedAuthor.collectAsState()
@@ -88,17 +89,19 @@ fun TeammatesNavGraph(
         }
     }
 
-    ObserveAsEvents(viewModel.uiEvent) { event ->
+    ObserveAsEvents(questionnairesViewModel.questionnaireUiEvent) { event ->
         when (event) {
-
-
-            is UiEvent.QuestionnaireCreated -> {
-                viewModel.loadUserQuestionnaires()
+            is QuestionnaireUiEvent.QuestionnaireCreated -> {
+                questionnairesViewModel.loadUserQuestionnaires()
                 navController.navigate(UserQuestionnairesDestination.route) {
                     popUpTo(HomeDestination.route) { inclusive = false }
                 }
             }
+        }
+    }
 
+    ObserveAsEvents(viewModel.uiEvent) { event ->
+        when (event) {
             is UiEvent.UserProfileUpdated -> {
                 navController.navigate(UserProfileDestination.route) {
                     popUpTo(HomeDestination.route) { inclusive = false }
@@ -161,8 +164,9 @@ fun TeammatesNavGraph(
 
             TeammatesHomeScreen(
                 viewModel = viewModel,
+                questionnairesViewModel = questionnairesViewModel,
                 questionnaires = questionnaires,
-                onRefresh = viewModel::loadQuestionnaires,
+                onRefresh = questionnairesViewModel::loadQuestionnaires,
                 navigateToQuestionnaireDetails = {
                     navController.navigate(QuestionnaireDetailsDestination.route)
 
@@ -190,6 +194,7 @@ fun TeammatesNavGraph(
             LikedQuestionnairesScreen(
                 likedQuestionnaires = likedQuestionnaires,
                 viewModel = viewModel,
+                questionnairesViewModel = questionnairesViewModel,
                 navigateToQuestionnaireDetails = {
                     navController.navigate(QuestionnaireDetailsDestination.route)
                 },
@@ -211,7 +216,7 @@ fun TeammatesNavGraph(
         composable(QuestionnaireCreateDestination.route) {
             onTabChange(BottomNavItem.CREATE)
             QuestionnaireCreateScreen(
-                viewModel = viewModel,
+                questionnairesViewModel = questionnairesViewModel,
                 contentState = contentState,
                 topBar = {
                     TeammatesTopAppBar(
@@ -234,7 +239,7 @@ fun TeammatesNavGraph(
 
             UserProfileScreen(
                 navigateToMyQuestionnaires = {
-                    viewModel.loadUserQuestionnaires()
+                    questionnairesViewModel.loadUserQuestionnaires()
                     navController.navigate(UserQuestionnairesDestination.route)
                 },
                 navigateToUserProfileEditScreen = {
@@ -287,7 +292,7 @@ fun TeammatesNavGraph(
                     onTabChange(BottomNavItem.CREATE)
                 },
                 userQuestionnaires = userQuestionnaires,
-                onRefresh = viewModel::loadUserQuestionnaires,
+                onRefresh = questionnairesViewModel::loadUserQuestionnaires,
                 navigateToQuestionnaireDetails = {
                     navController.navigate(QuestionnaireDetailsDestination.route)
                 },

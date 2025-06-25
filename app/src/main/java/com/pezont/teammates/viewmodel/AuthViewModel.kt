@@ -29,6 +29,8 @@ class AuthViewModel @Inject constructor(
 
     private val stateManager: StateManager,
 
+    private val errorHandler: ErrorHandler,
+
     private val loginUseCase: LoginUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val checkAuthenticationUseCase: CheckAuthenticationUseCase,
@@ -59,7 +61,7 @@ class AuthViewModel @Inject constructor(
         }.onFailure { throwable ->
             Log.e(TAG, throwable.toString())
             stateManager.updateAuthState(AuthState.UNAUTHENTICATED)
-            ErrorHandler.handleError(throwable)
+            errorHandler.handleError(throwable)
         }
     }
 
@@ -97,7 +99,7 @@ class AuthViewModel @Inject constructor(
 
                 _authUiEvent.tryEmit(AuthUiEvent.LoggedOut)
                 SnackbarController.sendEvent(SnackbarEvent(R.string.logged_out))
-            }.onFailure { throwable ->
+            }.onFailure {
                 stateManager.updateAuthState(AuthState.INITIAL)
             }
         }

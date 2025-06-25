@@ -15,11 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.ui.ObserveState
 import com.pezont.teammates.R
-import com.pezont.teammates.viewmodel.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.screen.questionnaire.QuestionnairesVerticalPager
+import com.pezont.teammates.viewmodel.QuestionnairesViewModel
+import com.pezont.teammates.viewmodel.TeammatesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -35,6 +36,7 @@ object HomeDestination : NavigationDestination {
 @Composable
 fun TeammatesHomeScreen(
     viewModel: TeammatesViewModel,
+    questionnairesViewModel: QuestionnairesViewModel,
     questionnaires: List<Questionnaire>,
     navigateToQuestionnaireDetails: () -> Unit,
     onRefresh: () -> Unit,
@@ -98,7 +100,7 @@ fun TeammatesHomeScreen(
                     val newPage =
                         if (questionnaires.size % 10 == 0) pagerState.currentPage / 10 + 1 else pagerState.currentPage / 10 + 2
                     try {
-                        viewModel.loadQuestionnaires(
+                        questionnairesViewModel.loadQuestionnaires(
                             page = newPage
                         )
                     } finally {
