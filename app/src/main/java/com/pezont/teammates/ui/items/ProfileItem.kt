@@ -39,7 +39,8 @@ import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.User
-import com.pezont.teammates.ui.buttons.TeammatesButton
+import com.pezont.teammates.ui.components.LoadingItem
+import com.pezont.teammates.ui.components.TeammatesButton
 import com.pezont.teammates.ui.theme.TeammatesTheme
 
 //TODO AuthorProfile
