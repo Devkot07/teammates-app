@@ -40,17 +40,19 @@ import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireCreateDestinati
 import com.pezont.teammates.ui.screen.user.UserProfileDestination
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.viewmodel.AuthViewModel
+import com.pezont.teammates.viewmodel.AuthorViewModel
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
-import com.pezont.teammates.viewmodel.TeammatesViewModel
+import com.pezont.teammates.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun TeammatesApp() {
     val context = LocalContext.current
 
-    val viewModel: TeammatesViewModel = hiltViewModel()
+    val authorViewModel: AuthorViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel()
     val questionnairesViewModel: QuestionnairesViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -142,9 +144,11 @@ fun TeammatesApp() {
         TeammatesNavGraph(
             onTabChange = { currentTab = it },
             navController = navController,
-            viewModel = viewModel,
+            authorViewModel = authorViewModel,
             authViewModel = authViewModel,
             questionnairesViewModel = questionnairesViewModel,
+            userViewModel = userViewModel,
+
             paddingValues = paddingValues,
         )
     }

@@ -17,7 +17,7 @@ import com.pezont.teammates.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import com.pezont.teammates.utils.ErrorHandler
-import com.pezont.teammates.viewmodel.TeammatesViewModel.Companion.TAG
+import com.pezont.teammates.utils.toMessageRes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -146,6 +146,8 @@ class QuestionnairesViewModel @Inject constructor(
             }
         }
     }
+
+    companion object { const val TAG  = "QVM" }
 }
 
 

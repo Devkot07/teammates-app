@@ -24,7 +24,7 @@ import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.components.TeammatesButton
 import com.pezont.teammates.ui.navigation.NavigationDestination
-import com.pezont.teammates.viewmodel.TeammatesViewModel
+import com.pezont.teammates.viewmodel.AuthorViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -39,7 +39,7 @@ object UserQuestionnairesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserQuestionnairesScreen(
-    viewModel: TeammatesViewModel,
+    authorViewModel: AuthorViewModel,
     userQuestionnaires: List<Questionnaire>,
     onRefresh: () -> Unit,
     navigateToQuestionnaireDetails: () -> Unit,
@@ -81,7 +81,7 @@ fun UserQuestionnairesScreen(
                 questionnaires = userQuestionnaires,
                 pagerState = pagerState,
                 navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
-                viewModel = viewModel,
+                authorViewModel = authorViewModel,
                 lastItem = { CreateButton(navigateToQuestionnaireCreate) },
                 modifier = Modifier.fillMaxSize()
             )

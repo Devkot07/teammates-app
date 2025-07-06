@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pezont.teammates.viewmodel.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.viewmodel.AuthorViewModel
 
 
 @Composable
@@ -22,7 +22,7 @@ fun QuestionnairesVerticalPager(
     pagerState: PagerState,
     questionnaires: List<Questionnaire>,
     navigateToQuestionnaireDetails: () -> Unit,
-    viewModel: TeammatesViewModel,
+    authorViewModel: AuthorViewModel,
     lastItem: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -38,8 +38,8 @@ fun QuestionnairesVerticalPager(
             val questionnaire = questionnaires[pageIndex]
             QuestionnaireItem(
                 navigateToQuestionnaireDetails = {
-                    viewModel.updateSelectedQuestionnaire(questionnaire)
-                    viewModel.loadAuthor(questionnaire.authorId)
+                    authorViewModel.updateSelectedQuestionnaire(questionnaire)
+                    authorViewModel.loadAuthor(questionnaire.authorId)
                     navigateToQuestionnaireDetails()
                 },
                 questionnaire = questionnaire,
@@ -53,7 +53,7 @@ fun QuestionnairesVerticalPager(
 fun QuestionnairesHorizontalRow(
     questionnaires: List<Questionnaire>,
     navigateToQuestionnaireDetails: () -> Unit,
-    viewModel: TeammatesViewModel,
+    authorViewModel: AuthorViewModel,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
@@ -70,7 +70,7 @@ fun QuestionnairesHorizontalRow(
                 QuestionnaireCompactItem(
                     navigateToQuestionnaireDetails = {
                         navigateToQuestionnaireDetails()
-                        viewModel.updateSelectedQuestionnaire(questionnaire)
+                        authorViewModel.updateSelectedQuestionnaire(questionnaire)
                     },
                     questionnaire = questionnaire,
                     modifier = Modifier

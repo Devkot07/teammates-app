@@ -19,8 +19,8 @@ import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.screen.questionnaire.QuestionnairesVerticalPager
+import com.pezont.teammates.viewmodel.AuthorViewModel
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
-import com.pezont.teammates.viewmodel.TeammatesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -35,7 +35,7 @@ object HomeDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeammatesHomeScreen(
-    viewModel: TeammatesViewModel,
+    authorViewModel: AuthorViewModel,
     questionnairesViewModel: QuestionnairesViewModel,
     questionnaires: List<Questionnaire>,
     navigateToQuestionnaireDetails: () -> Unit,
@@ -75,7 +75,7 @@ fun TeammatesHomeScreen(
             QuestionnairesVerticalPager(
                 questionnaires = questionnaires,
                 navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
-                viewModel = viewModel,
+                authorViewModel = authorViewModel,
                 pagerState = pagerState,
                 lastItem = {
                     Box(

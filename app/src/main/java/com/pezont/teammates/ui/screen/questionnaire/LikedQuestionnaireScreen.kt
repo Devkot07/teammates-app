@@ -22,8 +22,8 @@ import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.components.TeammatesTextItem
 import com.pezont.teammates.ui.navigation.NavigationDestination
+import com.pezont.teammates.viewmodel.AuthorViewModel
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
-import com.pezont.teammates.viewmodel.TeammatesViewModel
 import kotlinx.coroutines.launch
 
 object LikedQuestionnairesDestination : NavigationDestination {
@@ -34,7 +34,7 @@ object LikedQuestionnairesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LikedQuestionnairesScreen(
-    viewModel: TeammatesViewModel,
+    authorViewModel: AuthorViewModel,
     questionnairesViewModel: QuestionnairesViewModel,
     likedQuestionnaires: List<Questionnaire>,
     navigateToQuestionnaireDetails: () -> Unit,
@@ -79,7 +79,7 @@ fun LikedQuestionnairesScreen(
                 questionnaires = likedQuestionnaires,
                 pagerState = pagerState,
                 navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
-                viewModel = viewModel,
+                authorViewModel = authorViewModel,
                 lastItem = {
                     Box(
                         modifier = Modifier.fillMaxSize(),

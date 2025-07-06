@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
-import com.pezont.teammates.viewmodel.TeammatesViewModel
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
@@ -18,6 +17,7 @@ import com.pezont.teammates.ui.items.AuthorProfile
 import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.screen.questionnaire.QuestionnairesHorizontalRow
+import com.pezont.teammates.viewmodel.AuthorViewModel
 
 object AuthorProfileDestination : NavigationDestination {
     override val route = "author_profile"
@@ -26,7 +26,7 @@ object AuthorProfileDestination : NavigationDestination {
 
 @Composable
 fun AuthorProfileScreen(
-    viewModel: TeammatesViewModel,
+    authorViewModel: AuthorViewModel,
     contentState: ContentState,
     author: User,
     authorQuestionnaires: List<Questionnaire>,
@@ -53,7 +53,7 @@ fun AuthorProfileScreen(
                 QuestionnairesHorizontalRow(
                     authorQuestionnaires,
                     navigateToQuestionnaireDetails,
-                    viewModel,
+                    authorViewModel,
                     )
             }
         }

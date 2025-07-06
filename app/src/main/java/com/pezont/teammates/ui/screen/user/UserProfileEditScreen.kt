@@ -11,7 +11,7 @@ import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.navigation.NavigationDestination
-import com.pezont.teammates.viewmodel.TeammatesViewModel
+import com.pezont.teammates.viewmodel.UserViewModel
 
 object UserProfileEditDestination : NavigationDestination {
     override val route = "user_profile_edit"
@@ -23,7 +23,7 @@ object UserProfileEditDestination : NavigationDestination {
 fun UserProfileEditScreen(
     contentState: ContentState,
     user: User,
-    viewModel: TeammatesViewModel,
+    userViewModel: UserViewModel,
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = {},
     navigateUp: () -> Unit,
@@ -40,7 +40,7 @@ fun UserProfileEditScreen(
             )
         }
     } else {
-        UserProfileEditItem(user, viewModel, navigateUp = navigateUp)
+        UserProfileEditItem(user, userViewModel, navigateUp = navigateUp)
     }
 }
 

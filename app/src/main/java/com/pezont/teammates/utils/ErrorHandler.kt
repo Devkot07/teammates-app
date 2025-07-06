@@ -10,7 +10,6 @@ import com.pezont.teammates.domain.usecase.LogoutUseCase
 import com.pezont.teammates.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
-import com.pezont.teammates.viewmodel.TeammatesViewModel.Companion.TAG
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.ConnectException
@@ -25,7 +24,7 @@ class ErrorHandler @Inject constructor(
 ) {
 
     suspend fun handleError(error: Throwable) {
-        Log.e(TAG, "error: $error")
+        Log.e("Error", "error: $error")
         when (error) {
             is IOException -> {
                 when (error) {
@@ -56,7 +55,7 @@ class ErrorHandler @Inject constructor(
             }
 
             is HttpException -> {
-                Log.e(TAG, "http error: $error")
+                Log.e("http error", "$error")
                 val errorBody = error.response()?.errorBody()?.string()
 
                 when {

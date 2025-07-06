@@ -1,6 +1,5 @@
 package com.pezont.teammates.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pezont.teammates.R
@@ -16,7 +15,6 @@ import com.pezont.teammates.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import com.pezont.teammates.utils.ErrorHandler
-import com.pezont.teammates.viewmodel.TeammatesViewModel.Companion.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -59,7 +57,6 @@ class AuthViewModel @Inject constructor(
             stateManager.updateAuthState(newAuthState)
 
         }.onFailure { throwable ->
-            Log.e(TAG, throwable.toString())
             stateManager.updateAuthState(AuthState.UNAUTHENTICATED)
             errorHandler.handleError(throwable)
         }
@@ -74,8 +71,7 @@ class AuthViewModel @Inject constructor(
                 stateManager.updateAuthState(AuthState.AUTHENTICATED)
 
                 _authUiEvent.tryEmit(AuthUiEvent.LoggedIn)
-            }.onFailure { throwable ->
-                Log.e(TAG, throwable.toString())
+            }.onFailure {
                 stateManager.updateAuthState(AuthState.UNAUTHENTICATED)
                 SnackbarController.sendEvent(SnackbarEvent(R.string.you_aren_t_logged_in))
             }

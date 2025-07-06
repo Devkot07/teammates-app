@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.domain.model.enums.BottomNavItem
-import com.pezont.teammates.ui.screen.NavigationItemContent
+import com.pezont.teammates.ui.navigation.NavigationItemContent
 
 @Composable
 fun TeammatesBottomNavigationBar(

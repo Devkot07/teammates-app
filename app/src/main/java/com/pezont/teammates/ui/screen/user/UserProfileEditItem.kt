@@ -49,17 +49,17 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.pezont.teammates.R
-import com.pezont.teammates.viewmodel.TeammatesViewModel
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.form.UserProfileForm
-import com.pezont.teammates.ui.components.TeammatesTopAppBar
 import com.pezont.teammates.ui.components.LoadingItem
+import com.pezont.teammates.ui.components.TeammatesTopAppBar
+import com.pezont.teammates.viewmodel.UserViewModel
 
 
 @Composable
 fun UserProfileEditItem(
     user: User,
-    viewModel: TeammatesViewModel,
+    userViewModel: UserViewModel,
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit,
 ) {
@@ -101,12 +101,12 @@ fun UserProfileEditItem(
                     IconButton(
                         onClick = {
                             val imagePart = selectedImageUri?.let {
-                                viewModel.prepareImageForUploadUseCase(
+                                userViewModel.prepareImageForUploadUseCase(
                                     it,
                                     context
                                 )
                             }
-                            viewModel.updateUserProfile(
+                            userViewModel.updateUserProfile(
                                 userProfileForm.nickname,
                                 userProfileForm.description,
                                 imagePart
