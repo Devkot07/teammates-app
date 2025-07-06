@@ -52,13 +52,9 @@ import com.pezont.teammates.domain.model.form.QuestionnaireForm
 import com.pezont.teammates.ui.components.GamesDropdownMenu
 import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.components.TeammatesButton
-import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
 
-object QuestionnaireCreateDestination : NavigationDestination {
-    override val route = "item_create"
-    override val titleRes = R.string.entry_information
-}
+
 
 
 @Composable

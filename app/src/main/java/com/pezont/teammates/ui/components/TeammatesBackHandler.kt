@@ -6,12 +6,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.pezont.teammates.domain.model.enums.BottomNavItem
-import com.pezont.teammates.ui.screen.HomeDestination
-import com.pezont.teammates.ui.screen.user.UserProfileDestination
-import com.pezont.teammates.ui.screen.user.UserProfileEditDestination
-import com.pezont.teammates.ui.screen.questionnaire.LikedQuestionnairesDestination
-import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireCreateDestination
-import com.pezont.teammates.ui.screen.questionnaire.UserQuestionnairesDestination
+import com.pezont.teammates.ui.navigation.Destinations
+
 
 @Composable
 fun TeammatesBackHandler(
@@ -20,11 +16,11 @@ fun TeammatesBackHandler(
     navController: NavController,
     context: Context
 ) {
-    val homeRoute = HomeDestination.route
+    val homeRoute = Destinations.Home.route
     val bottomNavigationTabs = listOf(
-        LikedQuestionnairesDestination.route,
-        QuestionnaireCreateDestination.route,
-        UserProfileDestination.route
+        Destinations.LikedQuestionnaires.route,
+        Destinations.QuestionnaireCreate.route,
+        Destinations.UserProfile.route
     )
 
     BackHandler {
@@ -37,8 +33,8 @@ fun TeammatesBackHandler(
                 }
             }
 
-            UserQuestionnairesDestination.route -> navController.navigateUp()
-            UserProfileEditDestination.route -> navController.navigateUp()
+            Destinations.UserQuestionnaires.route -> navController.navigateUp()
+            Destinations.UserProfileEdit.route -> navController.navigateUp()
             else -> {}
         }
     }

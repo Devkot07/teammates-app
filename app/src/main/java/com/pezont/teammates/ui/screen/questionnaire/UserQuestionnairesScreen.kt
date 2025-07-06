@@ -20,10 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.components.TeammatesButton
-import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.viewmodel.AuthorViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,10 +29,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-object UserQuestionnairesDestination : NavigationDestination {
-    override val route = "user_questionnaires"
-    override val titleRes = R.string.user_questionnaires
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

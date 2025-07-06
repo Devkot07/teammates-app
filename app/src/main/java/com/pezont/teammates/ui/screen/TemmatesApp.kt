@@ -33,11 +33,9 @@ import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.enums.BottomNavItem
 import com.pezont.teammates.ui.ObserveAsEvents
 import com.pezont.teammates.ui.components.TeammatesBottomNavigationBar
+import com.pezont.teammates.ui.navigation.Destinations
 import com.pezont.teammates.ui.navigation.NavigationItemContent
 import com.pezont.teammates.ui.navigation.TeammatesNavGraph
-import com.pezont.teammates.ui.screen.questionnaire.LikedQuestionnairesDestination
-import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireCreateDestination
-import com.pezont.teammates.ui.screen.user.UserProfileDestination
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.viewmodel.AuthViewModel
 import com.pezont.teammates.viewmodel.AuthorViewModel
@@ -65,10 +63,10 @@ fun TeammatesApp() {
     val currentRoute = navBackStackEntry?.destination?.route
 
     val bottomBarDestinations = listOf(
-        HomeDestination.route,
-        LikedQuestionnairesDestination.route,
-        QuestionnaireCreateDestination.route,
-        UserProfileDestination.route
+        Destinations.Home.route,
+        Destinations.LikedQuestionnaires.route,
+        Destinations.QuestionnaireCreate.route,
+        Destinations.UserProfile.route
     )
     val shouldShowBottomBar by remember(currentRoute) {
         derivedStateOf { currentRoute in bottomBarDestinations }
@@ -118,19 +116,19 @@ fun TeammatesApp() {
                         currentTab = contentType
                         when (contentType) {
                             BottomNavItem.HOME -> navController.navigate(
-                                HomeDestination.route
+                                Destinations.Home.route
                             )
 
                             BottomNavItem.LIKED -> navController.navigate(
-                                LikedQuestionnairesDestination.route
+                                Destinations.LikedQuestionnaires.route
                             )
 
                             BottomNavItem.CREATE -> navController.navigate(
-                                QuestionnaireCreateDestination.route
+                                Destinations.QuestionnaireCreate.route
                             )
 
                             BottomNavItem.PROFILE -> navController.navigate(
-                                UserProfileDestination.route
+                                Destinations.UserProfile.route
                             )
                         }
                     },

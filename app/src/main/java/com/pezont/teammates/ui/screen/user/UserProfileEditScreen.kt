@@ -6,17 +6,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.ui.components.LoadingItemWithText
-import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.viewmodel.UserViewModel
-
-object UserProfileEditDestination : NavigationDestination {
-    override val route = "user_profile_edit"
-    override val titleRes = R.string.profile
-}
 
 
 @Composable

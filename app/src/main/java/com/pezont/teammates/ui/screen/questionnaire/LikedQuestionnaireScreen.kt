@@ -21,15 +21,11 @@ import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.components.TeammatesTextItem
-import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.viewmodel.AuthorViewModel
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
 import kotlinx.coroutines.launch
 
-object LikedQuestionnairesDestination : NavigationDestination {
-    override val route = "favorite_questionnaires"
-    override val titleRes = R.string.favorites
-}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

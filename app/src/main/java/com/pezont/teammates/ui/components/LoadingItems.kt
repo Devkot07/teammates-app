@@ -16,13 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
-import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.theme.TeammatesTheme
-
-object LoadingDestination : NavigationDestination {
-    override val route = "loading"
-    override val titleRes = R.string.loading
-}
 
 @Composable
 fun LoadingItem(modifier: Modifier = Modifier) {

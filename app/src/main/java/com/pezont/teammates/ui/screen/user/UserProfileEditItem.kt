@@ -53,6 +53,7 @@ import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.form.UserProfileForm
 import com.pezont.teammates.ui.components.LoadingItem
 import com.pezont.teammates.ui.components.TeammatesTopAppBar
+import com.pezont.teammates.ui.navigation.Destinations
 import com.pezont.teammates.viewmodel.UserViewModel
 
 
@@ -94,7 +95,7 @@ fun UserProfileEditItem(
     Scaffold(
         topBar = {
             TeammatesTopAppBar(
-                title = stringResource(UserProfileEditDestination.titleRes),
+                title = stringResource(Destinations.UserProfileEdit.titleRes),
                 canNavigateBack = true,
                 navigateUp = navigateUp,
                 actions = {

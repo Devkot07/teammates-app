@@ -37,14 +37,10 @@ import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.enums.BottomNavItem
 import com.pezont.teammates.domain.model.Credentials
 import com.pezont.teammates.ui.components.TeammatesButton
-import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import com.pezont.teammates.viewmodel.AuthViewModel
 
-object LoginDestination : NavigationDestination {
-    override val route = "login"
-    override val titleRes = R.string.login
-}
+
 
 @Composable
 fun LoginField(
