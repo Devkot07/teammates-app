@@ -2,10 +2,7 @@ package com.pezont.teammates.domain.model
 
 import com.google.gson.annotations.SerializedName
 
-
-data class LoginResponse(
-    @SerializedName("user")
-    val user: User,
+data class UpdateTokenResponse (
     @SerializedName("access_token")
     val accessToken: String,
     @SerializedName("refresh_token")

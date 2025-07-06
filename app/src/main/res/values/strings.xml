@@ -44,4 +44,16 @@
     <string name="resource_not_found_error">Requested resource not found.</string>
     <string name="server_error_please_try_again_later">Server error. Please try again later.</string>
     <string name="server_communication_error">An error occurred while communicating with the server.</string>
+
+
+    <string name="the_header_must_contain_at_least_3_characters">The header must contain at least 3 characters</string>
+    <string name="the_maximum_length_of_the_header_is_80_characters">The maximum length of the header is 80 characters</string>
+    <string name="the_maximum_length_of_the_description_is_300_characters">The maximum length of the description is 300 characters</string>
+    <string name="please_select_a_game">Please select a game</string>
+    <string name="close">Close</string>
+    <string name="edit_information">Edit information</string>
+    <string name="the_maximum_length_of_the_nickname_is_20_characters">The maximum length of the nickname is 20 characters</string>
+    <string name="the_nickname_must_contain_at_least_3_characters">The nickname must contain at least 3 characters</string>
+    <string name="information_update_successfully">Information update successfully</string>
+    <string name="photo_update">Photo update</string>
 </resources>

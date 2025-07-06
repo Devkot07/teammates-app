@@ -7,6 +7,8 @@ import android.net.NetworkCapabilities
 import com.pezont.teammates.data.TeammatesAuthApiService
 import com.pezont.teammates.domain.model.LoginResponse
 import com.pezont.teammates.domain.model.LoginRequest
+import com.pezont.teammates.domain.model.UpdateTokenRequest
+import com.pezont.teammates.domain.model.UpdateTokenResponse
 import com.pezont.teammates.domain.repository.AuthRepository
 import java.io.IOException
 
@@ -33,6 +35,14 @@ class AuthRepositoryImpl(
             Result.failure(e)
         }
     }
+
+    override suspend fun updateTokens(request: UpdateTokenRequest): Result<UpdateTokenResponse> {
+        if (!isNetworkAvailable()) return Result.failure(IOException("No internet connection"))
+        return try {
+            Result.success(authApiService.updateTokens(request))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }    }
 
 
 }

@@ -10,10 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -26,7 +23,8 @@ import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
-import com.pezont.teammates.ui.items.TeammatesLoadingItem
+import com.pezont.teammates.ui.buttons.TeammatesButton
+import com.pezont.teammates.ui.items.LoadingItemWithText
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -78,14 +76,14 @@ fun UserQuestionnairesScreen(
                 }
             }
         ) {
-            QuestionnairesPager(
+            QuestionnairesVerticalPager(
                 questionnaires = userQuestionnaires,
                 pagerState = pagerState,
                 navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
                 viewModel = viewModel,
                 lastItem = {
                     if (userQuestionnaires.isEmpty()) {
-                        TeammatesLoadingItem()
+                        LoadingItemWithText()
                     } else {
                         CreateButton(navigateToQuestionnaireCreate)
                     }
@@ -110,17 +108,12 @@ fun CreateButton(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Button(
+        TeammatesButton(
             onClick = navigateToQuestionnaireEntry,
-            shape = MaterialTheme.shapes.medium,
             modifier = Modifier
-                .size(80.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add"
-            )
-        }
+                .size(80.dp),
+            imageVector = Icons.Default.Add
+        )
         Spacer(Modifier.height(10.dp))
         Text(text = ("Create new questionnaire"))
     }

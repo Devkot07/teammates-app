@@ -20,7 +20,7 @@ import com.pezont.teammates.ObserveState
 import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
-import com.pezont.teammates.ui.items.TeammatesLoadingItem
+import com.pezont.teammates.ui.items.LoadingItemWithText
 import com.pezont.teammates.ui.items.TeammatesTextItem
 import com.pezont.teammates.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
@@ -73,7 +73,7 @@ fun LikedQuestionnairesScreen(
                 }
             }
         ) {
-            QuestionnairesPager(
+            QuestionnairesVerticalPager(
                 questionnaires = likedQuestionnaires,
                 pagerState = pagerState,
                 navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
@@ -84,7 +84,7 @@ fun LikedQuestionnairesScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         when {
-                            isLoadingMore -> TeammatesLoadingItem()
+                            isLoadingMore -> LoadingItemWithText()
                             likedQuestionnaires.isEmpty() -> TeammatesTextItem(stringResource(R.string.you_haven_t_liked_any_questionnaire))
                             else -> TeammatesTextItem(stringResource(R.string.end))
                         }

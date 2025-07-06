@@ -1,27 +1,18 @@
 package com.pezont.teammates.ui.screens
 
-import android.content.Context
-import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -45,29 +35,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesViewModel
-import com.pezont.teammates.domain.model.BottomNavItem
+import com.pezont.teammates.domain.model.enums.BottomNavItem
 import com.pezont.teammates.domain.model.Credentials
+import com.pezont.teammates.ui.buttons.TeammatesButton
 import com.pezont.teammates.ui.navigation.NavigationDestination
+import com.pezont.teammates.ui.snackbar.SnackbarEvent
 
 object LoginDestination : NavigationDestination {
     override val route = "login"
     override val titleRes = R.string.login
-}
-
-@Composable
-fun LabeledCheckbox(
-    label: String, onCheckChanged: () -> Unit, isChecked: Boolean
-) {
-
-    Row(
-        Modifier
-            .clickable(onClick = onCheckChanged)
-            .padding(4.dp)
-    ) {
-        Checkbox(checked = isChecked, onCheckedChange = null)
-        Spacer(Modifier.size(6.dp))
-        Text(label)
-    }
 }
 
 @Composable
@@ -86,7 +62,8 @@ fun LoginField(
         )
     }
 
-    TextField(leadingIcon = leadingIcon,
+    TextField(
+        leadingIcon = leadingIcon,
         value = value,
         onValueChange = onChange,
         modifier = modifier,
@@ -111,23 +88,20 @@ fun PasswordField(
 
     var isPasswordVisible by remember { mutableStateOf(false) }
 
-    val leadingIcon = @Composable {
-        Icon(
-            Icons.Default.Key, contentDescription = "", tint = MaterialTheme.colorScheme.primary
-        )
-    }
+
     val trailingIcon = @Composable {
         IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
             Icon(
-                if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                if (isPasswordVisible) Icons.Default.VisibilityOff
+                else Icons.Default.Visibility,
                 contentDescription = "",
                 tint = MaterialTheme.colorScheme.primary
             )
         }
     }
 
-
-    TextField(value = value,
+    TextField(
+        value = value,
         onValueChange = onChange,
         modifier = modifier,
         trailingIcon = trailingIcon,
@@ -150,7 +124,6 @@ fun LoginScreen(
     modifier: Modifier = Modifier
 ) {
     var credentials by remember { mutableStateOf(Credentials()) }
-    val context = LocalContext.current
 
 
     Column(
@@ -166,53 +139,40 @@ fun LoginScreen(
             color = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.height(20.dp))
+
         LoginField(
             value = credentials.login,
             onChange = { data -> credentials = credentials.copy(login = data) },
             modifier = Modifier.wrapContentWidth(Alignment.CenterHorizontally)
         )
         Spacer(modifier = Modifier.height(10.dp))
+
         PasswordField(
             value = credentials.pwd,
             onChange = { data -> credentials = credentials.copy(pwd = data) },
-            submit = {
-                tryLogin(
-                    onTabChange, credentials, context, viewModel
-                )
-            },
+            submit = { tryLogin(onTabChange, credentials, viewModel) },
             modifier = Modifier.wrapContentWidth(Alignment.CenterHorizontally)
         )
         Spacer(modifier = Modifier.height(30.dp))
-        Button(
-            onClick = {
-                if (credentials.isNotEmpty()) {
-                    tryLogin(
-                        onTabChange, credentials, context, viewModel
-                    )
-                } else {
-                    Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
-                }
-            },
+
+        TeammatesButton(
+            text = stringResource(R.string.login),
+            onClick = { tryLogin(onTabChange, credentials, viewModel) },
             enabled = credentials.isNotEmpty(),
-            shape = RoundedCornerShape(5.dp),
             modifier = Modifier.wrapContentWidth(Alignment.CenterHorizontally)
-        ) {
-            Text("Login")
-        }
+        )
     }
 }
 
 fun tryLogin(
     onTabChange: (BottomNavItem) -> Unit,
     credentials: Credentials,
-    context: Context,
     viewModel: TeammatesViewModel
 ) {
     if (credentials.isNotEmpty()) {
         onTabChange(BottomNavItem.HOME)
         viewModel.login(credentials.login, credentials.pwd)
     } else {
-        Toast.makeText(context, context.getString(R.string.fill_all_fields), Toast.LENGTH_SHORT)
-            .show()
+        SnackbarEvent(R.string.fill_all_fields)
     }
 }

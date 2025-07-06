@@ -34,7 +34,7 @@ import com.pezont.teammates.ObserveAsEvents
 import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesBottomNavigationBar
 import com.pezont.teammates.TeammatesViewModel
-import com.pezont.teammates.domain.model.BottomNavItem
+import com.pezont.teammates.domain.model.enums.BottomNavItem
 import com.pezont.teammates.ui.items.HomeDestination
 import com.pezont.teammates.ui.navigation.TeammatesNavGraph
 import com.pezont.teammates.ui.screens.questionnaires.LikedQuestionnairesDestination

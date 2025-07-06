@@ -17,7 +17,7 @@ val bodyFontFamily = FontFamily(
     Font(
         googleFont = GoogleFont("Nunito"),
         fontProvider = provider,
-        weight = FontWeight.ExtraBold
+        weight = FontWeight.Bold
     )
 )
 

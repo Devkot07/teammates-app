@@ -13,7 +13,7 @@ import retrofit2.http.Query
 interface TeammatesQuestionnairesApiService {
 
 
-    @GET("questionnaires/")
+    @GET("questionnaires")
     suspend fun getQuestionnaires(
         @Header("accept") accept: String = "application/json",
         @Header("Authorization") token: String,
@@ -28,7 +28,7 @@ interface TeammatesQuestionnairesApiService {
 
 
     @Multipart
-    @POST("questionnaire/")
+    @POST("questionnaire")
     suspend fun createQuestionnaire(
         @Header("accept") accept: String = "application/json",
         @Header("Authorization") token: String,

@@ -3,11 +3,13 @@ package com.pezont.teammates
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pezont.teammates.domain.model.AuthState
-import com.pezont.teammates.domain.model.ContentState
-import com.pezont.teammates.domain.model.Games
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
+import com.pezont.teammates.domain.model.ValidationError
+import com.pezont.teammates.domain.model.ValidationResult
+import com.pezont.teammates.domain.model.enums.AuthState
+import com.pezont.teammates.domain.model.enums.ContentState
+import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.usecase.CheckAuthenticationUseCase
 import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
 import com.pezont.teammates.domain.usecase.LoadAuthorProfileUseCase
@@ -17,6 +19,8 @@ import com.pezont.teammates.domain.usecase.LoadUserQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadUserUseCase
 import com.pezont.teammates.domain.usecase.LoginUseCase
 import com.pezont.teammates.domain.usecase.LogoutUseCase
+import com.pezont.teammates.domain.usecase.PrepareImageForUploadUseCase
+import com.pezont.teammates.domain.usecase.UpdateUserProfileUseCase
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,8 +35,13 @@ import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import retrofit2.HttpException
 import java.io.IOException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
+
+//TODO crushing viewModel
 @HiltViewModel
 class TeammatesViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
@@ -48,6 +57,10 @@ class TeammatesViewModel @Inject constructor(
     private val loadAuthorProfileUseCase: LoadAuthorProfileUseCase,
 
     val createNewQuestionnaireUseCase: CreateQuestionnaireUseCase,
+
+    val updateUserProfileUseCase: UpdateUserProfileUseCase,
+
+    val prepareImageForUploadUseCase: PrepareImageForUploadUseCase,
 
     ) : ViewModel() {
 
@@ -160,74 +173,177 @@ class TeammatesViewModel @Inject constructor(
     }
 
     fun createNewQuestionnaire(
-        header: String, description: String, selectedGame: Games, image: MultipartBody.Part?
+        header: String,
+        description: String,
+        selectedGame: Games?,
+        image: MultipartBody.Part?,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
     ) {
         viewModelScope.launch {
-            _uiState.update { it.copy(contentState = ContentState.LOADING) }
-            createNewQuestionnaireUseCase(
-                header = header,
-                selectedGame = selectedGame,
-                description = description,
-                image = image
-            ).onSuccess {
-                _uiState.update { it.copy(contentState = ContentState.LOADED) }
-                SnackbarController.sendEvent(SnackbarEvent(R.string.questionnaire_created_successfully))
-            }.onFailure { throwable ->
-                _uiState.update { it.copy(contentState = ContentState.ERROR) }
-                handleError(throwable)
+            val validationResult = createNewQuestionnaireUseCase.validateQuestionnaireForm(
+                header,
+                description,
+                selectedGame
+            )
+
+            when (validationResult) {
+                is ValidationResult.Error -> {
+                    val messageRes = validationResult.errorCode.toMessageRes()
+                    SnackbarController.sendEvent(SnackbarEvent(messageRes))
+                    onError()
+                }
+
+                ValidationResult.Success -> {
+                    _uiState.update { it.copy(contentState = ContentState.LOADING) }
+                    createNewQuestionnaireUseCase(
+                        header = header,
+                        selectedGame = selectedGame!!,
+                        description = description,
+                        image = image
+                    ).onSuccess {
+                        _uiState.update { it.copy(contentState = ContentState.LOADED) }
+                        SnackbarController.sendEvent(SnackbarEvent(R.string.questionnaire_created_successfully))
+                        _uiEvent.tryEmit(UiEvent.QuestionnaireCreated)
+                        onSuccess()
+                    }.onFailure { throwable ->
+                        _uiState.update { it.copy(contentState = ContentState.ERROR) }
+                        handleError(throwable)
+                        onError()
+                    }
+                }
             }
-            _uiEvent.tryEmit(UiEvent.QuestionnaireCreated)
+        }
+    }
+
+    fun updateUserProfile(
+        nickname: String,
+        description: String,
+        image: MultipartBody.Part?,
+        onSuccess: () -> Unit,
+    ) {
+        viewModelScope.launch {
+            val validationResult =
+                updateUserProfileUseCase.validateUserProfileForm(nickname, description)
+            when (validationResult) {
+                is ValidationResult.Error -> {
+                    val messageRes = validationResult.errorCode.toMessageRes()
+                    SnackbarController.sendEvent(SnackbarEvent(messageRes))
+                }
+
+                ValidationResult.Success -> {
+                    _uiState.update { it.copy(contentState = ContentState.LOADING) }
+                    updateUserProfileUseCase(
+                        nickname = nickname,
+                        description = description
+                    ).onSuccess { user ->
+                        if (image != null) {
+                            updateUserProfileUseCase.updateUserAvatar(image)
+                                .onSuccess { newImagePath ->
+                                    _uiState.update {
+                                        it.copy(
+                                            contentState = ContentState.LOADED,
+                                            user = uiState.value.user.copy(
+                                                nickname = user.nickname,
+                                                description = user.description,
+                                                imagePath = newImagePath.imagePath
+                                            )
+                                        )
+                                    }
+                                    SnackbarController.sendEvent(SnackbarEvent(R.string.photo_update))
+                                }.onFailure { throwable ->
+                                _uiState.update { it.copy(contentState = ContentState.ERROR) }
+                                handleError(throwable)
+                                return@onFailure
+                            }
+                        } else {
+
+                            _uiState.update {
+                                it.copy(
+                                    contentState = ContentState.LOADED,
+                                    user = uiState.value.user.copy(
+                                        nickname = user.nickname,
+                                        description = user.description,
+                                        imagePath = user.imagePath
+                                    )
+                                )
+                            }
+                            SnackbarController.sendEvent(SnackbarEvent(R.string.information_update_successfully))
+                        }
+                        _uiEvent.tryEmit(UiEvent.UserProfileUpdated)
+                        onSuccess()
+                    }.onFailure { throwable ->
+                        _uiState.update { it.copy(contentState = ContentState.ERROR) }
+                        handleError(throwable)
+                    }
+                }
+            }
         }
     }
 
     fun loadAuthor(authorId: String) {
-        _uiState.update {
-            it.copy(
-                selectedAuthor = User(), contentState = ContentState.LOADING
-            )
-        }
-        viewModelScope.launch {
-            loadAuthorProfileUseCase(authorId).onSuccess { author ->
+        if (uiState.value.selectedAuthor.publicId != authorId) {
+            viewModelScope.launch {
                 _uiState.update {
                     it.copy(
-                        selectedAuthor = author, contentState = ContentState.LOADED
+                        selectedAuthor = User(),
+                        contentState = ContentState.LOADING
                     )
                 }
-            }.onFailure { throwable ->
-                _uiState.update { it.copy(contentState = ContentState.ERROR) }
-                handleError(throwable)
+                loadAuthorProfileUseCase(authorId).onSuccess { author ->
+                    _uiState.update { it.copy(selectedAuthor = author) }
+                    loadQuestionnairesUseCase(
+                        game = null,
+                        limit = 100,
+                        authorId = author.publicId
+                    ).onSuccess { result ->
+                        Log.i(TAG, result.toString())
+                        _uiState.update {
+                            it.copy(
+                                selectedAuthorQuestionnaires = result,
+                                contentState = ContentState.LOADED
+                            )
+                        }
+                    }.onFailure { throwable ->
+                        Log.e(TAG, throwable.toString())
+                        _uiState.update { it.copy(contentState = ContentState.ERROR) }
+                        handleError(throwable)
+                    }
+                }.onFailure { throwable ->
+                    _uiState.update { it.copy(contentState = ContentState.ERROR) }
+                    handleError(throwable)
+                }
             }
         }
     }
 
     fun updateSelectedQuestionnaire(questionnaire: Questionnaire) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(selectedQuestionnaire = questionnaire) }
-        }
+        _uiState.update { it.copy(selectedQuestionnaire = questionnaire) }
     }
 
     fun logout() {
         viewModelScope.launch {
             _uiState.update { it.copy(authState = AuthState.LOADING) }
             logoutUseCase().onSuccess {
-                    _uiState.update {
-                        it.copy(
-                            user = User(),
-                            authState = AuthState.UNAUTHENTICATED,
-                            questionnaires = emptyList(),
-                            likedQuestionnaires = emptyList(),
-                            userQuestionnaires = emptyList(),
-                            selectedQuestionnaire = Questionnaire(),
-                            selectedAuthor = User(),
-                            contentState = ContentState.INITIAL
-                        )
-                    }
-                    _uiEvent.tryEmit(UiEvent.LoggedOut)
-                    SnackbarController.sendEvent(SnackbarEvent(R.string.logged_out))
-                }.onFailure { throwable ->
-                    _uiState.update { it.copy(authState = AuthState.AUTHENTICATED) }
-                    handleError(throwable)
+                _uiState.update {
+                    it.copy(
+                        user = User(),
+                        authState = AuthState.UNAUTHENTICATED,
+                        questionnaires = emptyList(),
+                        likedQuestionnaires = emptyList(),
+                        userQuestionnaires = emptyList(),
+                        selectedAuthor = User(),
+                        selectedQuestionnaire = Questionnaire(),
+                        selectedAuthorQuestionnaires = emptyList(),
+                        contentState = ContentState.INITIAL
+                    )
                 }
+                _uiEvent.tryEmit(UiEvent.LoggedOut)
+                SnackbarController.sendEvent(SnackbarEvent(R.string.logged_out))
+            }.onFailure { throwable ->
+                _uiState.update { it.copy(authState = AuthState.AUTHENTICATED) }
+                handleError(throwable)
+            }
         }
     }
 
@@ -237,21 +353,24 @@ class TeammatesViewModel @Inject constructor(
             when (error) {
                 is IOException -> {
                     when (error) {
-                        is java.net.UnknownHostException -> {
+                        is UnknownHostException -> {
                             SnackbarController.sendEvent(
                                 SnackbarEvent(R.string.no_internet_connection)
                             )
                         }
-                        is java.net.SocketTimeoutException -> {
+
+                        is SocketTimeoutException -> {
                             SnackbarController.sendEvent(
                                 SnackbarEvent(R.string.connection_timeout)
                             )
                         }
-                        is java.net.ConnectException -> {
+
+                        is ConnectException -> {
                             SnackbarController.sendEvent(
                                 SnackbarEvent(R.string.server_unavailable)
                             )
                         }
+
                         else -> {
                             SnackbarController.sendEvent(
                                 SnackbarEvent(R.string.network_error_please_check_your_connection)
@@ -270,20 +389,21 @@ class TeammatesViewModel @Inject constructor(
                             ignoreCase = true
                         ) == true || error.code() == 401 -> {
                             logoutUseCase().onSuccess {
-                                    _uiState.update {
-                                        it.copy(
-                                            user = User(),
-                                            authState = AuthState.UNAUTHENTICATED,
-                                            questionnaires = emptyList(),
-                                            likedQuestionnaires = emptyList(),
-                                            userQuestionnaires = emptyList(),
-                                            selectedQuestionnaire = Questionnaire(),
-                                            selectedAuthor = User(),
-                                            contentState = ContentState.INITIAL
-                                        )
-                                    }
-                                    _uiEvent.tryEmit(UiEvent.LoggedOut)
+                                _uiState.update {
+                                    it.copy(
+                                        user = User(),
+                                        authState = AuthState.UNAUTHENTICATED,
+                                        questionnaires = emptyList(),
+                                        likedQuestionnaires = emptyList(),
+                                        userQuestionnaires = emptyList(),
+                                        selectedAuthor = User(),
+                                        selectedQuestionnaire = Questionnaire(),
+                                        selectedAuthorQuestionnaires = emptyList(),
+                                        contentState = ContentState.INITIAL
+                                    )
                                 }
+                                _uiEvent.tryEmit(UiEvent.LoggedOut)
+                            }
                                 .onFailure { throwable ->
                                     _uiState.update { it.copy(authState = AuthState.AUTHENTICATED) }
                                     handleError(throwable)
@@ -342,6 +462,17 @@ class TeammatesViewModel @Inject constructor(
     }
 }
 
+fun ValidationError.toMessageRes(): Int = when (this) {
+
+    ValidationError.HEADER_TOO_SHORT -> R.string.the_header_must_contain_at_least_3_characters
+    ValidationError.HEADER_TOO_LONG -> R.string.the_maximum_length_of_the_header_is_80_characters
+    ValidationError.DESCRIPTION_TOO_LONG -> R.string.the_maximum_length_of_the_description_is_300_characters
+    ValidationError.GAME_NOT_SELECTED -> R.string.please_select_a_game
+    ValidationError.NICKNAME_TOO_SHORT -> R.string.the_nickname_must_contain_at_least_3_characters
+    ValidationError.NICKNAME_TOO_LONG -> R.string.the_maximum_length_of_the_nickname_is_20_characters
+}
+
+
 data class UiState(
     val user: User = User(),
     val authState: AuthState = AuthState.INITIAL,
@@ -351,11 +482,14 @@ data class UiState(
     val likedQuestionnaires: List<Questionnaire> = emptyList(),
     val userQuestionnaires: List<Questionnaire> = emptyList(),
 
+    val selectedAuthor: User = User(),
     val selectedQuestionnaire: Questionnaire = Questionnaire(),
-    val selectedAuthor: User = User()
-)
+    val selectedAuthorQuestionnaires: List<Questionnaire> = emptyList(),
+
+    )
 
 sealed class UiEvent {
+    data object UserProfileUpdated : UiEvent()
     data object QuestionnaireCreated : UiEvent()
     data object LoggedOut : UiEvent()
     data object LoggedIn : UiEvent()

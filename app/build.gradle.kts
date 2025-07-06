@@ -3,7 +3,6 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.relay)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.dagger.hilt)

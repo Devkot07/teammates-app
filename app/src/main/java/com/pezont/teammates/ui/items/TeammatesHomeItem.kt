@@ -3,9 +3,7 @@ package com.pezont.teammates.ui.items
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -20,7 +18,7 @@ import com.pezont.teammates.R
 import com.pezont.teammates.TeammatesViewModel
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.navigation.NavigationDestination
-import com.pezont.teammates.ui.screens.questionnaires.QuestionnairesPager
+import com.pezont.teammates.ui.screens.questionnaires.QuestionnairesVerticalPager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -71,7 +69,7 @@ fun TeammatesHomeItem(
                 }
             }
         ) {
-            QuestionnairesPager(
+            QuestionnairesVerticalPager(
                 questionnaires = questionnaires,
                 navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
                 viewModel = viewModel,
@@ -83,10 +81,7 @@ fun TeammatesHomeItem(
                             .padding(32.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(100.dp)
-                        )
+                        LoadingItemWithText()
                     }
                 },
                 modifier = Modifier.fillMaxSize()

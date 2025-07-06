@@ -4,11 +4,14 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.pezont.teammates.data.interceptor.TokenRefreshInterceptor
 import com.pezont.teammates.data.repository.UserDataRepositoryImpl
 import com.pezont.teammates.domain.repository.AuthRepository
 import com.pezont.teammates.domain.repository.QuestionnairesRepository
 import com.pezont.teammates.domain.repository.UserDataRepository
 import com.pezont.teammates.domain.repository.UsersRepository
+import com.pezont.teammates.domain.usecase.UpdateTokensUseCase
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,8 +43,20 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAppContainer(@ApplicationContext context: Context): AppContainer {
-        return DefaultAppContainer(context)
+    fun provideTokenRefreshInterceptor(
+        userDataRepository: UserDataRepository,
+        updateTokensUseCase: Lazy<UpdateTokensUseCase>
+    ): TokenRefreshInterceptor {
+        return TokenRefreshInterceptor(userDataRepository, updateTokensUseCase)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppContainer(
+        @ApplicationContext context: Context,
+        tokenRefreshInterceptor: TokenRefreshInterceptor
+    ): AppContainer {
+        return DefaultAppContainer(context, tokenRefreshInterceptor)
     }
 
     @Provides

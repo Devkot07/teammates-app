@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -33,26 +32,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.BuildConfig
-import com.pezont.teammates.UiState
-import com.pezont.teammates.TeammatesViewModel
-import com.pezont.teammates.domain.model.ContentState
+import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.buttons.LikeButton
 
 @Composable
 fun QuestionnaireDetailsItem(
-    viewModel: TeammatesViewModel,
-    uiState: UiState,
+    // viewModel: TeammatesViewModel,
+    authorNickname: String,
+    contentState: ContentState,
     questionnaire: Questionnaire,
     navigateToAuthorProfile: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
-
-    val authorNickname: String = uiState.selectedAuthor.nickname.toString()
-
-
-    val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}"
+    val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}/questionnaire"
     val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
 
     var imageLoadingError by remember { mutableStateOf(false) }
@@ -69,20 +63,9 @@ fun QuestionnaireDetailsItem(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (uiState.contentState != ContentState.LOADED) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 50.dp, end = 50.dp)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(100.dp)
-                    )
-                }
-
-            } else {
+            if (contentState == ContentState.LOADING)
+                LoadingItemWithText()
+            else {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

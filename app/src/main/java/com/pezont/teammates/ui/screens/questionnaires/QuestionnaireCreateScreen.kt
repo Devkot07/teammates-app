@@ -1,12 +1,11 @@
 package com.pezont.teammates.ui.screens.questionnaires
 
+
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,14 +16,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
@@ -49,11 +46,15 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pezont.teammates.R
-import com.pezont.teammates.domain.model.Games
-import com.pezont.teammates.domain.model.QuestionnaireForm
-import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
+import com.pezont.teammates.TeammatesViewModel
+import com.pezont.teammates.UiState
+import com.pezont.teammates.domain.model.enums.ContentState
+import com.pezont.teammates.domain.model.enums.Games
+import com.pezont.teammates.domain.model.form.QuestionnaireForm
+import com.pezont.teammates.ui.GamesDropdownMenu
+import com.pezont.teammates.ui.buttons.TeammatesButton
+import com.pezont.teammates.ui.items.LoadingItemWithText
 import com.pezont.teammates.ui.navigation.NavigationDestination
-import okhttp3.MultipartBody
 
 object QuestionnaireCreateDestination : NavigationDestination {
     override val route = "item_create"
@@ -64,14 +65,8 @@ object QuestionnaireCreateDestination : NavigationDestination {
 @Composable
 fun QuestionnaireCreateScreen(
     modifier: Modifier = Modifier,
-    navigateToHome: () -> Unit,
-    createNewQuestionnaireAction: (
-        header: String,
-        description: String,
-        selectedGame: Games,
-        image: MultipartBody.Part?
-    ) -> Unit,
-    createQuestionnaireUseCase: CreateQuestionnaireUseCase,
+    uiState: UiState,
+    viewModel: TeammatesViewModel,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {}
 ) {
@@ -94,169 +89,167 @@ fun QuestionnaireCreateScreen(
         bottomBar = bottomBar,
     ) { innerPadding ->
 
-        Column(
-            modifier = modifier
-                .verticalScroll(rememberScrollState())
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 32.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
 
-            ) {
-            if (selectedImageUri == null) {
-                OutlinedButton(
-                    onClick = {
-                        imagePickerLauncher.launch("image/*")
-                    },
-                    modifier = Modifier.wrapContentWidth()
-                ) { Text(text = "Select Image") }
-            } else {
-                OutlinedButton(
-                    onClick = {
-                        selectedImageUri = null
-                    },
-                    modifier = Modifier.wrapContentWidth()
-                ) { Text(text = "Delete Image") }
-            }
+        if (uiState.contentState == ContentState.LOADING) {
+            LoadingItemWithText()
+        } else {
+            Column(
+                modifier = modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = 32.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
 
-
-            selectedImageUri?.let {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(selectedImageUri)
-                        .placeholder(R.drawable.ic_loading_image)
-                        .build(),
-                    error = painterResource(R.drawable.ic_broken_image),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .padding(32.dp)
-                        .aspectRatio(1f)
-                        .clip(ShapeDefaults.Medium)
-                        .widthIn(400.dp)
-                        .border(2.dp, Color.Gray, ShapeDefaults.Medium),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            OutlinedTextField(
-                value = questionnaireForm.header,
-                onValueChange = { data ->
-                    questionnaireForm = questionnaireForm.copy(header = data)
-                },
-                keyboardActions = KeyboardActions(
-                    onNext = {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    }
-                ),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                label = { Text(stringResource(R.string.header)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-
-            OutlinedTextField(
-                value = questionnaireForm.description,
-                onValueChange = { data ->
-                    questionnaireForm = questionnaireForm.copy(description = data)
-                },
-                keyboardActions = KeyboardActions(
-                    onDone = { focusManager.clearFocus() }
-                ),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                label = { Text(stringResource(R.string.description)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Box(modifier = Modifier.wrapContentWidth()) {
-                    OutlinedButton(
-                        onClick = { isDropdownExpanded = true },
+                ) {
+                if (selectedImageUri == null) {
+                    TeammatesButton(
+                        text = "Select Image",
+                        onClick = {
+                            imagePickerLauncher.launch("image/*")
+                        },
                         modifier = Modifier.wrapContentWidth()
+                    )
+                } else {
+                    TeammatesButton(
+                        text = "Delete Image",
+                        onClick = {
+                            selectedImageUri = null
+                        },
+                        modifier = Modifier.wrapContentWidth()
+                    )
+                }
+
+
+                selectedImageUri?.let {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(selectedImageUri)
+                            .placeholder(R.drawable.ic_loading_image)
+                            .build(),
+                        error = painterResource(R.drawable.ic_broken_image),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .padding(32.dp)
+                            .aspectRatio(1f)
+                            .clip(ShapeDefaults.Medium)
+                            .widthIn(400.dp)
+                            .border(2.dp, Color.Gray, ShapeDefaults.Medium),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = questionnaireForm.header,
+                    onValueChange = { data ->
+                        questionnaireForm = questionnaireForm.copy(header = data)
+                    },
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    label = { Text(stringResource(R.string.header)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = ShapeDefaults.Small
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+
+                OutlinedTextField(
+                    value = questionnaireForm.description,
+                    onValueChange = { data ->
+                        questionnaireForm = questionnaireForm.copy(description = data)
+                    },
+                    keyboardActions = KeyboardActions(
+                        onDone = { focusManager.clearFocus() }
+                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    label = { Text(stringResource(R.string.description)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = ShapeDefaults.Small
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+
                     ) {
-                        Text(
-                            text = questionnaireForm.selectedGame?.nameOfGame
+                        val buttonText = if (isDropdownExpanded) {
+                            stringResource(R.string.close)
+                        } else {
+                            questionnaireForm.selectedGame?.nameOfGame
                                 ?: stringResource(R.string.select_game)
+                        }
+
+                        TeammatesButton(
+                            onClick = { isDropdownExpanded = !isDropdownExpanded },
+                            text = buttonText,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                        )
+
+                        Spacer(Modifier.height(16.dp))
+
+
+                        GamesDropdownMenu(
+                            expanded = isDropdownExpanded,
+                            games = Games.entries,
+                            onGameSelected = { selected ->
+                                isDropdownExpanded = false
+                                questionnaireForm.selectedGame = selected
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentSize(Alignment.TopStart)
                         )
                     }
 
-                    DropdownMenu(
-                        expanded = isDropdownExpanded,
-                        onDismissRequest = { isDropdownExpanded = false },
-                        modifier = Modifier.wrapContentWidth()
-                    ) {
-                        Games.entries.forEach { game ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    questionnaireForm.selectedGame = game
-                                    isDropdownExpanded = false
-                                },
-                                text = { Text(text = game.nameOfGame) }
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                OutlinedButton(
-                    onClick = {
-                        if (questionnaireForm.isNotEmpty()) {
-                            when {
-                                questionnaireForm.header.length > 100 -> {
-                                    Toast.makeText(
-                                        context,
-                                        "Max value of header is 100",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-
-                                questionnaireForm.description.length > 500 -> {
-                                    Toast.makeText(
-                                        context,
-                                        "Max value of description is 500",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-
-                                questionnaireForm.selectedGame == null -> {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.select_game),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-
-                                else -> {
-                                    val imagePart = selectedImageUri?.let { createQuestionnaireUseCase.uriToSquareCroppedWebpMultipart(it, context) }
-                                    navigateToHome()
-                                    createNewQuestionnaireAction(
-                                        questionnaireForm.header,
-                                        questionnaireForm.description,
-                                        questionnaireForm.selectedGame!!,
-                                        imagePart
-                                    )
-                                    selectedImageUri = null
-                                }
+                    Spacer(modifier = Modifier.width(24.dp))
+                    TeammatesButton(
+                        enabled = (questionnaireForm.header.isNotEmpty() && questionnaireForm.description.isNotEmpty() && questionnaireForm.selectedGame != null),
+                        onClick = {
+                            val imagePart = selectedImageUri?.let {
+                                viewModel.prepareImageForUploadUseCase(
+                                    it,
+                                    context
+                                )
                             }
-                        }
+                            viewModel.createNewQuestionnaire(
+                                questionnaireForm.header,
+                                questionnaireForm.description,
+                                questionnaireForm.selectedGame,
+                                imagePart,
+                                onSuccess = {
+                                    selectedImageUri = null
+                                    questionnaireForm = QuestionnaireForm("", "", null)
+                                },
+                                onError = {}
 
-                    },
-                    modifier = Modifier.wrapContentWidth()
-                ) { Text(text = stringResource(R.string.create)) }
+                            )
+                        },
+                        text = stringResource(R.string.create),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .height(56.dp)
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(20.dp))
-
-
         }
     }
 }
-
 
 
