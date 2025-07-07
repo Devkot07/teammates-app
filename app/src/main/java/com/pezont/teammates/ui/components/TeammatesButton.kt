@@ -35,9 +35,9 @@ fun TeammatesButton(
     ) {
         if (imageVector != null) {
             Icon(imageVector = imageVector, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
         }
         if (text != null) {
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyLarge
@@ -51,6 +51,14 @@ fun TeammatesButton(
 fun TeammatesButtonWithIconPreview() {
     TeammatesTheme {
         TeammatesButton(onClick = {}, text = "Click", imageVector = Icons.Default.AdsClick)
+    }
+}
+
+@Preview(name = "Only Icon")
+@Composable
+fun TeammatesButtonOnlyIconPreview() {
+    TeammatesTheme {
+        TeammatesButton(onClick = {},  imageVector = Icons.Default.AdsClick)
     }
 }
 
