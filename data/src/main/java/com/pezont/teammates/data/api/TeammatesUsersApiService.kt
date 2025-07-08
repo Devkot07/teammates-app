@@ -1,9 +1,9 @@
 package com.pezont.teammates.data.api
 
-import com.pezont.teammates.domain.model.Questionnaire
-import com.pezont.teammates.domain.model.UpdateUserProfilePhotoResponse
-import com.pezont.teammates.domain.model.UpdateUserProfileRequest
-import com.pezont.teammates.domain.model.User
+import com.pezont.teammates.data.dto.QuestionnaireDto
+import com.pezont.teammates.data.dto.UpdateUserProfilePhotoResponseDto
+import com.pezont.teammates.data.dto.UpdateUserProfileRequestDto
+import com.pezont.teammates.data.dto.UserDto
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -20,7 +20,7 @@ interface TeammatesUsersApiService {
         @Header("accept") accept: String = "application/json",
         @Header("Authorization") token: String,
         @Query("user_id") userId: String,
-    ): List<Questionnaire>
+    ): List<QuestionnaireDto>
 
     @GET("users/profile")
     suspend fun loadAuthorProfile(
@@ -28,15 +28,15 @@ interface TeammatesUsersApiService {
         @Header("Authorization") token: String,
         @Query("user_id") userId: String,
         @Query("public_id") publicId: String?,
-    ): User
+    ): UserDto
 
     @PUT("users/update")
     suspend fun updateUserProfile(
         @Header("accept") accept: String = "application/json",
         @Header("Authorization") token: String,
         @Query("user_id") userId: String,
-        @Body request: UpdateUserProfileRequest,
-        ): User
+        @Body request: UpdateUserProfileRequestDto
+    ): UserDto
 
     @Multipart
     @PUT("users/update/photo")
@@ -45,6 +45,6 @@ interface TeammatesUsersApiService {
         @Header("Authorization") token: String,
         @Query("user_id") userId: String,
         @Part image: MultipartBody.Part
-    ): UpdateUserProfilePhotoResponse
+    ): UpdateUserProfilePhotoResponseDto
 
 }

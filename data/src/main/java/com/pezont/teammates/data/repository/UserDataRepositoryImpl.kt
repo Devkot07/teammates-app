@@ -92,11 +92,11 @@ class UserDataRepositoryImpl @Inject constructor(
 
     override suspend fun saveUser(user: User) {
         dataStore.edit { data ->
-            data[USER_NICKNAME] = user.nickname ?: ""
-            data[USER_PUBLIC_ID] = user.publicId ?: ""
-            data[USER_EMAIL] = user.email ?: ""
-            data[USER_DESCRIPTION] = user.description ?: ""
-            data[USER_IMAGE_PATH] = user.imagePath ?: ""
+            data[USER_NICKNAME] = user.nickname
+            data[USER_PUBLIC_ID] = user.publicId
+            data[USER_EMAIL] = user.email
+            data[USER_DESCRIPTION] = user.description
+            data[USER_IMAGE_PATH] = user.imagePath
         }
     }
 

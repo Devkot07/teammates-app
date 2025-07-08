@@ -1,11 +1,10 @@
 package com.pezont.teammates.data.repository
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.util.Log
 import com.pezont.teammates.data.api.TeammatesUsersApiService
+import com.pezont.teammates.data.mapper.toDomain
+import com.pezont.teammates.data.mapper.toDto
+import com.pezont.teammates.data.network.NetworkManager
 import com.pezont.teammates.domain.model.LoadAuthorRequest
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.UpdateUserProfilePhotoResponse
@@ -21,31 +20,27 @@ class UsersRepositoryImpl(
     private val context: Context
 ) : UsersRepository {
 
-    @SuppressLint("ServiceCast")
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork ?: return false
-        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-    }
-
     override suspend fun loadLikedQuestionnaires(
         token: String,
         userId: String,
     ): Result<List<Questionnaire>> {
-        if (!isNetworkAvailable()) return Result.failure(IOException("No internet connection"))
-        return try {
 
-            Result.success(
-                teammatesUsersApiService.loadLikedQuestionnaires(
-                    token = "Bearer $token",
-                    userId = userId
-                )
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            val dtoList = teammatesUsersApiService.loadLikedQuestionnaires(
+                token = "Bearer $token",
+                userId = userId
             )
+
+            val domainList = dtoList.map { it.toDomain() }
+            Result.success(domainList)
+
         } catch (e: Exception) {
             Result.failure(e)
         }
+
     }
 
     override suspend fun loadAuthorProfile(
@@ -53,20 +48,22 @@ class UsersRepositoryImpl(
         userId: String,
         request: LoadAuthorRequest
     ): Result<User> {
-        if (!isNetworkAvailable()) return Result.failure(IOException("No internet connection"))
-        return try {
-            Log.i("DEBUG", "$request")
 
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
             Result.success(
                 teammatesUsersApiService.loadAuthorProfile(
                     token = "Bearer $token",
                     userId = userId,
                     publicId = request.authorId
-                )
+                ).toDomain()
             )
         } catch (e: Exception) {
             Result.failure(e)
         }
+
     }
 
     override suspend fun updateUserProfile(
@@ -74,20 +71,22 @@ class UsersRepositoryImpl(
         userId: String,
         request: UpdateUserProfileRequest
     ): Result<User> {
-        if (!isNetworkAvailable()) return Result.failure(IOException("No internet connection"))
-        return try {
-            Log.i("DEBUG", "$request")
 
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
             Result.success(
                 teammatesUsersApiService.updateUserProfile(
                     token = "Bearer $token",
                     userId = userId,
-                    request = request
-                )
+                    request = request.toDto()
+                ).toDomain()
             )
         } catch (e: Exception) {
             Result.failure(e)
         }
+
     }
 
     override suspend fun updateUserProfilePhoto(
@@ -95,19 +94,21 @@ class UsersRepositoryImpl(
         userId: String,
         image: MultipartBody.Part
     ): Result<UpdateUserProfilePhotoResponse> {
-        if (!isNetworkAvailable()) return Result.failure(IOException("No internet connection"))
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
         return try {
             Result.success(
                 teammatesUsersApiService.updateUserProfilePhoto(
                     token = "Bearer $token",
                     userId = userId,
                     image = image
-                )
+                ).toDomain()
             )
         } catch (e: Exception) {
             Result.failure(e)
         }
+
     }
-
-
 }
