@@ -2,7 +2,9 @@ package com.pezont.teammates.ui.screen.questionnaire
 
 
 import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -70,8 +72,8 @@ fun QuestionnaireCreateScreen(
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
+    val imagePickerLauncher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?> = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri: Uri? ->
             selectedImageUri = uri
         }
@@ -100,7 +102,11 @@ fun QuestionnaireCreateScreen(
                     TeammatesButton(
                         text = "Select Image",
                         onClick = {
-                            imagePickerLauncher.launch("image/*")
+                            imagePickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
                         },
                         modifier = Modifier.wrapContentWidth()
                     )
