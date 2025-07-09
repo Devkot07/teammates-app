@@ -53,7 +53,7 @@ fun QuestionnairesVerticalPager(
 fun QuestionnairesHorizontalRow(
     questionnaires: List<Questionnaire>,
     navigateToQuestionnaireDetails: () -> Unit,
-    authorViewModel: AuthorViewModel,
+    updateSelectedQuestionnaire: (Questionnaire) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
@@ -70,7 +70,7 @@ fun QuestionnairesHorizontalRow(
                 QuestionnaireCompactItem(
                     navigateToQuestionnaireDetails = {
                         navigateToQuestionnaireDetails()
-                        authorViewModel.updateSelectedQuestionnaire(questionnaire)
+                        updateSelectedQuestionnaire(questionnaire)
                     },
                     questionnaire = questionnaire,
                     modifier = Modifier

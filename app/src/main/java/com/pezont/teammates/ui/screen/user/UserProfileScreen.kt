@@ -18,7 +18,6 @@ import com.pezont.teammates.ui.components.Dots
 import com.pezont.teammates.ui.components.DropdownItem
 import com.pezont.teammates.ui.components.TeammatesDropdownMenu
 import com.pezont.teammates.ui.components.TeammatesTopAppBar
-import com.pezont.teammates.ui.items.UserProfile
 import com.pezont.teammates.ui.navigation.Destinations
 import com.pezont.teammates.viewmodel.AuthViewModel
 
@@ -68,8 +67,8 @@ fun UserProfileScreen(
             )
         }
     ) { paddingValues ->
-        UserProfile(
-            navigateToMyQuestionnaires = navigateToMyQuestionnaires,
+        UserProfileItem(
+            navigateToUserQuestionnaires = navigateToMyQuestionnaires,
             user = user,
             paddingValues = paddingValues
         )
