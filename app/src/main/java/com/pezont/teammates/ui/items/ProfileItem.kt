@@ -86,13 +86,11 @@ fun AuthorProfile(
                 )
             }
 
-            if (author.description != null) {
-                ProfileInfoRow(
-                    icon = Icons.Outlined.Description,
-                    value = author.description!!,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+            ProfileInfoRow(
+                icon = Icons.Outlined.Description,
+                value = author.description,
+                modifier = Modifier.padding(16.dp)
+            )
 
             TeammatesButton(
                 onClick = starAction,
@@ -144,12 +142,12 @@ fun UserProfile(
     paddingValues: PaddingValues
 ) {
 
-    val nickname: String = user.nickname ?: ""
-    val description: String = user.description ?: ""
-    val email: String = user.email ?: ""
+    val nickname: String = user.nickname
+    val description: String = user.description
+    val email: String = user.email
 
     val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_3}${BuildConfig.END_URL}"
-    val fixedImagePath = user.imagePath?.replace("http://localhost:8200", baseUrl)?:""
+    val fixedImagePath = user.imagePath.replace("http://localhost:8200", baseUrl)
     Box(
         modifier = Modifier
             .fillMaxSize()

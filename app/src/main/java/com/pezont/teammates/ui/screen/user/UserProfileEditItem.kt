@@ -70,9 +70,9 @@ fun UserProfileEditItem(
     var userProfileForm by remember {
         mutableStateOf(
             UserProfileForm(
-                user.nickname ?: "",
-                user.email ?: "",
-                user.description ?: ""
+                user.nickname,
+                user.email,
+                user.description
             )
         )
     }
@@ -86,7 +86,7 @@ fun UserProfileEditItem(
     )
 
 
-    val model: Any? =
+    val model: Any =
         if (selectedImageUri != null) ImageRequest.Builder(LocalContext.current)
             .data(selectedImageUri).placeholder(R.drawable.ic_loading_image).build()
         else user.imagePath
@@ -109,9 +109,9 @@ fun UserProfileEditItem(
                             ) {
                                 selectedImageUri = null
                                 userProfileForm = UserProfileForm(
-                                    user.nickname ?: "",
-                                    user.email ?: "",
-                                    user.description ?: ""
+                                    user.nickname,
+                                    user.email,
+                                    user.description
                                 )
                             }
                         }

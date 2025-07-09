@@ -22,7 +22,7 @@ fun QuestionnaireDetailsScreen(
     Scaffold(
         topBar = topBar
     ) { innerPadding ->
-        val authorNickname = author.nickname?: ""
+        val authorNickname = author.nickname
         QuestionnaireDetailsItem( authorNickname, contentState, questionnaire,navigateToAuthorProfile, Modifier.padding(innerPadding))
 
     }

@@ -14,7 +14,6 @@ class UpdateTokensUseCase @Inject constructor(
     suspend operator fun invoke(): Result<Unit> = runCatching {
         val refreshToken = userDataRepository.refreshToken.first()
         val publicId = userDataRepository.user.first().publicId
-            ?: throw IllegalStateException("User don't have publicId")
         Log.d("UpdateTokensUseCase", "Tokens updated successfully. Saving new tokens")
 
         val response =

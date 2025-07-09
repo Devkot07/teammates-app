@@ -335,7 +335,7 @@ fun TeammatesNavGraph(
                 authorQuestionnaires = selectedAuthorQuestionnaires,
                 topBar = {
                     TeammatesTopAppBar(
-                        title = selectedAuthor.nickname ?: "",
+                        title = selectedAuthor.nickname,
                         canNavigateBack = true,
                         navigateUp = { navController.navigate(Destinations.Home.route) }
                     )
