@@ -101,16 +101,11 @@ fun UserProfileEditItem(
                 actions = {
                     IconButton(
                         onClick = {
-                            val imagePart = selectedImageUri?.let {
-                                userViewModel.prepareImageForUploadUseCase(
-                                    it,
-                                    context
-                                )
-                            }
                             userViewModel.updateUserProfile(
                                 userProfileForm.nickname,
                                 userProfileForm.description,
-                                imagePart
+                                selectedImageUri,
+                                context = context
                             ) {
                                 selectedImageUri = null
                                 userProfileForm = UserProfileForm(

@@ -55,8 +55,6 @@ import com.pezont.teammates.ui.components.TeammatesButton
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
 
 
-
-
 @Composable
 fun QuestionnaireCreateScreen(
     modifier: Modifier = Modifier,
@@ -216,14 +214,12 @@ fun QuestionnaireCreateScreen(
                     TeammatesButton(
                         enabled = (questionnaireForm.header.isNotEmpty() && questionnaireForm.description.isNotEmpty() && questionnaireForm.selectedGame != null),
                         onClick = {
-                            val imagePart = selectedImageUri?.let {
-                                questionnairesViewModel.prepareImageForUploadUseCase(it, context)
-                            }
                             questionnairesViewModel.createNewQuestionnaire(
                                 questionnaireForm.header,
                                 questionnaireForm.description,
                                 questionnaireForm.selectedGame,
-                                imagePart,
+                                selectedImageUri,
+                                context = context,
                                 onSuccess = {
                                     selectedImageUri = null
                                     questionnaireForm = QuestionnaireForm("", "", null)
