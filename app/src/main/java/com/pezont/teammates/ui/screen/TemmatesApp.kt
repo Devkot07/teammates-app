@@ -1,7 +1,9 @@
 package com.pezont.teammates.ui.screen
 
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -10,6 +12,7 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Drafts
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -33,11 +36,9 @@ import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.enums.BottomNavItem
 import com.pezont.teammates.ui.ObserveAsEvents
 import com.pezont.teammates.ui.components.TeammatesBottomNavigationBar
+import com.pezont.teammates.ui.navigation.Destinations
 import com.pezont.teammates.ui.navigation.NavigationItemContent
 import com.pezont.teammates.ui.navigation.TeammatesNavGraph
-import com.pezont.teammates.ui.screen.questionnaire.LikedQuestionnairesDestination
-import com.pezont.teammates.ui.screen.questionnaire.QuestionnaireCreateDestination
-import com.pezont.teammates.ui.screen.user.UserProfileDestination
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.viewmodel.AuthViewModel
 import com.pezont.teammates.viewmodel.AuthorViewModel
@@ -65,10 +66,10 @@ fun TeammatesApp() {
     val currentRoute = navBackStackEntry?.destination?.route
 
     val bottomBarDestinations = listOf(
-        HomeDestination.route,
-        LikedQuestionnairesDestination.route,
-        QuestionnaireCreateDestination.route,
-        UserProfileDestination.route
+        Destinations.Home.route,
+        Destinations.LikedQuestionnaires.route,
+        Destinations.QuestionnaireCreate.route,
+        Destinations.UserProfile.route
     )
     val shouldShowBottomBar by remember(currentRoute) {
         derivedStateOf { currentRoute in bottomBarDestinations }
@@ -96,7 +97,10 @@ fun TeammatesApp() {
         scope.launch {
             snackbarHostState.currentSnackbarData?.dismiss()
             val result = snackbarHostState.showSnackbar(
-                message = context.getString(event.messageId),
+                message = context.getString(
+                    event.messageId,
+                    *event.formatArgs.toTypedArray()
+                ),
                 actionLabel = event.action?.name,
                 duration = SnackbarDuration.Short
             )
@@ -118,19 +122,19 @@ fun TeammatesApp() {
                         currentTab = contentType
                         when (contentType) {
                             BottomNavItem.HOME -> navController.navigate(
-                                HomeDestination.route
+                                Destinations.Home.route
                             )
 
                             BottomNavItem.LIKED -> navController.navigate(
-                                LikedQuestionnairesDestination.route
+                                Destinations.LikedQuestionnaires.route
                             )
 
                             BottomNavItem.CREATE -> navController.navigate(
-                                QuestionnaireCreateDestination.route
+                                Destinations.QuestionnaireCreate.route
                             )
 
                             BottomNavItem.PROFILE -> navController.navigate(
-                                UserProfileDestination.route
+                                Destinations.UserProfile.route
                             )
                         }
                     },
@@ -138,7 +142,11 @@ fun TeammatesApp() {
                     modifier = Modifier.height(60.dp)
                 )
             }
-        }, modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars)
+        },
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .windowInsetsPadding(WindowInsets.systemBars)
     ) { paddingValues ->
 
         TeammatesNavGraph(

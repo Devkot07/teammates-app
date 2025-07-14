@@ -2,7 +2,9 @@ package com.pezont.teammates.ui.screen.user
 
 
 import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -53,6 +55,7 @@ import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.form.UserProfileForm
 import com.pezont.teammates.ui.components.LoadingItem
 import com.pezont.teammates.ui.components.TeammatesTopAppBar
+import com.pezont.teammates.ui.navigation.Destinations
 import com.pezont.teammates.viewmodel.UserViewModel
 
 
@@ -69,23 +72,23 @@ fun UserProfileEditItem(
     var userProfileForm by remember {
         mutableStateOf(
             UserProfileForm(
-                user.nickname ?: "",
-                user.email ?: "",
-                user.description ?: ""
+                user.nickname,
+                user.email,
+                user.description
             )
         )
     }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
+    val imagePickerLauncher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?> = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri: Uri? ->
             selectedImageUri = uri
         }
     )
 
 
-    val model: Any? =
+    val model: Any =
         if (selectedImageUri != null) ImageRequest.Builder(LocalContext.current)
             .data(selectedImageUri).placeholder(R.drawable.ic_loading_image).build()
         else user.imagePath
@@ -94,28 +97,23 @@ fun UserProfileEditItem(
     Scaffold(
         topBar = {
             TeammatesTopAppBar(
-                title = stringResource(UserProfileEditDestination.titleRes),
+                title = stringResource(Destinations.UserProfileEdit.titleRes),
                 canNavigateBack = true,
                 navigateUp = navigateUp,
                 actions = {
                     IconButton(
                         onClick = {
-                            val imagePart = selectedImageUri?.let {
-                                userViewModel.prepareImageForUploadUseCase(
-                                    it,
-                                    context
-                                )
-                            }
                             userViewModel.updateUserProfile(
                                 userProfileForm.nickname,
                                 userProfileForm.description,
-                                imagePart
+                                selectedImageUri,
+                                context = context
                             ) {
                                 selectedImageUri = null
                                 userProfileForm = UserProfileForm(
-                                    user.nickname ?: "",
-                                    user.email ?: "",
-                                    user.description ?: ""
+                                    user.nickname,
+                                    user.email,
+                                    user.description
                                 )
                             }
                         }
@@ -156,7 +154,11 @@ fun UserProfileEditItem(
                         .aspectRatio(1f)
                         .border(width = 1.dp, color = Color.LightGray, shape = CircleShape)
                         .clip(CircleShape)
-                        .clickable { imagePickerLauncher.launch("image/*") },
+                        .clickable { imagePickerLauncher.launch(
+                            PickVisualMediaRequest(
+                                mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
+                        ) },
                     contentDescription = "Profile Picture",
                     contentScale = ContentScale.Crop
                 )

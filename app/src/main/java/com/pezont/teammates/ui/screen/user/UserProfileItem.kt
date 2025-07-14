@@ -1,4 +1,4 @@
-package com.pezont.teammates.ui.items
+package com.pezont.teammates.ui.screen.user
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,142 +14,39 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.BuildConfig
-import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.components.LoadingItem
 import com.pezont.teammates.ui.components.TeammatesButton
 import com.pezont.teammates.ui.theme.TeammatesTheme
 
-//TODO AuthorProfile
-@Composable
-fun AuthorProfile(
-    starAction: () -> Unit,
-    author: User,
-) {
-    Box(
-        modifier = Modifier
-            .wrapContentSize()
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Box(
-                modifier = Modifier
-                    .size(250.dp)
-
-            ) {
-                SubcomposeAsyncImage(
-                    model = author.imagePath,
-                    loading = {
-                        CircularProgressIndicator(Modifier.padding(16.dp))
-                    },
-                    error = {
-                        Icon(
-                            imageVector = Icons.Default.Error,
-                            contentDescription = "Error",
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    },
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(250.dp)
-                        .aspectRatio(1f)
-                        .border(width = 1.dp, color = Color.LightGray, shape = CircleShape)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            if (author.description != null) {
-                ProfileInfoRow(
-                    icon = Icons.Outlined.Description,
-                    value = author.description!!,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            TeammatesButton(
-                onClick = starAction,
-                text = stringResource(R.string.subscribe),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                imageVector = Icons.Filled.Add
-            )
-        }
-    }
-}
 
 @Composable
-fun ProfileInfoRow(
-    icon: ImageVector,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top,
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
-        )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Column {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.primary,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    }
-}
-
-
-@Composable
-fun UserProfile(
-    navigateToMyQuestionnaires: () -> Unit,
+fun UserProfileItem(
     user: User,
+    navigateToUserQuestionnaires: () -> Unit,
     paddingValues: PaddingValues
 ) {
 
-    val nickname: String = user.nickname ?: ""
-    val description: String = user.description ?: ""
-    val email: String = user.email ?: ""
+    val nickname: String = user.nickname
+    val description: String = user.description
+    val email: String = user.email
 
     val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_3}${BuildConfig.END_URL}"
-    val fixedImagePath = user.imagePath?.replace("http://localhost:8200", baseUrl)?:""
+    val fixedImagePath = user.imagePath.replace("http://localhost:8200", baseUrl)
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -184,7 +81,7 @@ fun UserProfile(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TeammatesButton(onClick = navigateToMyQuestionnaires, text = "My questionnaires")
+            TeammatesButton(onClick = navigateToUserQuestionnaires, text = "My questionnaires")
         }
     }
 }
@@ -193,9 +90,9 @@ fun UserProfile(
 fun UserProfileSection(
     nickname: String,
     email: String,
+    imagePath: String,
 
-    modifier: Modifier = Modifier,
-    imagePath: String
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -246,13 +143,13 @@ fun UserProfileSection(
 @Composable
 fun UserProfilePreview() {
     TeammatesTheme {
-        UserProfile(
-            {},
+        UserProfileItem(
             User(
                 "Bob",
                 "111-111-111-111",
                 "bob@longcorp.com",
             ),
+            {},
             PaddingValues()
         )
     }

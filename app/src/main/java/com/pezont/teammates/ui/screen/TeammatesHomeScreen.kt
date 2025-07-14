@@ -14,10 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.ui.ObserveState
-import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.components.LoadingItemWithText
-import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.ui.screen.questionnaire.QuestionnairesVerticalPager
 import com.pezont.teammates.viewmodel.AuthorViewModel
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
@@ -27,10 +25,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-object HomeDestination : NavigationDestination {
-    override val route = "home"
-    override val titleRes = R.string.home
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

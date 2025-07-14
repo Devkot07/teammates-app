@@ -1,5 +1,7 @@
 package com.pezont.teammates.viewmodel
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,7 +24,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import okhttp3.MultipartBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,7 +53,9 @@ class QuestionnairesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            if (stateManager.authState.value == AuthState.AUTHENTICATED) loadLikedQuestionnaires()
+            stateManager.authState.collect { authState ->
+                if (authState == AuthState.AUTHENTICATED) loadLikedQuestionnaires()
+            }
         }
     }
 
@@ -107,7 +110,8 @@ class QuestionnairesViewModel @Inject constructor(
         header: String,
         description: String,
         selectedGame: Games?,
-        image: MultipartBody.Part?,
+        uri: Uri?,
+        context: Context,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
@@ -131,7 +135,7 @@ class QuestionnairesViewModel @Inject constructor(
                         header = header,
                         selectedGame = selectedGame!!,
                         description = description,
-                        image = image
+                        image = prepareImageForUploadUseCase(uri, context)
                     ).onSuccess {
                         stateManager.updateContentState(ContentState.LOADED)
                         SnackbarController.sendEvent(SnackbarEvent(R.string.questionnaire_created_successfully))
@@ -147,7 +151,9 @@ class QuestionnairesViewModel @Inject constructor(
         }
     }
 
-    companion object { const val TAG  = "QVM" }
+    companion object {
+        const val TAG = "QVM"
+    }
 }
 
 

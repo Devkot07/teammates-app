@@ -2,7 +2,9 @@ package com.pezont.teammates.ui.screen.questionnaire
 
 
 import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -52,13 +54,7 @@ import com.pezont.teammates.domain.model.form.QuestionnaireForm
 import com.pezont.teammates.ui.components.GamesDropdownMenu
 import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.components.TeammatesButton
-import com.pezont.teammates.ui.navigation.NavigationDestination
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
-
-object QuestionnaireCreateDestination : NavigationDestination {
-    override val route = "item_create"
-    override val titleRes = R.string.entry_information
-}
 
 
 @Composable
@@ -76,8 +72,8 @@ fun QuestionnaireCreateScreen(
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
+    val imagePickerLauncher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?> = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri: Uri? ->
             selectedImageUri = uri
         }
@@ -106,7 +102,11 @@ fun QuestionnaireCreateScreen(
                     TeammatesButton(
                         text = "Select Image",
                         onClick = {
-                            imagePickerLauncher.launch("image/*")
+                            imagePickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
                         },
                         modifier = Modifier.wrapContentWidth()
                     )
@@ -220,14 +220,12 @@ fun QuestionnaireCreateScreen(
                     TeammatesButton(
                         enabled = (questionnaireForm.header.isNotEmpty() && questionnaireForm.description.isNotEmpty() && questionnaireForm.selectedGame != null),
                         onClick = {
-                            val imagePart = selectedImageUri?.let {
-                                questionnairesViewModel.prepareImageForUploadUseCase(it, context)
-                            }
                             questionnairesViewModel.createNewQuestionnaire(
                                 questionnaireForm.header,
                                 questionnaireForm.description,
                                 questionnaireForm.selectedGame,
-                                imagePart,
+                                selectedImageUri,
+                                context = context,
                                 onSuccess = {
                                     selectedImageUri = null
                                     questionnaireForm = QuestionnaireForm("", "", null)

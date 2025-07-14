@@ -1,5 +1,7 @@
 package com.pezont.teammates.viewmodel
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pezont.teammates.R
@@ -16,7 +18,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import okhttp3.MultipartBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,7 +47,8 @@ class UserViewModel @Inject constructor(
     fun updateUserProfile(
         nickname: String,
         description: String,
-        image: MultipartBody.Part?,
+        uri: Uri?,
+        context: Context,
         onSuccess: () -> Unit,
     ) {
         viewModelScope.launch {
@@ -64,6 +66,8 @@ class UserViewModel @Inject constructor(
                         nickname = nickname,
                         description = description
                     ).onSuccess { user ->
+
+                        val image = prepareImageForUploadUseCase(uri, context)
                         if (image != null) {
                             updateUserProfileUseCase.updateUserAvatar(image)
                                 .onSuccess { newImagePath ->

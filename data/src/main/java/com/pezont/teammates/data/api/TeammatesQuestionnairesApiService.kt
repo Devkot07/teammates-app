@@ -1,7 +1,7 @@
 package com.pezont.teammates.data.api
 
-import com.pezont.teammates.domain.model.Questionnaire
-import com.pezont.teammates.domain.model.CreateQuestionnaireRequest
+import com.pezont.teammates.data.dto.CreateQuestionnaireRequestDto
+import com.pezont.teammates.data.dto.QuestionnaireDto
 import okhttp3.MultipartBody
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -12,7 +12,6 @@ import retrofit2.http.Query
 
 interface TeammatesQuestionnairesApiService {
 
-
     @GET("questionnaires")
     suspend fun getQuestionnaires(
         @Header("accept") accept: String = "application/json",
@@ -22,20 +21,17 @@ interface TeammatesQuestionnairesApiService {
         @Query("limit") limit: Int?,
         @Query("game") gameName: String?,
         @Query("author_id") authorId: String?,
-        @Query("questionnaire_id") questionnaireId: String?,
-
-        ): List<Questionnaire>
-
+        @Query("questionnaire_id") questionnaireId: String?
+    ): List<QuestionnaireDto>
 
     @Multipart
     @POST("questionnaire")
-    suspend fun createQuestionnaire(
+    suspend fun  createQuestionnaire(
         @Header("accept") accept: String = "application/json",
         @Header("Authorization") token: String,
         @Query("user_id") userId: String,
-        @Part("questionnaire_in") questionnaire: CreateQuestionnaireRequest,
+        @Part("questionnaire_in") request: CreateQuestionnaireRequestDto,
         @Part image: MultipartBody.Part? = null
-    ): Questionnaire
-
+    ): QuestionnaireDto
 
 }

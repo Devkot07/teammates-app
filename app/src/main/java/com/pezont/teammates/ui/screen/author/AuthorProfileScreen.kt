@@ -1,28 +1,17 @@
 package com.pezont.teammates.ui.screen.author
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.pezont.teammates.R
-import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
-import com.pezont.teammates.ui.items.AuthorProfile
+import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.ui.components.LoadingItemWithText
-import com.pezont.teammates.ui.navigation.NavigationDestination
-import com.pezont.teammates.ui.screen.questionnaire.QuestionnairesHorizontalRow
 import com.pezont.teammates.viewmodel.AuthorViewModel
 
-object AuthorProfileDestination : NavigationDestination {
-    override val route = "author_profile"
-    override val titleRes = R.string.profile
-}
 
 @Composable
 fun AuthorProfileScreen(
@@ -30,15 +19,16 @@ fun AuthorProfileScreen(
     contentState: ContentState,
     author: User,
     authorQuestionnaires: List<Questionnaire>,
-    starAction: () -> Unit,
+    likedAuthors: List<User>,
     navigateToQuestionnaireDetails: () -> Unit,
     topBar: @Composable () -> Unit = {},
     modifier: Modifier,
 ) {
+    val isLiked = likedAuthors.any { it.publicId == author.publicId }
     Scaffold(
         topBar = topBar,
     ) { paddingValues ->
-        Column (
+        Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
@@ -46,15 +36,20 @@ fun AuthorProfileScreen(
             if (contentState == ContentState.LOADING)
                 LoadingItemWithText()
             else {
-                AuthorProfile(
-                    starAction, author
+                AuthorProfileItem(
+                    author = author,
+                    authorQuestionnaires = authorQuestionnaires,
+                    isLiked = isLiked,
+                    updateSelectedQuestionnaire = authorViewModel::updateSelectedQuestionnaire,
+                    navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
+                    action = { user ->
+                        if (isLiked) {
+                            authorViewModel.unlikeAuthor(user)
+                        } else {
+                            authorViewModel.likeAuthor(user)
+                        }
+                    }
                 )
-                Spacer(modifier.height(8.dp))
-                QuestionnairesHorizontalRow(
-                    authorQuestionnaires,
-                    navigateToQuestionnaireDetails,
-                    authorViewModel,
-                    )
             }
         }
     }

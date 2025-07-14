@@ -18,14 +18,9 @@ import com.pezont.teammates.ui.components.Dots
 import com.pezont.teammates.ui.components.DropdownItem
 import com.pezont.teammates.ui.components.TeammatesDropdownMenu
 import com.pezont.teammates.ui.components.TeammatesTopAppBar
-import com.pezont.teammates.ui.items.UserProfile
-import com.pezont.teammates.ui.navigation.NavigationDestination
+import com.pezont.teammates.ui.navigation.Destinations
 import com.pezont.teammates.viewmodel.AuthViewModel
 
-object UserProfileDestination : NavigationDestination {
-    override val route = "user_profile"
-    override val titleRes = R.string.profile
-}
 
 @Composable
 fun UserProfileScreen(
@@ -57,7 +52,7 @@ fun UserProfileScreen(
                 ),
             )
             TeammatesTopAppBar(
-                title = stringResource(UserProfileDestination.titleRes),
+                title = stringResource(Destinations.UserProfile.titleRes),
                 actions = {
                     IconButton(onClick = { showDropDownMenu = !showDropDownMenu }) {
                         Icon(Dots, contentDescription = null)
@@ -72,8 +67,8 @@ fun UserProfileScreen(
             )
         }
     ) { paddingValues ->
-        UserProfile(
-            navigateToMyQuestionnaires = navigateToMyQuestionnaires,
+        UserProfileItem(
+            navigateToUserQuestionnaires = navigateToMyQuestionnaires,
             user = user,
             paddingValues = paddingValues
         )

@@ -30,6 +30,9 @@ class StateManager @Inject constructor() {
     private val _likedQuestionnaires = MutableStateFlow<List<Questionnaire>>(emptyList())
     val likedQuestionnaires: StateFlow<List<Questionnaire>> = _likedQuestionnaires.asStateFlow()
 
+    private val _likedAuthors = MutableStateFlow<List<User>>(emptyList())
+    val likedAuthors: StateFlow<List<User>> = _likedAuthors.asStateFlow()
+
     private val _userQuestionnaires = MutableStateFlow<List<Questionnaire>>(emptyList())
     val userQuestionnaires: StateFlow<List<Questionnaire>> = _userQuestionnaires.asStateFlow()
 
@@ -79,6 +82,10 @@ class StateManager @Inject constructor() {
     }
     fun updateSelectedAuthorQuestionnaires(selectedAuthorQuestionnaires: List<Questionnaire>) {
         _selectedAuthorQuestionnaires.value = selectedAuthorQuestionnaires
+    }
+
+    fun updateLikedAuthors(likedAuthors: List<User>) {
+        _likedAuthors.value = likedAuthors
     }
 
 }
