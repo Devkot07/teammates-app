@@ -36,9 +36,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
+import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
+import com.pezont.teammates.ui.components.Minus
 import com.pezont.teammates.ui.components.TeammatesButton
 import com.pezont.teammates.ui.screen.questionnaire.QuestionnairesHorizontalRow
 import com.pezont.teammates.ui.theme.TeammatesTheme
@@ -47,10 +49,15 @@ import com.pezont.teammates.ui.theme.TeammatesTheme
 fun AuthorProfileItem(
     author: User,
     authorQuestionnaires: List<Questionnaire>,
+    isLiked: Boolean,
     updateSelectedQuestionnaire: (Questionnaire) -> Unit,
     navigateToQuestionnaireDetails: () -> Unit,
-    starAction: () -> Unit,
+    action: (User) -> Unit,
 ) {
+
+    val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_3}${BuildConfig.END_URL}"
+    val fixedImagePath = author.imagePath.replace("http://localhost:8200", baseUrl)
+
     Box(
         modifier = Modifier.wrapContentSize()
     ) {
@@ -68,7 +75,7 @@ fun AuthorProfileItem(
 
             ) {
                 SubcomposeAsyncImage(
-                    model = author.imagePath,
+                    model = fixedImagePath,
                     loading = {
                         CircularProgressIndicator(Modifier.padding(16.dp))
                     },
@@ -97,15 +104,27 @@ fun AuthorProfileItem(
                 )
             }
 
+            //TODO contentState
+            if (!isLiked) {
+                TeammatesButton(
+                    onClick = { action(author) },
+                    text = stringResource(R.string.subscribe),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    imageVector = Icons.Filled.Add
+                )
+            } else {
+                TeammatesButton(
+                    onClick = { action(author) },
+                    text = stringResource(R.string.unsubscribe),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    imageVector = Minus
+                )
+            }
 
-            TeammatesButton(
-                onClick = starAction,
-                text = stringResource(R.string.subscribe),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                imageVector = Icons.Filled.Add
-            )
 
             Spacer(Modifier.height(8.dp))
             QuestionnairesHorizontalRow(
@@ -158,6 +177,7 @@ fun AuthorProfilePreview() {
         AuthorProfileItem(
             User(),
             listOf(Questionnaire()),
+            false,
             {},
             {},
             {}

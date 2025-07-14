@@ -19,11 +19,12 @@ fun AuthorProfileScreen(
     contentState: ContentState,
     author: User,
     authorQuestionnaires: List<Questionnaire>,
-    starAction: () -> Unit,
+    likedAuthors: List<User>,
     navigateToQuestionnaireDetails: () -> Unit,
     topBar: @Composable () -> Unit = {},
     modifier: Modifier,
 ) {
+    val isLiked = likedAuthors.any { it.publicId == author.publicId }
     Scaffold(
         topBar = topBar,
     ) { paddingValues ->
@@ -38,9 +39,16 @@ fun AuthorProfileScreen(
                 AuthorProfileItem(
                     author = author,
                     authorQuestionnaires = authorQuestionnaires,
+                    isLiked = isLiked,
                     updateSelectedQuestionnaire = authorViewModel::updateSelectedQuestionnaire,
                     navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
-                    starAction = starAction
+                    action = { user ->
+                        if (isLiked) {
+                            authorViewModel.unlikeAuthor(user)
+                        } else {
+                            authorViewModel.likeAuthor(user)
+                        }
+                    }
                 )
             }
         }

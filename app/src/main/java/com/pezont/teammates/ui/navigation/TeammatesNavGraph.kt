@@ -32,6 +32,7 @@ import com.pezont.teammates.ui.screen.user.UserProfileEditScreen
 import com.pezont.teammates.ui.screen.user.UserProfileScreen
 import com.pezont.teammates.viewmodel.AuthUiEvent
 import com.pezont.teammates.viewmodel.AuthViewModel
+import com.pezont.teammates.viewmodel.AuthorUiEvent
 import com.pezont.teammates.viewmodel.AuthorViewModel
 import com.pezont.teammates.viewmodel.QuestionnaireUiEvent
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
@@ -54,6 +55,9 @@ fun TeammatesNavGraph(
 
     val contentState by userViewModel.contentState.collectAsState()
 
+    val user by userViewModel.user.collectAsState()
+
+
     val questionnaires by questionnairesViewModel.questionnaires.collectAsState()
     val likedQuestionnaires by questionnairesViewModel.likedQuestionnaires.collectAsState()
     val userQuestionnaires by questionnairesViewModel.userQuestionnaires.collectAsState()
@@ -62,6 +66,7 @@ fun TeammatesNavGraph(
     val selectedAuthor by authorViewModel.selectedAuthor.collectAsState()
     val selectedQuestionnaire by authorViewModel.selectedQuestionnaire.collectAsState()
     val selectedAuthorQuestionnaires by authorViewModel.selectedAuthorQuestionnaires.collectAsState()
+    val likedAuthors by authorViewModel.likedAuthors.collectAsState()
 
 
 
@@ -89,6 +94,13 @@ fun TeammatesNavGraph(
                     popUpTo(Destinations.Home.route) { inclusive = false }
                 }
             }
+        }
+    }
+
+    ObserveAsEvents(authorViewModel.authorUiEvent) { event ->
+        when (event) {
+            is AuthorUiEvent.AuthorSubscribed -> { }
+            is AuthorUiEvent.AuthorUnsubscribed -> { }
         }
     }
 
@@ -225,8 +237,6 @@ fun TeammatesNavGraph(
 
         composable(Destinations.UserProfile.route) {
             onTabChange(BottomNavItem.PROFILE)
-            val user by userViewModel.user.collectAsState()
-
             UserProfileScreen(
                 navigateToMyQuestionnaires = {
                     questionnairesViewModel.loadUserQuestionnaires()
@@ -247,10 +257,6 @@ fun TeammatesNavGraph(
         }
 
         composable(Destinations.UserProfileEdit.route) {
-            val user by userViewModel.user.collectAsState()
-
-
-
             UserProfileEditScreen(
                 contentState = contentState,
                 user = user,
@@ -275,7 +281,6 @@ fun TeammatesNavGraph(
         }
 
         composable(Destinations.UserQuestionnaires.route) {
-
             UserQuestionnairesScreen(
                 navigateToQuestionnaireCreate = {
                     navController.navigate(Destinations.QuestionnaireCreate.route)
@@ -304,8 +309,6 @@ fun TeammatesNavGraph(
         }
 
         composable(Destinations.QuestionnaireDetails.route) {
-            val user by userViewModel.user.collectAsState()
-
             QuestionnaireDetailsScreen(
                 author = selectedAuthor,
                 questionnaire = selectedQuestionnaire,
@@ -330,9 +333,9 @@ fun TeammatesNavGraph(
             AuthorProfileScreen(
                 authorViewModel = authorViewModel,
                 contentState = contentState,
-                starAction = {},
                 author = selectedAuthor,
                 authorQuestionnaires = selectedAuthorQuestionnaires,
+                likedAuthors = likedAuthors,
                 topBar = {
                     TeammatesTopAppBar(
                         title = selectedAuthor.nickname,
