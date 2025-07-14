@@ -56,4 +56,8 @@
     <string name="the_nickname_must_contain_at_least_3_characters">The nickname must contain at least 3 characters</string>
     <string name="information_update_successfully">Information update successfully</string>
     <string name="photo_update">Photo update</string>
+    <string name="users">Users</string>
+    <string name="you_subscribe">You subscribe %1$s !</string>
+    <string name="unsubscribe">Unsubscribe</string>
+    <string name="you_unsubscribe">You unsubscribe %1$s !</string>
 </resources>
