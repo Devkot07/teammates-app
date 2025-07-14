@@ -97,7 +97,10 @@ fun TeammatesApp() {
         scope.launch {
             snackbarHostState.currentSnackbarData?.dismiss()
             val result = snackbarHostState.showSnackbar(
-                message = context.getString(event.messageId),
+                message = context.getString(
+                    event.messageId,
+                    *event.formatArgs.toTypedArray()
+                ),
                 actionLabel = event.action?.name,
                 duration = SnackbarDuration.Short
             )
