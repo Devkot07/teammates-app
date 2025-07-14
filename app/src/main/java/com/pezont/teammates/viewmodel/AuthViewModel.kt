@@ -1,5 +1,6 @@
 package com.pezont.teammates.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pezont.teammates.R
@@ -93,14 +94,20 @@ class AuthViewModel @Inject constructor(
                 stateManager.updateSelectedQuestionnaire(Questionnaire())
                 stateManager.updateSelectedAuthorQuestionnaires(emptyList())
 
+                stateManager.updateLikedAuthors(emptyList())
+
                 _authUiEvent.tryEmit(AuthUiEvent.LoggedOut)
                 SnackbarController.sendEvent(SnackbarEvent(R.string.logged_out))
-            }.onFailure {
+            }.onFailure { throwable ->
+                Log.e(TAG, throwable.toString())
                 stateManager.updateAuthState(AuthState.INITIAL)
             }
         }
     }
 
+    companion object {
+        const val TAG = "AuthVM"
+    }
 
 }
 

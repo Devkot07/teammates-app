@@ -53,7 +53,9 @@ class QuestionnairesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            if (stateManager.authState.value == AuthState.AUTHENTICATED) loadLikedQuestionnaires()
+            stateManager.authState.collect { authState ->
+                if (authState == AuthState.AUTHENTICATED) loadLikedQuestionnaires()
+            }
         }
     }
 
@@ -149,7 +151,9 @@ class QuestionnairesViewModel @Inject constructor(
         }
     }
 
-    companion object { const val TAG  = "QVM" }
+    companion object {
+        const val TAG = "QVM"
+    }
 }
 
 
