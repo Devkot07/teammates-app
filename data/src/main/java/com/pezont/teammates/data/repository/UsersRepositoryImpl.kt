@@ -2,9 +2,11 @@ package com.pezont.teammates.data.repository
 
 import android.content.Context
 import com.pezont.teammates.data.api.TeammatesUsersApiService
+import com.pezont.teammates.data.dto.LikeUserRequestDto
 import com.pezont.teammates.data.mapper.toDomain
 import com.pezont.teammates.data.mapper.toDto
 import com.pezont.teammates.data.network.NetworkManager
+import com.pezont.teammates.domain.model.LikeUserResponse
 import com.pezont.teammates.domain.model.LoadAuthorRequest
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.UpdateUserProfilePhotoResponse
@@ -41,6 +43,71 @@ class UsersRepositoryImpl(
             Result.failure(e)
         }
 
+    }
+
+    override suspend fun loadLikedUsers(token: String, userId: String): Result<List<User>> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            val dtoList = teammatesUsersApiService.loadLikedUsers(
+                token = "Bearer $token",
+                userId = userId
+            )
+
+            val domainList = dtoList.map { it.toDomain() }
+            Result.success(domainList)
+
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+
+    override suspend fun likeUser(
+        token: String,
+        userId: String,
+        likedUserId: String
+    ): Result<LikeUserResponse> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesUsersApiService.likeUser(
+                    token = "Bearer $token",
+                    userId = userId,
+                    request = LikeUserRequestDto(userId, likedUserId)
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+
+    override suspend fun unlikeUser(
+        token: String,
+        userId: String,
+        unlikedUserId: String
+    ): Result<LikeUserResponse> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesUsersApiService.unlikeUser(
+                    token = "Bearer $token",
+                    userId = userId,
+                    request = LikeUserRequestDto(userId, unlikedUserId)
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     override suspend fun loadAuthorProfile(

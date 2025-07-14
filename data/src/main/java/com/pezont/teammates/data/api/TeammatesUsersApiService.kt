@@ -1,5 +1,7 @@
 package com.pezont.teammates.data.api
 
+import com.pezont.teammates.data.dto.LikeUserRequestDto
+import com.pezont.teammates.data.dto.LikeUserResponseDto
 import com.pezont.teammates.data.dto.QuestionnaireDto
 import com.pezont.teammates.data.dto.UpdateUserProfilePhotoResponseDto
 import com.pezont.teammates.data.dto.UpdateUserProfileRequestDto
@@ -7,8 +9,10 @@ import com.pezont.teammates.data.dto.UserDto
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.Header
 import retrofit2.http.Multipart
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Query
@@ -21,6 +25,31 @@ interface TeammatesUsersApiService {
         @Header("Authorization") token: String,
         @Query("user_id") userId: String,
     ): List<QuestionnaireDto>
+
+    @GET("like/users")
+    suspend fun loadLikedUsers(
+        @Header("accept") accept: String = "application/json",
+        @Header("Authorization") token: String,
+        @Query("user_id") userId: String,
+    ): List<UserDto>
+
+
+    @POST("like/user")
+    suspend fun likeUser(
+        @Header("accept") accept: String = "application/json",
+        @Header("Authorization") token: String,
+        @Query("user_id") userId: String,
+        @Body request: LikeUserRequestDto,
+    ): LikeUserResponseDto
+
+    @HTTP(method = "DELETE", path = "like/user", hasBody = true)
+    suspend fun unlikeUser(
+        @Header("accept") accept: String = "application/json",
+        @Header("Authorization") token: String,
+        @Query("user_id") userId: String,
+
+        @Body request: LikeUserRequestDto,
+    ): LikeUserResponseDto
 
     @GET("users/profile")
     suspend fun loadAuthorProfile(
