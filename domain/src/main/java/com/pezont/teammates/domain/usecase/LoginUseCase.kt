@@ -11,7 +11,7 @@ class LoginUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(nickname: String, password: String): Result<Unit> =
         runCatching {
-            val response = authRepository.login(LoginRequest( nickname, password)).getOrThrow()
+            val response = authRepository.login(LoginRequest(nickname, password)).getOrThrow()
             userDataRepository.saveAccessToken(response.accessToken)
             userDataRepository.saveRefreshToken(response.refreshToken)
             userDataRepository.saveUser(response.user)

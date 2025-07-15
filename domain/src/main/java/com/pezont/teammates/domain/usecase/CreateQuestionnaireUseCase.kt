@@ -23,7 +23,6 @@ class CreateQuestionnaireUseCase @Inject constructor(
         return runCatching {
 
             val user = userDataRepository.user.first()
-            if (user.publicId == null) throw Exception("User not authenticated")
 
             questionnairesRepository.createQuestionnaire(
                 token = userDataRepository.accessToken.first(),

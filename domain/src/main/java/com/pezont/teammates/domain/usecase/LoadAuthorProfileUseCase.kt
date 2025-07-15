@@ -15,7 +15,6 @@ class LoadAuthorProfileUseCase @Inject constructor(
         return runCatching {
 
             val user = userDataRepository.user.first()
-            if (user.publicId == null) throw Exception("User not authenticated")
 
             usersRepository.loadAuthorProfile(
                 token = userDataRepository.accessToken.first(),
