@@ -37,21 +37,14 @@ android {
 
 dependencies {
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
 
-    implementation(libs.retrofit2.kotlinx.serialization.converter)
-    implementation(libs.logging.interceptor)
-    implementation(libs.converter.gson)
 
     // Dagger Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
+    implementation(libs.logging.interceptor)
     implementation(libs.androidx.exifinterface)
-
-
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

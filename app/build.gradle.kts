@@ -67,8 +67,6 @@ dependencies {
     implementation(project(":domain"))
 
     // AndroidX
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
 
@@ -81,11 +79,8 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.ui.text.google.fonts)
 
-    // Data Storage (DataStore, Room)
+    // Data Storage
     implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore.preferences.core.jvm)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
@@ -101,9 +96,9 @@ dependencies {
 
     // Dagger Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
 
-    implementation(libs.androidx.hilt.navigation.compose)
 
     // Testing
     testImplementation(libs.junit)
