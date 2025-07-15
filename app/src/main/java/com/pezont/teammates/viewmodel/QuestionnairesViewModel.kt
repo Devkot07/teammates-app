@@ -6,15 +6,18 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pezont.teammates.R
+import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.ValidationResult
 import com.pezont.teammates.domain.model.enums.AuthState
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
+import com.pezont.teammates.domain.usecase.LikeQuestionnaireUseCase
 import com.pezont.teammates.domain.usecase.LoadLikedQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadUserQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.PrepareImageForUploadUseCase
+import com.pezont.teammates.domain.usecase.UnlikeQuestionnaireUseCase
 import com.pezont.teammates.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
@@ -34,7 +37,10 @@ class QuestionnairesViewModel @Inject constructor(
 
     private val loadQuestionnairesUseCase: LoadQuestionnairesUseCase,
     private val loadUserQuestionnairesUseCase: LoadUserQuestionnairesUseCase,
+
     private val loadLikedQuestionnairesUseCase: LoadLikedQuestionnairesUseCase,
+    private val likeQuestionnaireUseCase: LikeQuestionnaireUseCase,
+    private val unlikeQuestionnaireUseCase: UnlikeQuestionnaireUseCase,
 
     val createNewQuestionnaireUseCase: CreateQuestionnaireUseCase,
     val prepareImageForUploadUseCase: PrepareImageForUploadUseCase,
@@ -79,6 +85,22 @@ class QuestionnairesViewModel @Inject constructor(
         }
     }
 
+    fun loadUserQuestionnaires() {
+        viewModelScope.launch {
+            stateManager.updateContentState(ContentState.LOADING)
+            loadUserQuestionnairesUseCase(game = null).onSuccess { result ->
+                Log.i(TAG, result.toString())
+                stateManager.updateUserQuestionnaires(result)
+                stateManager.updateContentState(ContentState.LOADED)
+
+            }.onFailure { throwable ->
+                Log.e(TAG, throwable.toString())
+                stateManager.updateContentState(ContentState.ERROR)
+                errorHandler.handleError(throwable)
+            }
+        }
+    }
+
     suspend fun loadLikedQuestionnaires() {
         loadLikedQuestionnairesUseCase().onSuccess { result ->
             Log.i(TAG, result.toString())
@@ -90,16 +112,38 @@ class QuestionnairesViewModel @Inject constructor(
         }
     }
 
-    fun loadUserQuestionnaires() {
+    fun likeQuestionnaire(likedQuestionnaire: Questionnaire) {
         viewModelScope.launch {
             stateManager.updateContentState(ContentState.LOADING)
-            loadUserQuestionnairesUseCase(game = null).onSuccess { result ->
-                Log.i(TAG, result.toString())
-                stateManager.updateUserQuestionnaires(result)
+            likeQuestionnaireUseCase(
+                likedQuestionnaireId = likedQuestionnaire.questionnaireId
+            ).onSuccess { result ->
+                Log.i(AuthorViewModel.TAG, result.toString())
+                val likedQuestionnaires = likedQuestionnaires.value.plus(likedQuestionnaire)
+                stateManager.updateLikedQuestionnaires(likedQuestionnaires = likedQuestionnaires)
                 stateManager.updateContentState(ContentState.LOADED)
-
+                _questionnaireUiEvent.tryEmit(QuestionnaireUiEvent.QuestionnaireLiked)
             }.onFailure { throwable ->
-                Log.e(TAG, throwable.toString())
+                Log.e(AuthorViewModel.TAG, throwable.toString())
+                stateManager.updateContentState(ContentState.ERROR)
+                errorHandler.handleError(throwable)
+            }
+        }
+    }
+
+    fun unlikeQuestionnaire(unlikedQuestionnaire: Questionnaire) {
+        viewModelScope.launch {
+            stateManager.updateContentState(ContentState.LOADING)
+            unlikeQuestionnaireUseCase(
+                unlikedQuestionnaireId = unlikedQuestionnaire.questionnaireId
+            ).onSuccess { result ->
+                Log.i(AuthorViewModel.TAG, result.toString())
+                val likedQuestionnaires = likedQuestionnaires.value.minus(unlikedQuestionnaire)
+                stateManager.updateLikedQuestionnaires(likedQuestionnaires = likedQuestionnaires)
+                stateManager.updateContentState(ContentState.LOADED)
+                _questionnaireUiEvent.tryEmit(QuestionnaireUiEvent.QuestionnaireUnliked)
+            }.onFailure { throwable ->
+                Log.e(AuthorViewModel.TAG, throwable.toString())
                 stateManager.updateContentState(ContentState.ERROR)
                 errorHandler.handleError(throwable)
             }
@@ -159,6 +203,8 @@ class QuestionnairesViewModel @Inject constructor(
 
 sealed class QuestionnaireUiEvent {
     data object QuestionnaireCreated : QuestionnaireUiEvent()
+    data object QuestionnaireLiked : QuestionnaireUiEvent()
+    data object QuestionnaireUnliked : QuestionnaireUiEvent()
 }
 
 

@@ -19,7 +19,6 @@ class UpdateUserProfileUseCase @Inject constructor(
         return runCatching {
 
             val user = userDataRepository.user.first()
-            if (user.publicId == null) throw Exception("User not authenticated")
 
             val response = usersRepository.updateUserProfile(
                 token = userDataRepository.accessToken.first(),
@@ -63,7 +62,6 @@ class UpdateUserProfileUseCase @Inject constructor(
         return runCatching {
 
             val user = userDataRepository.user.first()
-            if (user.publicId == null) throw Exception("User not authenticated")
 
             val response = usersRepository.updateUserProfilePhoto(
                 token = userDataRepository.accessToken.first(),

@@ -32,97 +32,62 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.BuildConfig
-import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.ui.components.LikeButton
 import com.pezont.teammates.ui.components.LoadingItemWithText
 
 @Composable
 fun QuestionnaireDetailsItem(
-    // viewModel: TeammatesViewModel,
+    questionnaire: Questionnaire,
     authorNickname: String,
     contentState: ContentState,
-    questionnaire: Questionnaire,
+    isLiked: Boolean,
+    likeAction: (Questionnaire) -> Unit,
     navigateToAuthorProfile: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
     val baseUrl = "${BuildConfig.BASE_URL}${BuildConfig.PORT_1}${BuildConfig.END_URL}/questionnaire"
     val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
-
     var imageLoadingError by remember { mutableStateOf(false) }
 
-    Scaffold(floatingActionButton = {
-        LikeButton(
-            modifier = modifier
-                .wrapContentHeight()
-                .background(Color.Transparent)
-        )
-    }) { paddingValues ->
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            if (contentState == ContentState.LOADING)
-                LoadingItemWithText()
-            else {
+    if (contentState == ContentState.LOADING)
+        LoadingItemWithText()
+    else {
+        Scaffold(
+            floatingActionButton = {
+                LikeButton(
+                    modifier = modifier
+                        .wrapContentHeight()
+                        .background(Color.Transparent),
+                    likeButtonState = isLiked,
+                ) { likeAction(questionnaire) }
+            }
+        ) { paddingValues ->
+
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
                     if (questionnaire.imagePath.isNotEmpty() && !imageLoadingError) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f),
-                            contentAlignment = Alignment.BottomStart
-                        ) {
-                            SubcomposeAsyncImage(
-                                model = fixedImagePath,
-                                loading = {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.padding(100.dp)
-                                    )
-                                },
-                                error = {
-                                    imageLoadingError = true
-                                },
-                                contentDescription = "Profile Picture",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(120.dp)
-                                    .background(
-                                        brush = Brush.verticalGradient(
-                                            colors = listOf(
-                                                Color.Transparent, Color.Black.copy(alpha = 0.6f)
-                                            )
-                                        )
-                                    )
-                                    .align(Alignment.BottomCenter)
-                            )
-
-                            Row {
-                                Text(
-                                    text = questionnaire.game,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = Color.White,
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .zIndex(1f)
-                                )
-                                Spacer(Modifier.weight(1f))
-                                AuthorNickname(authorNickname, navigateToAuthorProfile)
-                            }
-                        }
+                        QuestionnaireImageItem(
+                            questionnaire = questionnaire,
+                            imagePath = fixedImagePath,
+                            authorNickname = authorNickname,
+                            navigateToAuthorProfile = navigateToAuthorProfile,
+                            onError = { imageLoadingError = true }
+                        )
                     } else {
                         Row {
                             Text(
+
                                 text = questionnaire.game,
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color.White,
@@ -156,7 +121,61 @@ fun QuestionnaireDetailsItem(
                     }
                 }
             }
+        }
+    }
+}
 
+@Composable
+fun QuestionnaireImageItem(
+    questionnaire: Questionnaire,
+    imagePath: String,
+    authorNickname: String,
+    navigateToAuthorProfile: () -> Unit,
+    onError: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f),
+        contentAlignment = Alignment.BottomStart
+    ) {
+        SubcomposeAsyncImage(
+            model = imagePath,
+            loading = {
+                CircularProgressIndicator(
+                    modifier = Modifier.padding(100.dp)
+                )
+            },
+            error = { onError() },
+            contentDescription = "Profile Picture",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent, Color.Black.copy(alpha = 0.6f)
+                        )
+                    )
+                )
+                .align(Alignment.BottomCenter)
+        )
+
+        Row {
+            Text(
+                text = questionnaire.game,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .zIndex(1f)
+            )
+            Spacer(Modifier.weight(1f))
+            AuthorNickname(authorNickname, navigateToAuthorProfile)
         }
     }
 }
@@ -170,8 +189,6 @@ fun AuthorNickname(authorNickname: String, action: () -> Unit) {
         modifier = Modifier
             .padding(16.dp)
             .zIndex(1f)
-            .clickable{
-                action()
-            }
+            .clickable { action() }
     )
 }

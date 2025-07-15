@@ -36,24 +36,15 @@ android {
 
 dependencies {
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-
     implementation(project(":domain"))
 
     // Network (Retrofit, OkHttp, Gson)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
-    implementation(libs.retrofit2.kotlinx.serialization.converter)
 
-    // JSON serialization
-    implementation(libs.jetbrains.kotlinx.serialization.json)
-
+    //Data Storage
     implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore.preferences.core.jvm)
-
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)

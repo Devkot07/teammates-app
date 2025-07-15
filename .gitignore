@@ -27,3 +27,6 @@ output.json
 .cxx
 gradle.properties
 /.kotlin/
+
+# Gradle Wrapper JAR
+gradle/wrapper/gradle-wrapper.jar

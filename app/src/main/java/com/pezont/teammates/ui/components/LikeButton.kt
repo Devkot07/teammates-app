@@ -26,15 +26,17 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun LikeButton(
     modifier: Modifier = Modifier,
-    likeButtonState: Boolean = false,
+    likeButtonState: Boolean,
+    onClick: () -> Unit,
 ) {
+
     var isLiked by remember { mutableStateOf(likeButtonState) }
     val scale by animateFloatAsState(
         targetValue = if (isLiked) 1.2f else 1f,
         animationSpec = tween(durationMillis = 300), label = ""
     )
     val iconColor by animateColorAsState(
-        targetValue = if (isLiked) Color.Red else Color.Gray,
+        targetValue = if (isLiked) Color.White else Color.Gray,
         animationSpec = tween(durationMillis = 300), label = ""
     )
 
@@ -44,7 +46,10 @@ fun LikeButton(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
-            ) { isLiked = !isLiked },
+            ) {
+                isLiked = !isLiked
+                onClick()
+            },
         contentAlignment = Alignment.BottomEnd
     ) {
         Icon(
@@ -54,4 +59,5 @@ fun LikeButton(
             modifier = modifier.size((36 * scale).dp)
         )
     }
+
 }
