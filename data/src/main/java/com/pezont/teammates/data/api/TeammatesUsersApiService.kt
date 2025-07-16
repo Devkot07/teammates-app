@@ -1,5 +1,7 @@
 package com.pezont.teammates.data.api
 
+import com.pezont.teammates.data.dto.LikeQuestionnaireRequestDto
+import com.pezont.teammates.data.dto.LikeQuestionnaireResponseDto
 import com.pezont.teammates.data.dto.LikeUserRequestDto
 import com.pezont.teammates.data.dto.LikeUserResponseDto
 import com.pezont.teammates.data.dto.QuestionnaireDto
@@ -33,6 +35,22 @@ interface TeammatesUsersApiService {
         @Query("user_id") userId: String,
     ): List<UserDto>
 
+    @POST("like/questionnaire")
+    suspend fun likeQuestionnaire(
+        @Header("accept") accept: String = "application/json",
+        @Header("Authorization") token: String,
+        @Query("user_id") userId: String,
+        @Body request: LikeQuestionnaireRequestDto,
+    ): LikeQuestionnaireResponseDto
+
+    @HTTP(method = "DELETE", path = "like/questionnaire", hasBody = true)
+    suspend fun unlikeQuestionnaire(
+        @Header("accept") accept: String = "application/json",
+        @Header("Authorization") token: String,
+        @Query("user_id") userId: String,
+
+        @Body request: LikeQuestionnaireRequestDto,
+    ): LikeQuestionnaireResponseDto
 
     @POST("like/user")
     suspend fun likeUser(

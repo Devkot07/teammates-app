@@ -94,13 +94,16 @@ fun TeammatesNavGraph(
                     popUpTo(Destinations.Home.route) { inclusive = false }
                 }
             }
+
+            QuestionnaireUiEvent.QuestionnaireLiked -> {}
+            QuestionnaireUiEvent.QuestionnaireUnliked -> {}
         }
     }
 
     ObserveAsEvents(authorViewModel.authorUiEvent) { event ->
         when (event) {
-            is AuthorUiEvent.AuthorSubscribed -> { }
-            is AuthorUiEvent.AuthorUnsubscribed -> { }
+            is AuthorUiEvent.AuthorSubscribed -> {}
+            is AuthorUiEvent.AuthorUnsubscribed -> {}
         }
     }
 
@@ -312,7 +315,8 @@ fun TeammatesNavGraph(
             QuestionnaireDetailsScreen(
                 author = selectedAuthor,
                 questionnaire = selectedQuestionnaire,
-
+                likedQuestionnaires = likedQuestionnaires,
+                questionnairesViewModel = questionnairesViewModel,
                 navigateToAuthorProfile = {
                     if (user.publicId == selectedQuestionnaire.authorId)
                         navController.navigate(Destinations.UserProfile.route)

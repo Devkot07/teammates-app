@@ -2,10 +2,12 @@ package com.pezont.teammates.data.repository
 
 import android.content.Context
 import com.pezont.teammates.data.api.TeammatesUsersApiService
+import com.pezont.teammates.data.dto.LikeQuestionnaireRequestDto
 import com.pezont.teammates.data.dto.LikeUserRequestDto
 import com.pezont.teammates.data.mapper.toDomain
 import com.pezont.teammates.data.mapper.toDto
 import com.pezont.teammates.data.network.NetworkManager
+import com.pezont.teammates.domain.model.LikeQuestionnaireResponse
 import com.pezont.teammates.domain.model.LikeUserResponse
 import com.pezont.teammates.domain.model.LoadAuthorRequest
 import com.pezont.teammates.domain.model.Questionnaire
@@ -63,6 +65,51 @@ class UsersRepositoryImpl(
             Result.failure(e)
         }
 
+    }
+
+    override suspend fun likeQuestionnaire(
+        token: String,
+        userId: String,
+        likedQuestionnaireId: String
+    ): Result<LikeQuestionnaireResponse> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesUsersApiService.likeQuestionnaire(
+                    token = "Bearer $token",
+                    userId = userId,
+                    request = LikeQuestionnaireRequestDto(userId, likedQuestionnaireId)
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+
+    override suspend fun unlikeQuestionnaire(
+        token: String,
+        userId: String,
+        unlikedQuestionnaireId: String
+    ): Result<LikeQuestionnaireResponse> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesUsersApiService.unlikeQuestionnaire(
+                    token = "Bearer $token",
+                    userId = userId,
+                    request = LikeQuestionnaireRequestDto(userId, unlikedQuestionnaireId)
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     override suspend fun likeUser(

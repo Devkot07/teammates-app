@@ -1,5 +1,6 @@
 package com.pezont.teammates.domain.repository
 
+import com.pezont.teammates.domain.model.LikeQuestionnaireResponse
 import com.pezont.teammates.domain.model.LikeUserResponse
 import com.pezont.teammates.domain.model.LoadAuthorRequest
 import com.pezont.teammates.domain.model.Questionnaire
@@ -20,12 +21,23 @@ interface UsersRepository {
         userId: String,
     ): Result<List<User>>
 
+    suspend fun likeQuestionnaire(
+        token: String,
+        userId: String,
+        likedQuestionnaireId: String
+    ): Result<LikeQuestionnaireResponse>
+
+    suspend fun unlikeQuestionnaire(
+        token: String,
+        userId: String,
+        unlikedQuestionnaireId: String
+    ): Result<LikeQuestionnaireResponse>
+
     suspend fun likeUser(
         token: String,
         userId: String,
         likedUserId: String
     ): Result<LikeUserResponse>
-
 
     suspend fun unlikeUser(
         token: String,
