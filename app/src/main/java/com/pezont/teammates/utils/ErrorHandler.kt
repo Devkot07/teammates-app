@@ -7,7 +7,7 @@ import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.enums.AuthState
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.usecase.LogoutUseCase
-import com.pezont.teammates.state.StateManager
+import com.pezont.teammates.domain.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import retrofit2.HttpException

@@ -13,7 +13,7 @@ import com.pezont.teammates.domain.usecase.LoadAuthorProfileUseCase
 import com.pezont.teammates.domain.usecase.LoadLikedAuthorsUseCase
 import com.pezont.teammates.domain.usecase.LoadQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.UnlikeAuthorUseCase
-import com.pezont.teammates.state.StateManager
+import com.pezont.teammates.domain.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import com.pezont.teammates.utils.ErrorHandler

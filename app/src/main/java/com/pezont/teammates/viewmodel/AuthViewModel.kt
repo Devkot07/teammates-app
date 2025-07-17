@@ -12,7 +12,7 @@ import com.pezont.teammates.domain.usecase.CheckAuthenticationUseCase
 import com.pezont.teammates.domain.usecase.LoadUserUseCase
 import com.pezont.teammates.domain.usecase.LoginUseCase
 import com.pezont.teammates.domain.usecase.LogoutUseCase
-import com.pezont.teammates.state.StateManager
+import com.pezont.teammates.domain.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import com.pezont.teammates.utils.ErrorHandler

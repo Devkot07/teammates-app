@@ -2,7 +2,6 @@ package com.pezont.teammates.data.repository
 
 import android.content.Context
 import com.pezont.teammates.data.api.TeammatesAuthApiService
-import com.pezont.teammates.data.mapper.toDomain
 import com.pezont.teammates.data.mapper.toDto
 import com.pezont.teammates.data.network.NetworkManager
 import com.pezont.teammates.domain.model.LoginRequest

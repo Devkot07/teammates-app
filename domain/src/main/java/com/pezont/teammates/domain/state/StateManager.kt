@@ -1,4 +1,4 @@
-package com.pezont.teammates.state
+package com.pezont.teammates.domain.state
 
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User

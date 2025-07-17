@@ -9,7 +9,7 @@ import com.pezont.teammates.domain.model.ValidationResult
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.usecase.PrepareImageForUploadUseCase
 import com.pezont.teammates.domain.usecase.UpdateUserProfileUseCase
-import com.pezont.teammates.state.StateManager
+ import com.pezont.teammates.domain.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import com.pezont.teammates.utils.ErrorHandler
