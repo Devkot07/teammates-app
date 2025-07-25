@@ -4,7 +4,7 @@ import android.content.Context
 import com.pezont.teammates.data.api.TeammatesQuestionnairesApiService
 import com.pezont.teammates.data.mapper.toDto
 import com.pezont.teammates.data.network.NetworkManager
-import com.pezont.teammates.domain.model.CreateQuestionnaireRequest
+import com.pezont.teammates.domain.model.requesrt.CreateQuestionnaireRequest
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.enums.Games
 import com.pezont.teammates.domain.repository.QuestionnairesRepository

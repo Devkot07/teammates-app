@@ -1,6 +1,6 @@
 package com.pezont.teammates.domain.usecase
 
-import com.pezont.teammates.domain.model.LoginRequest
+import com.pezont.teammates.domain.model.requesrt.LoginRequest
 import com.pezont.teammates.domain.repository.AuthRepository
 import com.pezont.teammates.domain.repository.UserDataRepository
 import java.time.Instant

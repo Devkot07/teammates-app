@@ -1,4 +1,4 @@
-package com.pezont.teammates.domain.model
+package com.pezont.teammates.domain.model.response
 
 data class LikeQuestionnaireResponse(
     val message: String,

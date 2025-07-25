@@ -1,7 +1,7 @@
 package com.pezont.teammates.domain.usecase
 
-import com.pezont.teammates.domain.model.UpdateUserProfilePhotoResponse
-import com.pezont.teammates.domain.model.UpdateUserProfileRequest
+import com.pezont.teammates.domain.model.response.UpdateUserProfilePhotoResponse
+import com.pezont.teammates.domain.model.requesrt.UpdateUserProfileRequest
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.ValidationError
 import com.pezont.teammates.domain.model.ValidationResult

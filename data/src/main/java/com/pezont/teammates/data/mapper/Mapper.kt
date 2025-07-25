@@ -4,10 +4,10 @@ import com.pezont.teammates.data.dto.CreateQuestionnaireRequestDto
 import com.pezont.teammates.data.dto.LoginRequestDto
 import com.pezont.teammates.data.dto.UpdateTokenRequestDto
 import com.pezont.teammates.data.dto.UpdateUserProfileRequestDto
-import com.pezont.teammates.domain.model.CreateQuestionnaireRequest
-import com.pezont.teammates.domain.model.LoginRequest
-import com.pezont.teammates.domain.model.UpdateTokenRequest
-import com.pezont.teammates.domain.model.UpdateUserProfileRequest
+import com.pezont.teammates.domain.model.requesrt.CreateQuestionnaireRequest
+import com.pezont.teammates.domain.model.requesrt.LoginRequest
+import com.pezont.teammates.domain.model.requesrt.UpdateTokenRequest
+import com.pezont.teammates.domain.model.requesrt.UpdateUserProfileRequest
 
 
 fun LoginRequest.toDto(): LoginRequestDto =

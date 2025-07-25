@@ -1,4 +1,4 @@
-package com.pezont.teammates.domain.model
+package com.pezont.teammates.domain.model.requesrt
 
 data class UpdateUserProfileRequest(
     val nickname: String,

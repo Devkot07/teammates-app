@@ -1,6 +1,6 @@
 package com.pezont.teammates.domain.usecase
 
-import com.pezont.teammates.domain.model.LikeUserResponse
+import com.pezont.teammates.domain.model.response.LikeUserResponse
 import com.pezont.teammates.domain.repository.UserDataRepository
 import com.pezont.teammates.domain.repository.UsersRepository
 import kotlinx.coroutines.flow.first

@@ -6,12 +6,12 @@ import com.pezont.teammates.data.dto.LikeQuestionnaireRequestDto
 import com.pezont.teammates.data.dto.LikeUserRequestDto
 import com.pezont.teammates.data.mapper.toDto
 import com.pezont.teammates.data.network.NetworkManager
-import com.pezont.teammates.domain.model.LikeQuestionnaireResponse
-import com.pezont.teammates.domain.model.LikeUserResponse
-import com.pezont.teammates.domain.model.LoadAuthorRequest
+import com.pezont.teammates.domain.model.response.LikeQuestionnaireResponse
+import com.pezont.teammates.domain.model.response.LikeUserResponse
+import com.pezont.teammates.domain.model.requesrt.LoadAuthorRequest
 import com.pezont.teammates.domain.model.Questionnaire
-import com.pezont.teammates.domain.model.UpdateUserProfilePhotoResponse
-import com.pezont.teammates.domain.model.UpdateUserProfileRequest
+import com.pezont.teammates.domain.model.response.UpdateUserProfilePhotoResponse
+import com.pezont.teammates.domain.model.requesrt.UpdateUserProfileRequest
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.repository.UsersRepository
 import okhttp3.MultipartBody

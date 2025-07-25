@@ -1,7 +1,7 @@
 package com.pezont.teammates.domain.usecase
 
 import android.util.Log
-import com.pezont.teammates.domain.model.UpdateTokenRequest
+import com.pezont.teammates.domain.model.requesrt.UpdateTokenRequest
 import com.pezont.teammates.domain.repository.AuthRepository
 import com.pezont.teammates.domain.repository.UserDataRepository
 import kotlinx.coroutines.flow.first

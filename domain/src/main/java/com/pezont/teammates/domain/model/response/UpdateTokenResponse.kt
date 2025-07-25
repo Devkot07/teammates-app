@@ -1,4 +1,4 @@
-package com.pezont.teammates.domain.model
+package com.pezont.teammates.domain.model.response
 
 data class UpdateTokenResponse (
     val accessToken: String,

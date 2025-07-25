@@ -1,6 +1,6 @@
 package com.pezont.teammates.domain.usecase
 
-import com.pezont.teammates.domain.model.LoadAuthorRequest
+import com.pezont.teammates.domain.model.requesrt.LoadAuthorRequest
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.repository.UserDataRepository
 import com.pezont.teammates.domain.repository.UsersRepository

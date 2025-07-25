@@ -1,9 +1,9 @@
 package com.pezont.teammates.domain.repository
 
-import com.pezont.teammates.domain.model.LoginRequest
+import com.pezont.teammates.domain.model.requesrt.LoginRequest
 import com.pezont.teammates.domain.model.LoginResponse
-import com.pezont.teammates.domain.model.UpdateTokenRequest
-import com.pezont.teammates.domain.model.UpdateTokenResponse
+import com.pezont.teammates.domain.model.requesrt.UpdateTokenRequest
+import com.pezont.teammates.domain.model.response.UpdateTokenResponse
 
 interface AuthRepository {
 

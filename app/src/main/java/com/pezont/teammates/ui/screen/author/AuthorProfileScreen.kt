@@ -15,11 +15,11 @@ import com.pezont.teammates.viewmodel.AuthorViewModel
 
 @Composable
 fun AuthorProfileScreen(
-    authorViewModel: AuthorViewModel,
-    contentState: ContentState,
     author: User,
     authorQuestionnaires: List<Questionnaire>,
     likedAuthors: List<User>,
+    authorViewModel: AuthorViewModel,
+    contentState: ContentState,
     navigateToQuestionnaireDetails: () -> Unit,
     topBar: @Composable () -> Unit = {},
     modifier: Modifier,

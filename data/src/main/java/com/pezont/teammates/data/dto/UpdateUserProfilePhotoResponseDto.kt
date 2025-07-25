@@ -1,7 +1,7 @@
 package com.pezont.teammates.data.dto
 
 import com.google.gson.annotations.SerializedName
-import com.pezont.teammates.domain.model.UpdateUserProfilePhotoResponse
+import com.pezont.teammates.domain.model.response.UpdateUserProfilePhotoResponse
 
 data class UpdateUserProfilePhotoResponseDto(
     @SerializedName("user_id")
