@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.repository.UserDataRepository
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 class UserDataRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
-) :UserDataRepository {
+) : UserDataRepository {
     private companion object {
         val ACCESS_TOKEN = stringPreferencesKey("access_token")
         val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
@@ -26,6 +27,8 @@ class UserDataRepositoryImpl @Inject constructor(
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_DESCRIPTION = stringPreferencesKey("user_description")
         val USER_IMAGE_PATH = stringPreferencesKey("user_image_path")
+        val REFRESH_TOKEN_EXPIRATION_TIME = longPreferencesKey("REFRESH_TOKEN_EXPIRATION_TIME ")
+
         const val TAG = "UserDataRepo"
     }
 
@@ -76,6 +79,18 @@ class UserDataRepositoryImpl @Inject constructor(
             )
         }
 
+    override val refreshTokenExpirationTime: Flow<Long> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                Log.e(TAG, "Error reading preferences.", exception)
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences -> preferences[REFRESH_TOKEN_EXPIRATION_TIME] ?: 0L }
+
+
     override suspend fun saveAccessToken(newAccessToken: String) {
         dataStore.edit { data ->
             Log.i(TAG, "Save accessToken: $newAccessToken")
@@ -118,6 +133,13 @@ class UserDataRepositoryImpl @Inject constructor(
                 Log.i(TAG, "Update imagePath: $imagePath")
                 data[USER_IMAGE_PATH] = it
             }
+        }
+    }
+
+    override suspend fun saveRefreshTokenExpirationTime(refreshTokenExpirationTime: Long) {
+        dataStore.edit { prefs ->
+            Log.i(TAG, "Save futureTimestamp: $refreshTokenExpirationTime")
+            prefs[REFRESH_TOKEN_EXPIRATION_TIME] = refreshTokenExpirationTime
         }
     }
 

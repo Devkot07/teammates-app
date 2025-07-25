@@ -12,5 +12,6 @@ class LogoutUseCase @Inject constructor(
         userDataRepository.saveAccessToken("")
         userDataRepository.saveRefreshToken("")
         userDataRepository.saveUser(User())
+        userDataRepository.saveRefreshTokenExpirationTime(0L)
     }
 }

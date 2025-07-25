@@ -5,6 +5,7 @@ import com.pezont.teammates.domain.model.UpdateTokenRequest
 import com.pezont.teammates.domain.repository.AuthRepository
 import com.pezont.teammates.domain.repository.UserDataRepository
 import kotlinx.coroutines.flow.first
+import java.time.Instant
 import javax.inject.Inject
 
 class UpdateTokensUseCase @Inject constructor(
@@ -18,8 +19,11 @@ class UpdateTokensUseCase @Inject constructor(
 
         val response =
             authRepository.updateTokens(UpdateTokenRequest(publicId, refreshToken)).getOrThrow()
+        val nowTimeInMillis = Instant.now().toEpochMilli()
+        val refreshTokenExpirationTime = nowTimeInMillis + 1000L*60L*60L*24L*100L
 
         userDataRepository.saveAccessToken(response.accessToken)
         userDataRepository.saveRefreshToken(response.refreshToken)
+        userDataRepository.saveRefreshTokenExpirationTime(refreshTokenExpirationTime)
     }
 }
