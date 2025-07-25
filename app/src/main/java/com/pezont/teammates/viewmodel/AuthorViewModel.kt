@@ -45,7 +45,7 @@ class AuthorViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             stateManager.authState.collect { authState ->
-                Log.i(TAG, "AUTH STATE CHANGED: $authState")
+                Log.d(TAG, "AUTH STATE CHANGED: $authState")
                 if (authState == AuthState.AUTHENTICATED) loadLikedAuthors()
             }
         }
@@ -99,7 +99,7 @@ class AuthorViewModel @Inject constructor(
     fun loadLikedAuthors() {
         viewModelScope.launch {
             loadLikedAuthorsUseCase().onSuccess { result ->
-                Log.i(TAG, result.toString())
+                Log.d(TAG, result.toString())
                 stateManager.updateLikedAuthors(result)
             }.onFailure { throwable ->
                 Log.e(TAG, throwable.toString())
@@ -114,7 +114,7 @@ class AuthorViewModel @Inject constructor(
         viewModelScope.launch {
             stateManager.updateContentState(ContentState.LOADING)
             likeAuthorUseCase(likedUserId = likedAuthor.publicId).onSuccess { result ->
-                Log.i(TAG, result.toString())
+                Log.d(TAG, result.toString())
                 val likedAuthors = likedAuthors.value.plus(likedAuthor)
                 stateManager.updateLikedAuthors(likedAuthors = likedAuthors)
                 stateManager.updateContentState(ContentState.LOADED)
@@ -126,7 +126,7 @@ class AuthorViewModel @Inject constructor(
                 )
                 _authorUiEvent.tryEmit(AuthorUiEvent.AuthorSubscribed)
             }.onFailure { throwable ->
-                Log.e(TAG, throwable.toString())
+                Log.d(TAG, throwable.toString())
                 stateManager.updateContentState(ContentState.ERROR)
                 errorHandler.handleError(throwable)
             }
@@ -137,7 +137,7 @@ class AuthorViewModel @Inject constructor(
         viewModelScope.launch {
             stateManager.updateContentState(ContentState.LOADING)
             unlikeAuthorUseCase(unlikedUserId = unlikedAuthor.publicId).onSuccess { result ->
-                Log.i(TAG, result.toString())
+                Log.d(TAG, result.toString())
                 val likedAuthors = likedAuthors.value.minus(unlikedAuthor)
                 stateManager.updateLikedAuthors(likedAuthors = likedAuthors)
                 stateManager.updateContentState(ContentState.LOADED)

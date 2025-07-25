@@ -80,7 +80,7 @@ object AppModule {
                         message.trim().startsWith("{") ||
                         message.trim().startsWith("["))
             ) {
-                Log.i("OkHttp", message)
+                Log.d("OkHttp", message)
             }
         }.apply {
             level = HttpLoggingInterceptor.Level.BODY

@@ -1,6 +1,5 @@
 package com.pezont.teammates.data.repository
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -29,13 +28,11 @@ class UserDataRepositoryImpl @Inject constructor(
         val USER_IMAGE_PATH = stringPreferencesKey("user_image_path")
         val REFRESH_TOKEN_EXPIRATION_TIME = longPreferencesKey("REFRESH_TOKEN_EXPIRATION_TIME ")
 
-        const val TAG = "UserDataRepo"
     }
 
     override val refreshToken: Flow<String> = dataStore.data
         .catch {
             if (it is IOException) {
-                Log.e(TAG, "Error reading preferences.", it)
                 emit(emptyPreferences())
             } else {
                 throw it
@@ -46,7 +43,6 @@ class UserDataRepositoryImpl @Inject constructor(
     override val accessToken: Flow<String> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
-                Log.e(TAG, "Error reading preferences.", exception)
                 emit(emptyPreferences())
             } else {
                 throw exception
@@ -57,7 +53,6 @@ class UserDataRepositoryImpl @Inject constructor(
     override val user: Flow<User> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
-                Log.e(TAG, "Error reading preferences.", exception)
                 emit(emptyPreferences())
             } else {
                 throw exception
@@ -82,7 +77,6 @@ class UserDataRepositoryImpl @Inject constructor(
     override val refreshTokenExpirationTime: Flow<Long> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
-                Log.e(TAG, "Error reading preferences.", exception)
                 emit(emptyPreferences())
             } else {
                 throw exception
@@ -93,14 +87,12 @@ class UserDataRepositoryImpl @Inject constructor(
 
     override suspend fun saveAccessToken(newAccessToken: String) {
         dataStore.edit { data ->
-            Log.i(TAG, "Save accessToken: $newAccessToken")
             data[ACCESS_TOKEN] = newAccessToken
         }
     }
 
     override suspend fun saveRefreshToken(newRefreshToken: String) {
         dataStore.edit { data ->
-            Log.i(TAG, "Save refreshToken: $newRefreshToken")
             data[REFRESH_TOKEN] = newRefreshToken
         }
     }
@@ -122,15 +114,12 @@ class UserDataRepositoryImpl @Inject constructor(
     ) {
         dataStore.edit { data ->
             nickname?.let {
-                Log.i(TAG, "Update nickname: $nickname")
                 data[USER_NICKNAME] = it
             }
             description?.let {
-                Log.i(TAG, "Update description: $description")
                 data[USER_DESCRIPTION] = it
             }
             imagePath?.let {
-                Log.i(TAG, "Update imagePath: $imagePath")
                 data[USER_IMAGE_PATH] = it
             }
         }
@@ -138,7 +127,6 @@ class UserDataRepositoryImpl @Inject constructor(
 
     override suspend fun saveRefreshTokenExpirationTime(refreshTokenExpirationTime: Long) {
         dataStore.edit { prefs ->
-            Log.i(TAG, "Save futureTimestamp: $refreshTokenExpirationTime")
             prefs[REFRESH_TOKEN_EXPIRATION_TIME] = refreshTokenExpirationTime
         }
     }

@@ -103,7 +103,7 @@ class QuestionnairesViewModel @Inject constructor(
         loadQuestionnairesUseCase(
             page = page, game = game, authorId = null
         ).onSuccess { result ->
-            Log.i(TAG, result.toString())
+            Log.d(TAG, result.toString())
             if (page == 1) {
                 stateManager.updateQuestionnaires(result)
             } else {
@@ -120,7 +120,7 @@ class QuestionnairesViewModel @Inject constructor(
     suspend fun loadUserQuestionnaires() {
         stateManager.updateContentState(ContentState.LOADING)
         loadUserQuestionnairesUseCase(game = null).onSuccess { result ->
-            Log.i(TAG, result.toString())
+            Log.d(TAG, result.toString())
             stateManager.updateUserQuestionnaires(result)
             stateManager.updateContentState(ContentState.LOADED)
 
@@ -133,7 +133,7 @@ class QuestionnairesViewModel @Inject constructor(
 
     suspend fun loadLikedQuestionnaires() {
         loadLikedQuestionnairesUseCase().onSuccess { result ->
-            Log.i(TAG, result.toString())
+            Log.d(TAG, result.toString())
             stateManager.updateLikedQuestionnaires(result)
         }.onFailure { throwable ->
             Log.e(TAG, throwable.toString())
@@ -148,7 +148,7 @@ class QuestionnairesViewModel @Inject constructor(
             likeQuestionnaireUseCase(
                 likedQuestionnaireId = likedQuestionnaire.questionnaireId
             ).onSuccess { result ->
-                Log.i(AuthorViewModel.TAG, result.toString())
+                Log.d(AuthorViewModel.TAG, result.toString())
                 val likedQuestionnaires = likedQuestionnaires.value.plus(likedQuestionnaire)
                 stateManager.updateLikedQuestionnaires(likedQuestionnaires = likedQuestionnaires)
                 stateManager.updateContentState(ContentState.LOADED)
@@ -167,7 +167,7 @@ class QuestionnairesViewModel @Inject constructor(
             unlikeQuestionnaireUseCase(
                 unlikedQuestionnaireId = unlikedQuestionnaire.questionnaireId
             ).onSuccess { result ->
-                Log.i(AuthorViewModel.TAG, result.toString())
+                Log.d(AuthorViewModel.TAG, result.toString())
                 val likedQuestionnaires = likedQuestionnaires.value.minus(unlikedQuestionnaire)
                 stateManager.updateLikedQuestionnaires(likedQuestionnaires = likedQuestionnaires)
                 stateManager.updateContentState(ContentState.LOADED)
