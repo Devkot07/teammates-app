@@ -15,27 +15,23 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.components.TeammatesButton
 import com.pezont.teammates.viewmodel.AuthorViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.pezont.teammates.viewmodel.QuestionnairesViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserQuestionnairesScreen(
     authorViewModel: AuthorViewModel,
+    questionnairesViewModel: QuestionnairesViewModel,
     userQuestionnaires: List<Questionnaire>,
-    onRefresh: () -> Unit,
     navigateToQuestionnaireDetails: () -> Unit,
     navigateToQuestionnaireCreate: () -> Unit,
     topBar: @Composable () -> Unit = {},
@@ -46,28 +42,15 @@ fun UserQuestionnairesScreen(
         topBar = topBar
     ) { innerPadding ->
 
-        val isRefreshing = remember { mutableStateOf(false) }
+        val isRefreshing by questionnairesViewModel.isRefreshingUserQuestionnaires.collectAsState()
         val pagerState = rememberPagerState(
             initialPage = 0,
             pageCount = { userQuestionnaires.size + 1 })
 
         PullToRefreshBox(
             modifier = Modifier.padding(innerPadding),
-            isRefreshing = isRefreshing.value,
-            onRefresh = {
-                isRefreshing.value = true
-                CoroutineScope(Dispatchers.IO).launch {
-                    try {
-                        delay(1000L)
-                        onRefresh()
-                    } finally {
-                        withContext(Dispatchers.Main) {
-                            isRefreshing.value = false
-                            pagerState.scrollToPage(0)
-                        }
-                    }
-                }
-            }
+            isRefreshing = isRefreshing,
+            onRefresh = { questionnairesViewModel.refreshUserQuestionnairesScreen() }
         ) {
 
             //TODO contentState

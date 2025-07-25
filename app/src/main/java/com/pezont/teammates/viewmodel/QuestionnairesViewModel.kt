@@ -11,6 +11,7 @@ import com.pezont.teammates.domain.model.ValidationResult
 import com.pezont.teammates.domain.model.enums.AuthState
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.model.enums.Games
+import com.pezont.teammates.domain.state.StateManager
 import com.pezont.teammates.domain.usecase.CreateQuestionnaireUseCase
 import com.pezont.teammates.domain.usecase.LikeQuestionnaireUseCase
 import com.pezont.teammates.domain.usecase.LoadLikedQuestionnairesUseCase
@@ -18,14 +19,17 @@ import com.pezont.teammates.domain.usecase.LoadQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.LoadUserQuestionnairesUseCase
 import com.pezont.teammates.domain.usecase.PrepareImageForUploadUseCase
 import com.pezont.teammates.domain.usecase.UnlikeQuestionnaireUseCase
-import com.pezont.teammates.domain.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import com.pezont.teammates.utils.ErrorHandler
 import com.pezont.teammates.utils.toMessageRes
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -57,6 +61,17 @@ class QuestionnairesViewModel @Inject constructor(
         MutableSharedFlow<QuestionnaireUiEvent>(extraBufferCapacity = 1)
     val questionnaireUiEvent: SharedFlow<QuestionnaireUiEvent> = _questionnaireUiEvent
 
+
+    private val _isRefreshingQuestionnaires = MutableStateFlow(false)
+    val isRefreshingQuestionnaires: StateFlow<Boolean> = _isRefreshingQuestionnaires.asStateFlow()
+
+
+    private val _isRefreshingUserQuestionnaires = MutableStateFlow(false)
+    val isRefreshingUserQuestionnaires: StateFlow<Boolean> = _isRefreshingUserQuestionnaires.asStateFlow()
+
+    private val _isLoadingMoreQuestionnaires = MutableStateFlow(false)
+    private val isLoadingMoreQuestionnaires: StateFlow<Boolean> = _isLoadingMoreQuestionnaires.asStateFlow()
+
     init {
         viewModelScope.launch {
             stateManager.authState.collect { authState ->
@@ -66,38 +81,53 @@ class QuestionnairesViewModel @Inject constructor(
     }
 
 
-    fun loadQuestionnaires(game: Games? = null, page: Int = 1) {
-        viewModelScope.launch {
-            loadQuestionnairesUseCase(
-                page = page, game = game, authorId = null
-            ).onSuccess { result ->
-                Log.i(TAG, result.toString())
-                if (page == 1) {
-                    stateManager.updateQuestionnaires(result)
-                } else {
-                    stateManager.updateQuestionnaires(questionnaires.value + result)
-                }
-            }.onFailure { throwable ->
-                Log.e(TAG, throwable.toString())
-                stateManager.updateContentState(ContentState.ERROR)
-                errorHandler.handleError(throwable)
+
+    fun loadMoreQuestionnaires(currentPage: Int, questionnairesSize: Int) {
+        if (isLoadingMoreQuestionnaires.value) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            _isLoadingMoreQuestionnaires.value = true
+            val newPage = if (questionnairesSize % 10 == 0) {
+                currentPage / 10 + 1
+            } else {
+                currentPage / 10 + 2
             }
+            loadQuestionnaires(page = newPage)
+            _isLoadingMoreQuestionnaires.value = false
         }
     }
 
-    fun loadUserQuestionnaires() {
-        viewModelScope.launch {
-            stateManager.updateContentState(ContentState.LOADING)
-            loadUserQuestionnairesUseCase(game = null).onSuccess { result ->
-                Log.i(TAG, result.toString())
-                stateManager.updateUserQuestionnaires(result)
-                stateManager.updateContentState(ContentState.LOADED)
 
-            }.onFailure { throwable ->
-                Log.e(TAG, throwable.toString())
-                stateManager.updateContentState(ContentState.ERROR)
-                errorHandler.handleError(throwable)
+    private suspend fun loadQuestionnaires(game: Games? = null, page: Int = 1) {
+        loadQuestionnairesUseCase(
+            page = page, game = game, authorId = null
+        ).onSuccess { result ->
+            Log.i(TAG, result.toString())
+            if (page == 1) {
+                stateManager.updateQuestionnaires(result)
+            } else {
+                stateManager.updateQuestionnaires(questionnaires.value + result)
             }
+        }.onFailure { throwable ->
+            Log.e(TAG, throwable.toString())
+            stateManager.updateContentState(ContentState.ERROR)
+            errorHandler.handleError(throwable)
+        }
+
+    }
+
+    suspend fun loadUserQuestionnaires() {
+        stateManager.updateContentState(ContentState.LOADING)
+        loadUserQuestionnairesUseCase(game = null).onSuccess { result ->
+            Log.i(TAG, result.toString())
+            stateManager.updateUserQuestionnaires(result)
+            stateManager.updateContentState(ContentState.LOADED)
+
+        }.onFailure { throwable ->
+            Log.e(TAG, throwable.toString())
+            stateManager.updateContentState(ContentState.ERROR)
+            errorHandler.handleError(throwable)
         }
     }
 
@@ -192,6 +222,22 @@ class QuestionnairesViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun refreshHomeScreen() {
+        viewModelScope.launch {
+            _isRefreshingQuestionnaires.value = true
+            loadQuestionnaires()
+            _isRefreshingQuestionnaires.value = false
+        }
+    }
+
+    fun refreshUserQuestionnairesScreen() {
+        viewModelScope.launch {
+            _isRefreshingUserQuestionnaires.value = true
+            loadUserQuestionnaires()
+            _isRefreshingUserQuestionnaires.value = false
         }
     }
 

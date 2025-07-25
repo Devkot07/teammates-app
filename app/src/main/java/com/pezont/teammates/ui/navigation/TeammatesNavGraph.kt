@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -38,6 +39,7 @@ import com.pezont.teammates.viewmodel.QuestionnaireUiEvent
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
 import com.pezont.teammates.viewmodel.UserUiEvent
 import com.pezont.teammates.viewmodel.UserViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun TeammatesNavGraph(
@@ -50,6 +52,9 @@ fun TeammatesNavGraph(
     userViewModel: UserViewModel,
 ) {
     val context = LocalContext.current
+
+    val coroutineScope = rememberCoroutineScope()
+
 
     val authState by authViewModel.authState.collectAsState()
 
@@ -89,9 +94,11 @@ fun TeammatesNavGraph(
     ObserveAsEvents(questionnairesViewModel.questionnaireUiEvent) { event ->
         when (event) {
             is QuestionnaireUiEvent.QuestionnaireCreated -> {
-                questionnairesViewModel.loadUserQuestionnaires()
-                navController.navigate(Destinations.UserQuestionnaires.route) {
-                    popUpTo(Destinations.Home.route) { inclusive = false }
+                coroutineScope.launch {
+                    questionnairesViewModel.loadUserQuestionnaires()
+                    navController.navigate(Destinations.UserQuestionnaires.route) {
+                        popUpTo(Destinations.Home.route) { inclusive = false }
+                    }
                 }
             }
 
@@ -171,10 +178,8 @@ fun TeammatesNavGraph(
                 authorViewModel = authorViewModel,
                 questionnairesViewModel = questionnairesViewModel,
                 questionnaires = questionnaires,
-                onRefresh = questionnairesViewModel::loadQuestionnaires,
                 navigateToQuestionnaireDetails = {
                     navController.navigate(Destinations.QuestionnaireDetails.route)
-
                 },
                 topBar = {
                     TeammatesTopAppBar(
@@ -242,8 +247,10 @@ fun TeammatesNavGraph(
             onTabChange(BottomNavItem.PROFILE)
             UserProfileScreen(
                 navigateToMyQuestionnaires = {
-                    questionnairesViewModel.loadUserQuestionnaires()
-                    navController.navigate(Destinations.UserQuestionnaires.route)
+                    coroutineScope.launch {
+                        questionnairesViewModel.loadUserQuestionnaires()
+                        navController.navigate(Destinations.UserQuestionnaires.route)
+                    }
                 },
                 navigateToUserProfileEditScreen = {
                     navController.navigate(Destinations.UserProfileEdit.route)
@@ -290,11 +297,11 @@ fun TeammatesNavGraph(
                     onTabChange(BottomNavItem.CREATE)
                 },
                 userQuestionnaires = userQuestionnaires,
-                onRefresh = questionnairesViewModel::loadUserQuestionnaires,
                 navigateToQuestionnaireDetails = {
                     navController.navigate(Destinations.QuestionnaireDetails.route)
                 },
                 authorViewModel = authorViewModel,
+                questionnairesViewModel = questionnairesViewModel,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(Destinations.UserQuestionnaires.titleRes),
