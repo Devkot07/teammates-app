@@ -65,6 +65,8 @@ class QuestionnairesViewModel @Inject constructor(
     private val _isRefreshingQuestionnaires = MutableStateFlow(false)
     val isRefreshingQuestionnaires: StateFlow<Boolean> = _isRefreshingQuestionnaires.asStateFlow()
 
+    private val _isRefreshingLikedQuestionnaires = MutableStateFlow(false)
+    val isRefreshingLikedQuestionnaires: StateFlow<Boolean> = _isRefreshingLikedQuestionnaires.asStateFlow()
 
     private val _isRefreshingUserQuestionnaires = MutableStateFlow(false)
     val isRefreshingUserQuestionnaires: StateFlow<Boolean> = _isRefreshingUserQuestionnaires.asStateFlow()
@@ -75,26 +77,11 @@ class QuestionnairesViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             stateManager.authState.collect { authState ->
-                if (authState == AuthState.AUTHENTICATED) loadLikedQuestionnaires()
+                if (authState == AuthState.AUTHENTICATED) {
+                    loadLikedQuestionnaires()
+                    loadUserQuestionnaires()
+                }
             }
-        }
-    }
-
-
-
-    fun loadMoreQuestionnaires(currentPage: Int, questionnairesSize: Int) {
-        if (isLoadingMoreQuestionnaires.value) return
-
-        viewModelScope.launch(Dispatchers.IO) {
-
-            _isLoadingMoreQuestionnaires.value = true
-            val newPage = if (questionnairesSize % 10 == 0) {
-                currentPage / 10 + 1
-            } else {
-                currentPage / 10 + 2
-            }
-            loadQuestionnaires(page = newPage)
-            _isLoadingMoreQuestionnaires.value = false
         }
     }
 
@@ -117,6 +104,22 @@ class QuestionnairesViewModel @Inject constructor(
 
     }
 
+    fun loadMoreQuestionnaires(currentPage: Int, questionnairesSize: Int) {
+        if (isLoadingMoreQuestionnaires.value) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            _isLoadingMoreQuestionnaires.value = true
+            val newPage = if (questionnairesSize % 10 == 0) {
+                currentPage / 10 + 1
+            } else {
+                currentPage / 10 + 2
+            }
+            loadQuestionnaires(page = newPage)
+            _isLoadingMoreQuestionnaires.value = false
+        }
+    }
+
     suspend fun loadUserQuestionnaires() {
         stateManager.updateContentState(ContentState.LOADING)
         loadUserQuestionnairesUseCase(game = null).onSuccess { result ->
@@ -131,7 +134,7 @@ class QuestionnairesViewModel @Inject constructor(
         }
     }
 
-    suspend fun loadLikedQuestionnaires() {
+    private suspend fun loadLikedQuestionnaires() {
         loadLikedQuestionnairesUseCase().onSuccess { result ->
             Log.d(TAG, result.toString())
             stateManager.updateLikedQuestionnaires(result)
@@ -238,6 +241,14 @@ class QuestionnairesViewModel @Inject constructor(
             _isRefreshingUserQuestionnaires.value = true
             loadUserQuestionnaires()
             _isRefreshingUserQuestionnaires.value = false
+        }
+    }
+
+    fun refreshLikedQuestionnairesScreen() {
+        viewModelScope.launch {
+            _isRefreshingLikedQuestionnaires.value = true
+            loadLikedQuestionnaires()
+            _isRefreshingLikedQuestionnaires.value = false
         }
     }
 

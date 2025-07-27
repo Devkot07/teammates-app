@@ -247,9 +247,9 @@ fun TeammatesNavGraph(
             onTabChange(BottomNavItem.PROFILE)
             UserProfileScreen(
                 navigateToMyQuestionnaires = {
+                    navController.navigate(Destinations.UserQuestionnaires.route)
                     coroutineScope.launch {
                         questionnairesViewModel.loadUserQuestionnaires()
-                        navController.navigate(Destinations.UserQuestionnaires.route)
                     }
                 },
                 navigateToUserProfileEditScreen = {
