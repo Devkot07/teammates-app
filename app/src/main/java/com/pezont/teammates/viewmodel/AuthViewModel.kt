@@ -84,7 +84,7 @@ class AuthViewModel @Inject constructor(
             logoutUseCase().onSuccess {
                 stateManager.updateUser(User())
                 stateManager.updateAuthState(AuthState.UNAUTHENTICATED)
-                stateManager.updateContentState(ContentState.INITIAL)
+                stateManager.updateContentsState(ContentState.INITIAL)
                 stateManager.updateQuestionnaires(emptyList())
                 stateManager.updateLikedQuestionnaires(emptyList())
                 stateManager.updateUserQuestionnaires(emptyList())

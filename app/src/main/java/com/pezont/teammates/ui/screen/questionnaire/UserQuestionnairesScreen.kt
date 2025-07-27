@@ -21,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.domain.model.enums.ContentState
+import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.components.TeammatesButton
 import com.pezont.teammates.viewmodel.AuthorViewModel
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
@@ -52,21 +54,21 @@ fun UserQuestionnairesScreen(
             isRefreshing = isRefreshing,
             onRefresh = { questionnairesViewModel.refreshUserQuestionnairesScreen() }
         ) {
+            when (questionnairesViewModel.userQuestionnairesState.collectAsState().value) {
+                ContentState.LOADED ->
+                    QuestionnairesVerticalPager(
+                        questionnaires = userQuestionnaires,
+                        pagerState = pagerState,
+                        navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
+                        authorViewModel = authorViewModel,
+                        lastItem = { CreateButton(navigateToQuestionnaireCreate) },
+                        modifier = Modifier.fillMaxSize()
+                    )
 
-            //TODO contentState
-            QuestionnairesVerticalPager(
-                questionnaires = userQuestionnaires,
-                pagerState = pagerState,
-                navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
-                authorViewModel = authorViewModel,
-                lastItem = { CreateButton(navigateToQuestionnaireCreate) },
-                modifier = Modifier.fillMaxSize()
-            )
+                ContentState.LOADING, ContentState.INITIAL, ContentState.ERROR -> LoadingItemWithText()
+            }
         }
-
     }
-
-
 }
 
 @Composable

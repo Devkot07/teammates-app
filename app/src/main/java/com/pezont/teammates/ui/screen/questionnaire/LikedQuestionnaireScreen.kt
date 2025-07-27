@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.Questionnaire
+import com.pezont.teammates.domain.model.enums.ContentState
+import com.pezont.teammates.ui.components.LoadingItemWithText
 import com.pezont.teammates.ui.components.TeammatesTextItem
 import com.pezont.teammates.viewmodel.AuthorViewModel
 import com.pezont.teammates.viewmodel.QuestionnairesViewModel
@@ -41,31 +43,37 @@ fun LikedQuestionnairesScreen(
             likedQuestionnaires.size + 1
         }
 
-        //TODO content state
-        //TODO move to viewModel
         PullToRefreshBox(
             modifier = Modifier.padding(paddingValues),
             isRefreshing = isRefreshing,
             onRefresh = { questionnairesViewModel.refreshLikedQuestionnairesScreen() }
         ) {
-            QuestionnairesVerticalPager(
-                questionnaires = likedQuestionnaires,
-                pagerState = pagerState,
-                navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
-                authorViewModel = authorViewModel,
-                lastItem = {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        when {
-                            likedQuestionnaires.isEmpty() -> TeammatesTextItem(stringResource(R.string.you_haven_t_liked_any_questionnaire))
-                            else -> TeammatesTextItem(stringResource(R.string.end))
-                        }
-                    }
-                },
-                modifier = Modifier.fillMaxSize()
-            )
+            when (questionnairesViewModel.likedQuestionnairesState.collectAsState().value) {
+                ContentState.LOADED ->
+                    QuestionnairesVerticalPager(
+                        questionnaires = likedQuestionnaires,
+                        pagerState = pagerState,
+                        navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
+                        authorViewModel = authorViewModel,
+                        lastItem = {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                when {
+                                    likedQuestionnaires.isEmpty() -> TeammatesTextItem(
+                                        stringResource(R.string.you_haven_t_liked_any_questionnaire)
+                                    )
+
+                                    else -> TeammatesTextItem(stringResource(R.string.end))
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    )
+
+                ContentState.LOADING, ContentState.INITIAL, ContentState.ERROR -> LoadingItemWithText()
+            }
         }
     }
 }

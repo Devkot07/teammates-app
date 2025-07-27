@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
@@ -19,7 +20,6 @@ fun AuthorProfileScreen(
     authorQuestionnaires: List<Questionnaire>,
     likedAuthors: List<User>,
     authorViewModel: AuthorViewModel,
-    contentState: ContentState,
     navigateToQuestionnaireDetails: () -> Unit,
     topBar: @Composable () -> Unit = {},
     modifier: Modifier,
@@ -33,23 +33,24 @@ fun AuthorProfileScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (contentState == ContentState.LOADING)
-                LoadingItemWithText()
-            else {
-                AuthorProfileItem(
-                    author = author,
-                    authorQuestionnaires = authorQuestionnaires,
-                    isLiked = isLiked,
-                    updateSelectedQuestionnaire = authorViewModel::updateSelectedQuestionnaire,
-                    navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
-                    action = { user ->
-                        if (isLiked) {
-                            authorViewModel.unlikeAuthor(user)
-                        } else {
-                            authorViewModel.likeAuthor(user)
+            when (authorViewModel.authorState.collectAsState().value) {
+                ContentState.LOADED, ContentState.INITIAL ->
+                    AuthorProfileItem(
+                        author = author,
+                        authorQuestionnaires = authorQuestionnaires,
+                        isLiked = isLiked,
+                        updateSelectedQuestionnaire = authorViewModel::updateSelectedQuestionnaire,
+                        navigateToQuestionnaireDetails = navigateToQuestionnaireDetails,
+                        action = { user ->
+                            if (isLiked) {
+                                authorViewModel.unlikeAuthor(user)
+                            } else {
+                                authorViewModel.likeAuthor(user)
+                            }
                         }
-                    }
-                )
+                    )
+
+                ContentState.LOADING, ContentState.ERROR -> LoadingItemWithText()
             }
         }
     }

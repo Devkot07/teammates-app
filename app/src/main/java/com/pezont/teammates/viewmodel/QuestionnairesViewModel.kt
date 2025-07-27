@@ -57,6 +57,15 @@ class QuestionnairesViewModel @Inject constructor(
     val userQuestionnaires = stateManager.userQuestionnaires
 
 
+    val likedQuestionnairesState = stateManager.likedQuestionnairesState
+    val userQuestionnairesState = stateManager.userQuestionnairesState
+    val newQuestionnaireState = stateManager.newQuestionnaireState
+
+
+    val selectedQuestionnaireState = stateManager.selectedQuestionnaireState
+    val authorState = stateManager.authorState
+
+
     private val _questionnaireUiEvent =
         MutableSharedFlow<QuestionnaireUiEvent>(extraBufferCapacity = 1)
     val questionnaireUiEvent: SharedFlow<QuestionnaireUiEvent> = _questionnaireUiEvent
@@ -98,7 +107,6 @@ class QuestionnairesViewModel @Inject constructor(
             }
         }.onFailure { throwable ->
             Log.e(TAG, throwable.toString())
-            stateManager.updateContentState(ContentState.ERROR)
             errorHandler.handleError(throwable)
         }
 
@@ -121,15 +129,15 @@ class QuestionnairesViewModel @Inject constructor(
     }
 
     suspend fun loadUserQuestionnaires() {
-        stateManager.updateContentState(ContentState.LOADING)
+        stateManager.updateUserQuestionnairesState(ContentState.LOADING)
         loadUserQuestionnairesUseCase(game = null).onSuccess { result ->
             Log.d(TAG, result.toString())
             stateManager.updateUserQuestionnaires(result)
-            stateManager.updateContentState(ContentState.LOADED)
+            stateManager.updateUserQuestionnairesState(ContentState.LOADED)
 
         }.onFailure { throwable ->
             Log.e(TAG, throwable.toString())
-            stateManager.updateContentState(ContentState.ERROR)
+            stateManager.updateUserQuestionnairesState(ContentState.ERROR)
             errorHandler.handleError(throwable)
         }
     }
@@ -138,27 +146,28 @@ class QuestionnairesViewModel @Inject constructor(
         loadLikedQuestionnairesUseCase().onSuccess { result ->
             Log.d(TAG, result.toString())
             stateManager.updateLikedQuestionnaires(result)
+            stateManager.updateLikedQuestionnairesState(ContentState.LOADED)
         }.onFailure { throwable ->
             Log.e(TAG, throwable.toString())
-            stateManager.updateContentState(ContentState.ERROR)
+            stateManager.updateLikedQuestionnairesState(ContentState.ERROR)
             errorHandler.handleError(throwable)
         }
     }
 
     fun likeQuestionnaire(likedQuestionnaire: Questionnaire) {
         viewModelScope.launch {
-            stateManager.updateContentState(ContentState.LOADING)
+            stateManager.updateSelectedQuestionnaireState(ContentState.LOADING)
             likeQuestionnaireUseCase(
                 likedQuestionnaireId = likedQuestionnaire.questionnaireId
             ).onSuccess { result ->
-                Log.d(AuthorViewModel.TAG, result.toString())
+                Log.d(TAG, result.toString())
                 val likedQuestionnaires = likedQuestionnaires.value.plus(likedQuestionnaire)
                 stateManager.updateLikedQuestionnaires(likedQuestionnaires = likedQuestionnaires)
-                stateManager.updateContentState(ContentState.LOADED)
+                stateManager.updateSelectedQuestionnaireState(ContentState.LOADED)
                 _questionnaireUiEvent.tryEmit(QuestionnaireUiEvent.QuestionnaireLiked)
             }.onFailure { throwable ->
-                Log.e(AuthorViewModel.TAG, throwable.toString())
-                stateManager.updateContentState(ContentState.ERROR)
+                Log.e(TAG, throwable.toString())
+                stateManager.updateSelectedQuestionnaireState(ContentState.ERROR)
                 errorHandler.handleError(throwable)
             }
         }
@@ -166,18 +175,18 @@ class QuestionnairesViewModel @Inject constructor(
 
     fun unlikeQuestionnaire(unlikedQuestionnaire: Questionnaire) {
         viewModelScope.launch {
-            stateManager.updateContentState(ContentState.LOADING)
+            stateManager.updateSelectedQuestionnaireState(ContentState.LOADING)
             unlikeQuestionnaireUseCase(
                 unlikedQuestionnaireId = unlikedQuestionnaire.questionnaireId
             ).onSuccess { result ->
-                Log.d(AuthorViewModel.TAG, result.toString())
+                Log.d(TAG, result.toString())
                 val likedQuestionnaires = likedQuestionnaires.value.minus(unlikedQuestionnaire)
                 stateManager.updateLikedQuestionnaires(likedQuestionnaires = likedQuestionnaires)
-                stateManager.updateContentState(ContentState.LOADED)
+                stateManager.updateSelectedQuestionnaireState(ContentState.LOADED)
                 _questionnaireUiEvent.tryEmit(QuestionnaireUiEvent.QuestionnaireUnliked)
             }.onFailure { throwable ->
-                Log.e(AuthorViewModel.TAG, throwable.toString())
-                stateManager.updateContentState(ContentState.ERROR)
+                Log.e(TAG, throwable.toString())
+                stateManager.updateSelectedQuestionnaireState(ContentState.ERROR)
                 errorHandler.handleError(throwable)
             }
         }
@@ -207,19 +216,19 @@ class QuestionnairesViewModel @Inject constructor(
                 }
 
                 ValidationResult.Success -> {
-                    stateManager.updateContentState(ContentState.LOADING)
+                    stateManager.updateNewQuestionnaireState(ContentState.LOADING)
                     createNewQuestionnaireUseCase(
                         header = header,
                         selectedGame = selectedGame!!,
                         description = description,
                         image = prepareImageForUploadUseCase(uri, context)
                     ).onSuccess {
-                        stateManager.updateContentState(ContentState.LOADED)
+                        stateManager.updateNewQuestionnaireState(ContentState.LOADED)
                         SnackbarController.sendEvent(SnackbarEvent(R.string.questionnaire_created_successfully))
                         _questionnaireUiEvent.tryEmit(QuestionnaireUiEvent.QuestionnaireCreated)
                         onSuccess()
                     }.onFailure { throwable ->
-                        stateManager.updateContentState(ContentState.ERROR)
+                        stateManager.updateNewQuestionnaireState(ContentState.ERROR)
                         errorHandler.handleError(throwable)
                         onError()
                     }
