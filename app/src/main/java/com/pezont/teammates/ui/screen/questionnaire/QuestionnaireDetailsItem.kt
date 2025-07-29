@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -35,13 +36,12 @@ import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.ui.components.LikeButton
-import com.pezont.teammates.ui.components.LoadingItemWithText
 
 @Composable
 fun QuestionnaireDetailsItem(
     questionnaire: Questionnaire,
     authorNickname: String,
-    contentState: ContentState,
+    authorState: ContentState,
     isLiked: Boolean,
     likeAction: (Questionnaire) -> Unit,
     navigateToAuthorProfile: () -> Unit,
@@ -52,73 +52,71 @@ fun QuestionnaireDetailsItem(
     val fixedImagePath = questionnaire.imagePath.replace("http://localhost:8000", baseUrl)
     var imageLoadingError by remember { mutableStateOf(false) }
 
-    if (contentState == ContentState.LOADING)
-        LoadingItemWithText()
-    else {
-        Scaffold(
-            floatingActionButton = {
-                LikeButton(
-                    modifier = modifier
-                        .wrapContentHeight()
-                        .background(Color.Transparent),
-                    likeButtonState = isLiked,
-                ) { likeAction(questionnaire) }
-            }
-        ) { paddingValues ->
 
-            Box(
+    Scaffold(
+        floatingActionButton = {
+            LikeButton(
                 modifier = modifier
+                    .wrapContentHeight()
+                    .background(Color.Transparent),
+                likeButtonState = isLiked,
+            ) { likeAction(questionnaire) }
+        }
+    ) { paddingValues ->
+
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Column(
+                modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
             ) {
+                if (questionnaire.imagePath.isNotEmpty() && !imageLoadingError) {
+                    QuestionnaireImageItem(
+                        questionnaire = questionnaire,
+                        imagePath = fixedImagePath,
+                        authorNickname = authorNickname,
+                        authorState = authorState,
+                        navigateToAuthorProfile = navigateToAuthorProfile,
+                        onError = { imageLoadingError = true }
+                    )
+                } else {
+                    Row {
+                        Text(
+
+                            text = questionnaire.game,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .zIndex(1f)
+                        )
+                        Spacer(Modifier.weight(1f))
+                        AuthorNickname(authorState, authorNickname, navigateToAuthorProfile)
+                    }
+                }
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
+                        .background(Color.Transparent)
+                        .padding(16.dp)
                 ) {
-                    if (questionnaire.imagePath.isNotEmpty() && !imageLoadingError) {
-                        QuestionnaireImageItem(
-                            questionnaire = questionnaire,
-                            imagePath = fixedImagePath,
-                            authorNickname = authorNickname,
-                            navigateToAuthorProfile = navigateToAuthorProfile,
-                            onError = { imageLoadingError = true }
-                        )
-                    } else {
-                        Row {
-                            Text(
-
-                                text = questionnaire.game,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = Color.White,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .zIndex(1f)
-                            )
-                            Spacer(Modifier.weight(1f))
-                            AuthorNickname(authorNickname, navigateToAuthorProfile)
-                        }
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Transparent)
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = questionnaire.header,
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = questionnaire.description,
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
+                    Text(
+                        text = questionnaire.header,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = questionnaire.description,
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
@@ -130,6 +128,7 @@ fun QuestionnaireImageItem(
     questionnaire: Questionnaire,
     imagePath: String,
     authorNickname: String,
+    authorState: ContentState,
     navigateToAuthorProfile: () -> Unit,
     onError: () -> Unit,
 ) {
@@ -175,20 +174,30 @@ fun QuestionnaireImageItem(
                     .zIndex(1f)
             )
             Spacer(Modifier.weight(1f))
-            AuthorNickname(authorNickname, navigateToAuthorProfile)
+            AuthorNickname(authorState, authorNickname, navigateToAuthorProfile)
         }
     }
 }
 
 @Composable
-fun AuthorNickname(authorNickname: String, action: () -> Unit) {
-    Text(
-        text = authorNickname,
-        style = MaterialTheme.typography.bodyLarge,
-        color = Color.White,
-        modifier = Modifier
-            .padding(16.dp)
-            .zIndex(1f)
-            .clickable { action() }
-    )
+fun AuthorNickname(authorState: ContentState, authorNickname: String, action: () -> Unit) {
+    when (authorState) {
+        ContentState.LOADED -> Text(
+            text = authorNickname,
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.White,
+            modifier = Modifier
+                .padding(16.dp)
+                .zIndex(1f)
+                .clickable { action() }
+        )
+
+        else -> CircularProgressIndicator(
+            strokeWidth = 2.dp,
+            modifier = Modifier
+                .padding(16.dp)
+                .size(20.dp)
+        )
+    }
+
 }

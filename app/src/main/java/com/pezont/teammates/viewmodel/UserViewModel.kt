@@ -7,9 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.ValidationResult
 import com.pezont.teammates.domain.model.enums.ContentState
+import com.pezont.teammates.domain.state.StateManager
 import com.pezont.teammates.domain.usecase.PrepareImageForUploadUseCase
 import com.pezont.teammates.domain.usecase.UpdateUserProfileUseCase
- import com.pezont.teammates.domain.state.StateManager
 import com.pezont.teammates.ui.snackbar.SnackbarController
 import com.pezont.teammates.ui.snackbar.SnackbarEvent
 import com.pezont.teammates.utils.ErrorHandler
@@ -37,7 +37,7 @@ class UserViewModel @Inject constructor(
 
     val user = stateManager.user
 
-    val contentState = stateManager.contentState
+    val userProfileInfoState = stateManager.userProfileInfoState
 
 
     private val _userUiEvent = MutableSharedFlow<UserUiEvent>(extraBufferCapacity = 1)
@@ -61,7 +61,7 @@ class UserViewModel @Inject constructor(
                 }
 
                 ValidationResult.Success -> {
-                    stateManager.updateContentState(ContentState.LOADING)
+                    stateManager.updateUserProfileInfoState(ContentState.LOADING)
                     updateUserProfileUseCase(
                         nickname = nickname,
                         description = description
@@ -79,10 +79,10 @@ class UserViewModel @Inject constructor(
                                             imagePath = newImagePath.imagePath
                                         )
                                     )
-                                    stateManager.updateContentState(ContentState.LOADED)
+                                    stateManager.updateUserProfileInfoState(ContentState.LOADED)
                                     SnackbarController.sendEvent(SnackbarEvent(R.string.photo_update))
                                 }.onFailure { throwable ->
-                                    stateManager.updateContentState(ContentState.ERROR)
+                                    stateManager.updateUserProfileInfoState(ContentState.ERROR)
                                     errorHandler.handleError(throwable)
                                     return@onFailure
                                 }
@@ -95,14 +95,14 @@ class UserViewModel @Inject constructor(
                                     imagePath = user.imagePath
                                 )
                             )
-                            stateManager.updateContentState(ContentState.LOADED)
+                            stateManager.updateUserProfileInfoState(ContentState.LOADED)
 
                             SnackbarController.sendEvent(SnackbarEvent(R.string.information_update_successfully))
                         }
                         _userUiEvent.tryEmit(UserUiEvent.UserProfileUpdated)
                         onSuccess()
                     }.onFailure { throwable ->
-                        stateManager.updateContentState(ContentState.ERROR)
+                        stateManager.updateUserProfileInfoState(ContentState.ERROR)
                         errorHandler.handleError(throwable)
                     }
                 }

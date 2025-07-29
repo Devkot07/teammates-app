@@ -152,9 +152,9 @@ fun TeammatesApp() {
         TeammatesNavGraph(
             onTabChange = { currentTab = it },
             navController = navController,
-            authorViewModel = authorViewModel,
             authViewModel = authViewModel,
             questionnairesViewModel = questionnairesViewModel,
+            authorViewModel = authorViewModel,
             userViewModel = userViewModel,
 
             paddingValues = paddingValues,

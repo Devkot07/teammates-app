@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +61,6 @@ import com.pezont.teammates.viewmodel.QuestionnairesViewModel
 @Composable
 fun QuestionnaireCreateScreen(
     modifier: Modifier = Modifier,
-    contentState: ContentState,
     questionnairesViewModel: QuestionnairesViewModel,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {}
@@ -85,10 +85,9 @@ fun QuestionnaireCreateScreen(
     ) { innerPadding ->
 
 
-        if (contentState == ContentState.LOADING) {
-            LoadingItemWithText()
-        } else {
-            Column(
+        when (questionnairesViewModel.newQuestionnaireState.collectAsState().value)  {
+            ContentState.LOADED, ContentState.INITIAL ->
+                Column(
                 modifier = modifier
                     .verticalScroll(rememberScrollState())
                     .fillMaxSize()
@@ -242,6 +241,7 @@ fun QuestionnaireCreateScreen(
                     )
                 }
             }
+            ContentState.LOADING, ContentState.ERROR -> LoadingItemWithText()
         }
     }
 }

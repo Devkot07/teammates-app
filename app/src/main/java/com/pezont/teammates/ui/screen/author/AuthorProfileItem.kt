@@ -104,7 +104,6 @@ fun AuthorProfileItem(
                 )
             }
 
-            //TODO contentState
             if (!isLiked) {
                 TeammatesButton(
                     onClick = { action(author) },

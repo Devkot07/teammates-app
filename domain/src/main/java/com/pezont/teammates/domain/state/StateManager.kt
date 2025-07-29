@@ -17,8 +17,29 @@ class StateManager @Inject constructor() {
     private val _authState = MutableStateFlow(AuthState.INITIAL)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
-    private val _contentState = MutableStateFlow(ContentState.INITIAL)
-    val contentState: StateFlow<ContentState> = _contentState.asStateFlow()
+
+    private val _likedQuestionnairesState = MutableStateFlow(ContentState.INITIAL)
+    val likedQuestionnairesState: StateFlow<ContentState> = _likedQuestionnairesState.asStateFlow()
+
+    private val _likedAuthorsState = MutableStateFlow(ContentState.INITIAL)
+    val likedAuthorsState: StateFlow<ContentState> = _likedAuthorsState.asStateFlow()
+
+    private val _userQuestionnairesState = MutableStateFlow(ContentState.INITIAL)
+    val userQuestionnairesState: StateFlow<ContentState> = _userQuestionnairesState.asStateFlow()
+
+    private val _selectedQuestionnaireState = MutableStateFlow(ContentState.INITIAL)
+    val selectedQuestionnaireState: StateFlow<ContentState> =
+        _selectedQuestionnaireState.asStateFlow()
+
+    private val _authorState = MutableStateFlow(ContentState.INITIAL)
+    val authorState: StateFlow<ContentState> = _authorState.asStateFlow()
+
+    private val _userProfileInfoState = MutableStateFlow(ContentState.INITIAL)
+    val userProfileInfoState: StateFlow<ContentState> = _userProfileInfoState.asStateFlow()
+
+    private val _newQuestionnaireState = MutableStateFlow(ContentState.INITIAL)
+    val newQuestionnaireState: StateFlow<ContentState> = _newQuestionnaireState.asStateFlow()
+
 
     private val _user = MutableStateFlow(User())
     val user: StateFlow<User> = _user.asStateFlow()
@@ -44,25 +65,13 @@ class StateManager @Inject constructor() {
     val selectedQuestionnaire: StateFlow<Questionnaire> = _selectedQuestionnaire.asStateFlow()
 
     private val _selectedAuthorQuestionnaires = MutableStateFlow<List<Questionnaire>>(emptyList())
-    val selectedAuthorQuestionnaires: StateFlow<List<Questionnaire>> = _selectedAuthorQuestionnaires.asStateFlow()
+    val selectedAuthorQuestionnaires: StateFlow<List<Questionnaire>> =
+        _selectedAuthorQuestionnaires.asStateFlow()
 
-
-
-
-
-
-    fun updateAuthState(authState: AuthState) {
-        _authState.value = authState
-    }
-
-    fun updateContentState(contentState: ContentState) {
-        _contentState.value = contentState
-    }
 
     fun updateUser(user: User) {
         _user.value = user
     }
-
     fun updateQuestionnaires(questionnaires: List<Questionnaire>) {
         _questionnaires.value = questionnaires
     }
@@ -72,20 +81,53 @@ class StateManager @Inject constructor() {
     fun updateUserQuestionnaires(userQuestionnaires: List<Questionnaire>) {
         _userQuestionnaires.value = userQuestionnaires
     }
-
     fun updateSelectedAuthor(selectedAuthor: User) {
         _selectedAuthor.value = selectedAuthor
     }
-
     fun updateSelectedQuestionnaire(selectedQuestionnaire: Questionnaire) {
         _selectedQuestionnaire.value = selectedQuestionnaire
     }
     fun updateSelectedAuthorQuestionnaires(selectedAuthorQuestionnaires: List<Questionnaire>) {
         _selectedAuthorQuestionnaires.value = selectedAuthorQuestionnaires
     }
-
     fun updateLikedAuthors(likedAuthors: List<User>) {
         _likedAuthors.value = likedAuthors
+    }
+
+
+    fun updateAuthState(authState: AuthState) {
+        _authState.value = authState
+    }
+    fun updateLikedQuestionnairesState(contentState: ContentState) {
+        _likedQuestionnairesState.value = contentState
+    }
+    fun updateLikedAuthorsState(contentState: ContentState) {
+        _likedAuthorsState.value = contentState
+    }
+    fun updateUserQuestionnairesState(contentState: ContentState) {
+        _userQuestionnairesState.value = contentState
+    }
+    fun updateSelectedQuestionnaireState(contentState: ContentState) {
+        _selectedQuestionnaireState.value = contentState
+    }
+    fun updateAuthorState(contentState: ContentState) {
+        _authorState.value = contentState
+    }
+    fun updateUserProfileInfoState(contentState: ContentState) {
+        _userProfileInfoState.value = contentState
+    }
+    fun updateNewQuestionnaireState(contentState: ContentState) {
+        _newQuestionnaireState.value = contentState
+    }
+
+    fun updateContentsState(contentState: ContentState) {
+        updateLikedQuestionnairesState(contentState)
+        updateLikedAuthorsState(contentState)
+        updateUserQuestionnairesState(contentState)
+        updateSelectedQuestionnaireState(contentState)
+        updateAuthorState(contentState)
+        updateUserProfileInfoState(contentState)
+        updateNewQuestionnaireState(contentState)
     }
 
 }

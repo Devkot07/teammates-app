@@ -61,10 +61,12 @@ class AuthorViewModel @Inject constructor(
 
     val likedAuthors = stateManager.likedAuthors
 
+    val authorState = stateManager.authorState
+
     fun loadAuthor(authorId: String) {
         if (selectedAuthor.value.publicId != authorId) {
             viewModelScope.launch {
-                stateManager.updateContentState(ContentState.LOADING)
+                stateManager.updateAuthorState(ContentState.LOADING)
                 stateManager.updateSelectedAuthor(User())
                 loadAuthorProfileUseCase(authorId).onSuccess { author ->
 
@@ -77,15 +79,15 @@ class AuthorViewModel @Inject constructor(
                     ).onSuccess { authorQuestionnaires ->
 
                         stateManager.updateSelectedAuthorQuestionnaires(authorQuestionnaires)
-                        stateManager.updateContentState(ContentState.LOADED)
+                        stateManager.updateAuthorState(ContentState.LOADED)
 
                     }.onFailure { throwable ->
 
-                        stateManager.updateContentState(ContentState.ERROR)
+                        stateManager.updateAuthorState(ContentState.ERROR)
                         errorHandler.handleError(throwable)
                     }
                 }.onFailure { throwable ->
-                    stateManager.updateContentState(ContentState.ERROR)
+                    stateManager.updateAuthorState(ContentState.ERROR)
                     errorHandler.handleError(throwable)
                 }
             }
@@ -96,14 +98,15 @@ class AuthorViewModel @Inject constructor(
         stateManager.updateSelectedQuestionnaire(questionnaire)
     }
 
-    fun loadLikedAuthors() {
+    private fun loadLikedAuthors() {
         viewModelScope.launch {
+            stateManager.updateLikedAuthorsState(ContentState.LOADING)
             loadLikedAuthorsUseCase().onSuccess { result ->
                 Log.d(TAG, result.toString())
                 stateManager.updateLikedAuthors(result)
             }.onFailure { throwable ->
                 Log.e(TAG, throwable.toString())
-                stateManager.updateContentState(ContentState.ERROR)
+                stateManager.updateLikedAuthorsState(ContentState.ERROR)
                 errorHandler.handleError(throwable)
             }
         }
@@ -112,12 +115,12 @@ class AuthorViewModel @Inject constructor(
 
     fun likeAuthor(likedAuthor: User) {
         viewModelScope.launch {
-            stateManager.updateContentState(ContentState.LOADING)
+            stateManager.updateAuthorState(ContentState.LOADING)
             likeAuthorUseCase(likedUserId = likedAuthor.publicId).onSuccess { result ->
                 Log.d(TAG, result.toString())
                 val likedAuthors = likedAuthors.value.plus(likedAuthor)
                 stateManager.updateLikedAuthors(likedAuthors = likedAuthors)
-                stateManager.updateContentState(ContentState.LOADED)
+                stateManager.updateAuthorState(ContentState.LOADED)
                 SnackbarController.sendEvent(
                     SnackbarEvent(
                         R.string.you_subscribe,
@@ -127,7 +130,7 @@ class AuthorViewModel @Inject constructor(
                 _authorUiEvent.tryEmit(AuthorUiEvent.AuthorSubscribed)
             }.onFailure { throwable ->
                 Log.d(TAG, throwable.toString())
-                stateManager.updateContentState(ContentState.ERROR)
+                stateManager.updateAuthorState(ContentState.ERROR)
                 errorHandler.handleError(throwable)
             }
         }
@@ -135,12 +138,12 @@ class AuthorViewModel @Inject constructor(
 
     fun unlikeAuthor(unlikedAuthor: User) {
         viewModelScope.launch {
-            stateManager.updateContentState(ContentState.LOADING)
+            stateManager.updateAuthorState(ContentState.LOADING)
             unlikeAuthorUseCase(unlikedUserId = unlikedAuthor.publicId).onSuccess { result ->
                 Log.d(TAG, result.toString())
                 val likedAuthors = likedAuthors.value.minus(unlikedAuthor)
                 stateManager.updateLikedAuthors(likedAuthors = likedAuthors)
-                stateManager.updateContentState(ContentState.LOADED)
+                stateManager.updateAuthorState(ContentState.LOADED)
                 SnackbarController.sendEvent(
                     SnackbarEvent(
                         R.string.you_unsubscribe,
@@ -150,7 +153,7 @@ class AuthorViewModel @Inject constructor(
                 _authorUiEvent.tryEmit(AuthorUiEvent.AuthorUnsubscribed)
             }.onFailure { throwable ->
                 Log.e(TAG, throwable.toString())
-                stateManager.updateContentState(ContentState.ERROR)
+                stateManager.updateAuthorState(ContentState.ERROR)
                 errorHandler.handleError(throwable)
             }
         }

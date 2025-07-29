@@ -45,10 +45,10 @@ import kotlinx.coroutines.launch
 fun TeammatesNavGraph(
     onTabChange: (BottomNavItem) -> Unit,
     navController: NavHostController,
-    authorViewModel: AuthorViewModel,
     paddingValues: PaddingValues,
     authViewModel: AuthViewModel,
     questionnairesViewModel: QuestionnairesViewModel,
+    authorViewModel: AuthorViewModel,
     userViewModel: UserViewModel,
 ) {
     val context = LocalContext.current
@@ -57,8 +57,6 @@ fun TeammatesNavGraph(
 
 
     val authState by authViewModel.authState.collectAsState()
-
-    val contentState by userViewModel.contentState.collectAsState()
 
     val user by userViewModel.user.collectAsState()
 
@@ -227,7 +225,6 @@ fun TeammatesNavGraph(
             onTabChange(BottomNavItem.CREATE)
             QuestionnaireCreateScreen(
                 questionnairesViewModel = questionnairesViewModel,
-                contentState = contentState,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(Destinations.QuestionnaireCreate.titleRes),
@@ -247,9 +244,9 @@ fun TeammatesNavGraph(
             onTabChange(BottomNavItem.PROFILE)
             UserProfileScreen(
                 navigateToMyQuestionnaires = {
+                    navController.navigate(Destinations.UserQuestionnaires.route)
                     coroutineScope.launch {
                         questionnairesViewModel.loadUserQuestionnaires()
-                        navController.navigate(Destinations.UserQuestionnaires.route)
                     }
                 },
                 navigateToUserProfileEditScreen = {
@@ -268,7 +265,6 @@ fun TeammatesNavGraph(
 
         composable(Destinations.UserProfileEdit.route) {
             UserProfileEditScreen(
-                contentState = contentState,
                 user = user,
                 userViewModel = userViewModel,
                 topBar = {
@@ -330,12 +326,14 @@ fun TeammatesNavGraph(
                     else
                         navController.navigate(Destinations.AuthorProfile.route)
                 },
-                contentState = contentState,
                 topBar = {
                     TeammatesTopAppBar(
                         title = stringResource(Destinations.QuestionnaireDetails.titleRes),
                         canNavigateBack = true,
-                        navigateUp = { navController.navigateUp() },
+                        navigateUp = {
+                            questionnairesViewModel.resetSelectedQuestionnaireState()
+                            navController.navigateUp()
+                        },
                     )
                 }
             )
@@ -343,7 +341,6 @@ fun TeammatesNavGraph(
         composable(Destinations.AuthorProfile.route) {
             AuthorProfileScreen(
                 authorViewModel = authorViewModel,
-                contentState = contentState,
                 author = selectedAuthor,
                 authorQuestionnaires = selectedAuthorQuestionnaires,
                 likedAuthors = likedAuthors,
