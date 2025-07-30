@@ -330,7 +330,10 @@ fun TeammatesNavGraph(
                     TeammatesTopAppBar(
                         title = stringResource(Destinations.QuestionnaireDetails.titleRes),
                         canNavigateBack = true,
-                        navigateUp = { navController.navigateUp() },
+                        navigateUp = {
+                            questionnairesViewModel.resetSelectedQuestionnaireState()
+                            navController.navigateUp()
+                        },
                     )
                 }
             )

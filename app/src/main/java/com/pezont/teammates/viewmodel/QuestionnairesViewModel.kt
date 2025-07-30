@@ -261,6 +261,10 @@ class QuestionnairesViewModel @Inject constructor(
         }
     }
 
+    fun resetSelectedQuestionnaireState() {
+        stateManager.updateSelectedQuestionnaireState(ContentState.INITIAL)
+    }
+
     companion object {
         const val TAG = "QVM"
     }
