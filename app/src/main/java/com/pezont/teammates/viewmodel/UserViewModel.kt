@@ -4,10 +4,12 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.ValidationResult
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.domain.state.StateManager
+import com.pezont.teammates.domain.usecase.ImageUseCase
 import com.pezont.teammates.domain.usecase.PrepareImageForUploadUseCase
 import com.pezont.teammates.domain.usecase.UpdateUserProfileUseCase
 import com.pezont.teammates.ui.snackbar.SnackbarController
@@ -31,6 +33,7 @@ class UserViewModel @Inject constructor(
 
     val prepareImageForUploadUseCase: PrepareImageForUploadUseCase,
 
+    private val imageUseCase: ImageUseCase
 
     ) : ViewModel() {
 
@@ -70,15 +73,17 @@ class UserViewModel @Inject constructor(
                         val image = prepareImageForUploadUseCase(uri, context)
                         if (image != null) {
                             updateUserProfileUseCase.updateUserAvatar(image)
-                                .onSuccess { newImagePath ->
+                                .onSuccess { result ->
 
                                     stateManager.updateUser(
                                         stateManager.user.value.copy(
                                             nickname = user.nickname,
                                             description = user.description,
-                                            imagePath = newImagePath.imagePath
+                                            imagePath = result.imagePath
                                         )
                                     )
+                                    val newUrl = result.imagePath.replace("http://localhost:8200","${BuildConfig.BASE_URL}${BuildConfig.PORT_3}${BuildConfig.END_URL}")
+                                    imageUseCase.updateImageCache(newUrl)
                                     stateManager.updateUserProfileInfoState(ContentState.LOADED)
                                     SnackbarController.sendEvent(SnackbarEvent(R.string.photo_update))
                                 }.onFailure { throwable ->

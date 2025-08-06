@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,11 +23,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.components.LoadingItem
 import com.pezont.teammates.ui.components.TeammatesButton
+import com.pezont.teammates.ui.components.TeammatesImage
 import com.pezont.teammates.ui.theme.TeammatesTheme
 
 
@@ -99,21 +96,16 @@ fun UserProfileSection(
             .fillMaxWidth()
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            SubcomposeAsyncImage(
+            TeammatesImage(
                 model = imagePath,
-                loading = { LoadingItem() },
-                error = {
-                    Icon(
-                        imageVector = Icons.Default.Error,
-                        contentDescription = "Error"
-                    )
-                },
+
                 contentDescription = "Profile Picture",
                 modifier = Modifier
                     .size(150.dp)
                     .aspectRatio(1f)
                     .border(width = 1.dp, color = Color.LightGray, shape = CircleShape)
-                    .clip(CircleShape)
+                    .clip(CircleShape),
+                loading = { LoadingItem() },
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(
@@ -134,7 +126,6 @@ fun UserProfileSection(
                 )
             }
         }
-
     }
 }
 

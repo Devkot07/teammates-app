@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,7 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -35,13 +33,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.ui.components.Minus
 import com.pezont.teammates.ui.components.TeammatesButton
+import com.pezont.teammates.ui.components.TeammatesImage
 import com.pezont.teammates.ui.screen.questionnaire.QuestionnairesHorizontalRow
 import com.pezont.teammates.ui.theme.TeammatesTheme
 
@@ -74,24 +72,17 @@ fun AuthorProfileItem(
                     .size(250.dp)
 
             ) {
-                SubcomposeAsyncImage(
+                TeammatesImage(
                     model = fixedImagePath,
-                    loading = {
-                        CircularProgressIndicator(Modifier.padding(16.dp))
-                    },
-                    error = {
-                        Icon(
-                            imageVector = Icons.Default.Error,
-                            contentDescription = "Error",
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    },
-                    contentDescription = "Profile Picture",
+                    contentDescription = null,
                     modifier = Modifier
                         .size(250.dp)
                         .aspectRatio(1f)
                         .border(width = 1.dp, color = Color.LightGray, shape = CircleShape)
                         .clip(CircleShape),
+                    loading = {
+                        CircularProgressIndicator(Modifier.padding(16.dp))
+                    },
                     contentScale = ContentScale.Crop
                 )
             }

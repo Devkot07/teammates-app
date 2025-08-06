@@ -31,11 +31,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.domain.model.enums.ContentState
 import com.pezont.teammates.ui.components.LikeButton
+import com.pezont.teammates.ui.components.LoadingItemWithText
+import com.pezont.teammates.ui.components.TeammatesImage
 
 @Composable
 fun QuestionnaireDetailsItem(
@@ -138,14 +139,10 @@ fun QuestionnaireImageItem(
             .aspectRatio(1f),
         contentAlignment = Alignment.BottomStart
     ) {
-        SubcomposeAsyncImage(
+        TeammatesImage(
             model = imagePath,
-            loading = {
-                CircularProgressIndicator(
-                    modifier = Modifier.padding(100.dp)
-                )
-            },
-            error = { onError() },
+            loading = { LoadingItemWithText() },
+            onError = { onError() },
             contentDescription = "Profile Picture",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -199,5 +196,4 @@ fun AuthorNickname(authorState: ContentState, authorNickname: String, action: ()
                 .size(20.dp)
         )
     }
-
 }

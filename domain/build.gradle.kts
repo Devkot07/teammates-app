@@ -45,6 +45,7 @@ dependencies {
 
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.exifinterface)
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -48,12 +48,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.R
 import com.pezont.teammates.domain.model.User
 import com.pezont.teammates.domain.model.form.UserProfileForm
 import com.pezont.teammates.ui.components.LoadingItem
+import com.pezont.teammates.ui.components.TeammatesImage
 import com.pezont.teammates.ui.components.TeammatesTopAppBar
 import com.pezont.teammates.ui.navigation.Destinations
 import com.pezont.teammates.viewmodel.UserViewModel
@@ -80,18 +81,22 @@ fun UserProfileEditItem(
     }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val imagePickerLauncher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?> = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri: Uri? ->
-            selectedImageUri = uri
-        }
-    )
+    val imagePickerLauncher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?> =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia(),
+            onResult = { uri: Uri? ->
+                selectedImageUri = uri
+            }
+        )
 
 
     val model: Any =
         if (selectedImageUri != null) ImageRequest.Builder(LocalContext.current)
             .data(selectedImageUri).placeholder(R.drawable.ic_loading_image).build()
-        else user.imagePath
+        else user.imagePath.replace(
+            "http://localhost:8200",
+            "${BuildConfig.BASE_URL}${BuildConfig.PORT_3}${BuildConfig.END_URL}"
+        )
 
 
     Scaffold(
@@ -137,8 +142,21 @@ fun UserProfileEditItem(
                 Spacer(modifier = Modifier.height(10.dp))
 
 
-                SubcomposeAsyncImage(
+                TeammatesImage(
                     model = model,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(250.dp)
+                        .aspectRatio(1f)
+                        .border(width = 1.dp, color = Color.LightGray, shape = CircleShape)
+                        .clip(CircleShape)
+                        .clickable {
+                            imagePickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        },
                     loading = { LoadingItem() },
                     error = {
                         Icon(
@@ -149,17 +167,6 @@ fun UserProfileEditItem(
                                 .fillMaxSize(),
                         )
                     },
-                    modifier = Modifier
-                        .size(250.dp)
-                        .aspectRatio(1f)
-                        .border(width = 1.dp, color = Color.LightGray, shape = CircleShape)
-                        .clip(CircleShape)
-                        .clickable { imagePickerLauncher.launch(
-                            PickVisualMediaRequest(
-                                mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
-                            )
-                        ) },
-                    contentDescription = "Profile Picture",
                     contentScale = ContentScale.Crop
                 )
 
@@ -196,11 +203,9 @@ fun UserProfileEditItem(
                     shape = ShapeDefaults.Small
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-
             }
         }
     }
-
 }
 
 

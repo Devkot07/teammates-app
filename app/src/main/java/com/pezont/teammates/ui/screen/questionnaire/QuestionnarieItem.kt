@@ -19,11 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
@@ -36,10 +33,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
 import com.pezont.teammates.BuildConfig
 import com.pezont.teammates.domain.model.Questionnaire
 import com.pezont.teammates.ui.components.LoadingItem
+import com.pezont.teammates.ui.components.TeammatesImage
 import com.pezont.teammates.ui.theme.TeammatesTheme
 
 @Composable
@@ -97,21 +94,15 @@ fun QuestionnaireCard(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                SubcomposeAsyncImage(
+                TeammatesImage(
                     model = fixedImagePath,
-                    loading = { LoadingItem() },
-                    error = {
-                        Icon(
-                            imageVector = Icons.Default.Error,
-                            contentDescription = "Error"
-                        )
-                    },
-                    contentDescription = "Profile Picture",
+                    contentDescription = null,
                     modifier = Modifier
                         .aspectRatio(1f)
-                        .clip(ShapeDefaults.Medium)
-                        .border(2.dp, Color.Gray, ShapeDefaults.Medium),
-                    contentScale = ContentScale.Crop
+                        .clip(ShapeDefaults.Small)
+                        .border(1.dp, Color.Gray, ShapeDefaults.Small),
+                    loading = { LoadingItem() },
+                    contentScale = ContentScale.Crop,
                 )
 
             }
@@ -181,22 +172,17 @@ fun QuestionnaireCompactItem(
                 .background(MaterialTheme.colorScheme.secondary)
                 .padding(8.dp)
         ) {
-            SubcomposeAsyncImage(
+
+            TeammatesImage(
                 model = fixedImagePath,
-                loading = { LoadingItem() },
-                error = {
-                    Icon(
-                        imageVector = Icons.Default.Error,
-                        contentDescription = "Error"
-                    )
-                },
-                contentDescription = "Profile Picture",
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxHeight()
                     .aspectRatio(1f)
                     .clip(ShapeDefaults.Small)
                     .border(1.dp, Color.Gray, ShapeDefaults.Small),
-                contentScale = ContentScale.Crop
+                loading = { LoadingItem() },
+                contentScale = ContentScale.Crop,
             )
 
             Spacer(modifier = Modifier.width(12.dp))
