@@ -1,0 +1,48 @@
+package com.devkot.teammates.di.module
+
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import com.devkot.teammates.data.interceptor.TokenRefreshInterceptor
+import com.devkot.teammates.data.repository.UserDataRepositoryImpl
+import com.devkot.teammates.domain.repository.UserDataRepository
+import com.devkot.teammates.domain.usecase.UpdateTokensUseCase
+import dagger.Lazy
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+private const val LAYOUT_PREFERENCE_NAME = "layout_preferences"
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+    name = LAYOUT_PREFERENCE_NAME
+)
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DataModule {
+
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return context.dataStore
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserDataRepository(dataStore: DataStore<Preferences>): UserDataRepository {
+        return UserDataRepositoryImpl(dataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTokenRefreshInterceptor(
+        userDataRepository: UserDataRepository,
+        updateTokensUseCase: Lazy<UpdateTokensUseCase>
+    ): TokenRefreshInterceptor {
+        return TokenRefreshInterceptor(userDataRepository, updateTokensUseCase)
+    }
+}
