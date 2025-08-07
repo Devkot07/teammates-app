@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.data"
+    namespace = "com.devkot.teammates.data"
     compileSdk = 35
 
     defaultConfig {

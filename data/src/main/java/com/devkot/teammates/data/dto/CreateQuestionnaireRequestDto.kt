@@ -1,0 +1,14 @@
+package com.devkot.teammates.data.dto
+
+import com.google.gson.annotations.SerializedName
+
+data class CreateQuestionnaireRequestDto(
+    @SerializedName("header")
+    val header: String,
+    @SerializedName("game")
+    val game: String,
+    @SerializedName("description")
+    val description: String,
+    @SerializedName("author_id")
+    val authorId: String
+)

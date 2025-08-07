@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.pezont.teammates.domain"
+    namespace = "com.devkot.teammates.domain"
     compileSdk = 35
 
     defaultConfig {
