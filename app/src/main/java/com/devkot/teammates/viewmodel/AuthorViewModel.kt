@@ -13,7 +13,7 @@ import com.devkot.teammates.domain.usecase.LoadAuthorProfileUseCase
 import com.devkot.teammates.domain.usecase.LoadLikedAuthorsUseCase
 import com.devkot.teammates.domain.usecase.LoadQuestionnairesUseCase
 import com.devkot.teammates.domain.usecase.UnlikeAuthorUseCase
-import com.devkot.teammates.domain.state.StateManager
+import com.devkot.teammates.state.StateManager
 import com.devkot.teammates.ui.snackbar.SnackbarController
 import com.devkot.teammates.ui.snackbar.SnackbarEvent
 import com.devkot.teammates.utils.ErrorHandler

@@ -1,4 +1,4 @@
-package com.devkot.teammates.data.network
+package com.devkot.teammates.data.remote.network
 
 import android.annotation.SuppressLint
 import android.content.Context

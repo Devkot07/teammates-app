@@ -1,7 +1,7 @@
 package com.teammates.data
 
-import com.devkot.teammates.data.dto.LoginResponseDto
-import com.devkot.teammates.data.dto.UserDto
+import com.devkot.teammates.data.remote.dto.LoginResponseDto
+import com.devkot.teammates.data.remote.dto.UserDto
 import org.junit.Test
 
 import org.junit.Assert.*

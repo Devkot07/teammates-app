@@ -1,9 +1,9 @@
 package com.devkot.teammates.data.repository
 
 import android.content.Context
-import com.devkot.teammates.data.api.TeammatesAuthApiService
+import com.devkot.teammates.data.remote.api.TeammatesAuthApiService
 import com.devkot.teammates.data.mapper.toDto
-import com.devkot.teammates.data.network.NetworkManager
+import com.devkot.teammates.data.remote.network.NetworkManager
 import com.devkot.teammates.domain.model.requesrt.LoginRequest
 import com.devkot.teammates.domain.model.LoginResponse
 import com.devkot.teammates.domain.model.requesrt.UpdateTokenRequest

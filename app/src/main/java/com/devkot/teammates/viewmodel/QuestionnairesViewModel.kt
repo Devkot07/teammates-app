@@ -11,7 +11,7 @@ import com.devkot.teammates.domain.model.ValidationResult
 import com.devkot.teammates.domain.model.enums.AuthState
 import com.devkot.teammates.domain.model.enums.ContentState
 import com.devkot.teammates.domain.model.enums.Games
-import com.devkot.teammates.domain.state.StateManager
+import com.devkot.teammates.state.StateManager
 import com.devkot.teammates.domain.usecase.CreateQuestionnaireUseCase
 import com.devkot.teammates.domain.usecase.LikeQuestionnaireUseCase
 import com.devkot.teammates.domain.usecase.LoadLikedQuestionnairesUseCase

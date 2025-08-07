@@ -1,4 +1,4 @@
-package com.devkot.teammates.domain.state
+package com.devkot.teammates.state
 
 import com.devkot.teammates.domain.model.Questionnaire
 import com.devkot.teammates.domain.model.User

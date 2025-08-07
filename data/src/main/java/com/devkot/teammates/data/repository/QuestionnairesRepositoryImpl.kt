@@ -1,9 +1,9 @@
 package com.devkot.teammates.data.repository
 
 import android.content.Context
-import com.devkot.teammates.data.api.TeammatesQuestionnairesApiService
+import com.devkot.teammates.data.remote.api.TeammatesQuestionnairesApiService
 import com.devkot.teammates.data.mapper.toDto
-import com.devkot.teammates.data.network.NetworkManager
+import com.devkot.teammates.data.remote.network.NetworkManager
 import com.devkot.teammates.domain.model.requesrt.CreateQuestionnaireRequest
 import com.devkot.teammates.domain.model.Questionnaire
 import com.devkot.teammates.domain.model.enums.Games

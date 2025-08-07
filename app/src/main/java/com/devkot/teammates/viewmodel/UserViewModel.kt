@@ -8,7 +8,7 @@ import com.devkot.teammates.BuildConfig
 import com.devkot.teammates.R
 import com.devkot.teammates.domain.model.ValidationResult
 import com.devkot.teammates.domain.model.enums.ContentState
-import com.devkot.teammates.domain.state.StateManager
+import com.devkot.teammates.state.StateManager
 import com.devkot.teammates.domain.usecase.ImageUseCase
 import com.devkot.teammates.domain.usecase.PrepareImageForUploadUseCase
 import com.devkot.teammates.domain.usecase.UpdateUserProfileUseCase

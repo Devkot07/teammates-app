@@ -1,4 +1,4 @@
-package com.devkot.teammates.data.interceptor
+package com.devkot.teammates.data.remote.interceptor
 
 import android.util.Log
 import com.devkot.teammates.domain.repository.UserDataRepository

@@ -1,11 +1,11 @@
 package com.devkot.teammates.data.repository
 
 import android.content.Context
-import com.devkot.teammates.data.api.TeammatesUsersApiService
-import com.devkot.teammates.data.dto.LikeQuestionnaireRequestDto
-import com.devkot.teammates.data.dto.LikeUserRequestDto
+import com.devkot.teammates.data.remote.api.TeammatesUsersApiService
+import com.devkot.teammates.data.remote.dto.LikeQuestionnaireRequestDto
+import com.devkot.teammates.data.remote.dto.LikeUserRequestDto
 import com.devkot.teammates.data.mapper.toDto
-import com.devkot.teammates.data.network.NetworkManager
+import com.devkot.teammates.data.remote.network.NetworkManager
 import com.devkot.teammates.domain.model.response.LikeQuestionnaireResponse
 import com.devkot.teammates.domain.model.response.LikeUserResponse
 import com.devkot.teammates.domain.model.requesrt.LoadAuthorRequest

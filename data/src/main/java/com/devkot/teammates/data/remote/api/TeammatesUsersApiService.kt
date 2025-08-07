@@ -1,13 +1,13 @@
-package com.devkot.teammates.data.api
+package com.devkot.teammates.data.remote.api
 
-import com.devkot.teammates.data.dto.LikeQuestionnaireRequestDto
-import com.devkot.teammates.data.dto.LikeQuestionnaireResponseDto
-import com.devkot.teammates.data.dto.LikeUserRequestDto
-import com.devkot.teammates.data.dto.LikeUserResponseDto
-import com.devkot.teammates.data.dto.QuestionnaireDto
-import com.devkot.teammates.data.dto.UpdateUserProfilePhotoResponseDto
-import com.devkot.teammates.data.dto.UpdateUserProfileRequestDto
-import com.devkot.teammates.data.dto.UserDto
+import com.devkot.teammates.data.remote.dto.LikeQuestionnaireRequestDto
+import com.devkot.teammates.data.remote.dto.LikeQuestionnaireResponseDto
+import com.devkot.teammates.data.remote.dto.LikeUserRequestDto
+import com.devkot.teammates.data.remote.dto.LikeUserResponseDto
+import com.devkot.teammates.data.remote.dto.QuestionnaireDto
+import com.devkot.teammates.data.remote.dto.UpdateUserProfilePhotoResponseDto
+import com.devkot.teammates.data.remote.dto.UpdateUserProfileRequestDto
+import com.devkot.teammates.data.remote.dto.UserDto
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET

@@ -1,7 +1,7 @@
-package com.devkot.teammates.data.api
+package com.devkot.teammates.data.remote.api
 
-import com.devkot.teammates.data.dto.CreateQuestionnaireRequestDto
-import com.devkot.teammates.data.dto.QuestionnaireDto
+import com.devkot.teammates.data.remote.dto.CreateQuestionnaireRequestDto
+import com.devkot.teammates.data.remote.dto.QuestionnaireDto
 import okhttp3.MultipartBody
 import retrofit2.http.GET
 import retrofit2.http.Header

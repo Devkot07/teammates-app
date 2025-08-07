@@ -7,7 +7,7 @@ import com.devkot.teammates.domain.model.User
 import com.devkot.teammates.domain.model.enums.AuthState
 import com.devkot.teammates.domain.model.enums.ContentState
 import com.devkot.teammates.domain.usecase.LogoutUseCase
-import com.devkot.teammates.domain.state.StateManager
+import com.devkot.teammates.state.StateManager
 import com.devkot.teammates.ui.snackbar.SnackbarController
 import com.devkot.teammates.ui.snackbar.SnackbarEvent
 import retrofit2.HttpException

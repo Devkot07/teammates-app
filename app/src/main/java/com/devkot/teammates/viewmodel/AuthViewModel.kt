@@ -11,7 +11,7 @@ import com.devkot.teammates.domain.usecase.CheckAuthenticationUseCase
 import com.devkot.teammates.domain.usecase.LoadUserUseCase
 import com.devkot.teammates.domain.usecase.LoginUseCase
 import com.devkot.teammates.domain.usecase.LogoutUseCase
-import com.devkot.teammates.domain.state.StateManager
+import com.devkot.teammates.state.StateManager
 import com.devkot.teammates.ui.snackbar.SnackbarController
 import com.devkot.teammates.ui.snackbar.SnackbarEvent
 import com.devkot.teammates.utils.ErrorHandler

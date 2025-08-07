@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.devkot.teammates.data.interceptor.TokenRefreshInterceptor
-import com.devkot.teammates.data.repository.UserDataRepositoryImpl
+import com.devkot.teammates.data.remote.interceptor.TokenRefreshInterceptor
+import com.devkot.teammates.data.local.datastore.UserDataRepositoryImpl
 import com.devkot.teammates.domain.repository.UserDataRepository
 import com.devkot.teammates.domain.usecase.UpdateTokensUseCase
 import dagger.Lazy

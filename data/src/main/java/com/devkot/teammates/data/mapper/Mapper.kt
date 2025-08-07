@@ -1,9 +1,9 @@
 package com.devkot.teammates.data.mapper
 
-import com.devkot.teammates.data.dto.CreateQuestionnaireRequestDto
-import com.devkot.teammates.data.dto.LoginRequestDto
-import com.devkot.teammates.data.dto.UpdateTokenRequestDto
-import com.devkot.teammates.data.dto.UpdateUserProfileRequestDto
+import com.devkot.teammates.data.remote.dto.CreateQuestionnaireRequestDto
+import com.devkot.teammates.data.remote.dto.LoginRequestDto
+import com.devkot.teammates.data.remote.dto.UpdateTokenRequestDto
+import com.devkot.teammates.data.remote.dto.UpdateUserProfileRequestDto
 import com.devkot.teammates.domain.model.requesrt.CreateQuestionnaireRequest
 import com.devkot.teammates.domain.model.requesrt.LoginRequest
 import com.devkot.teammates.domain.model.requesrt.UpdateTokenRequest

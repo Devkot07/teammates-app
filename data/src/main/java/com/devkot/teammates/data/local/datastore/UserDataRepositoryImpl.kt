@@ -1,4 +1,4 @@
-package com.devkot.teammates.data.repository
+package com.devkot.teammates.data.local.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

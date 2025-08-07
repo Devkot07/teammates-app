@@ -2,9 +2,9 @@ package com.devkot.teammates.di.module
 
 import android.content.Context
 import coil.ImageLoader
-import com.devkot.teammates.data.api.TeammatesAuthApiService
-import com.devkot.teammates.data.api.TeammatesQuestionnairesApiService
-import com.devkot.teammates.data.api.TeammatesUsersApiService
+import com.devkot.teammates.data.remote.api.TeammatesAuthApiService
+import com.devkot.teammates.data.remote.api.TeammatesQuestionnairesApiService
+import com.devkot.teammates.data.remote.api.TeammatesUsersApiService
 import com.devkot.teammates.data.repository.AuthRepositoryImpl
 import com.devkot.teammates.data.repository.ImageRepositoryImpl
 import com.devkot.teammates.data.repository.QuestionnairesRepositoryImpl

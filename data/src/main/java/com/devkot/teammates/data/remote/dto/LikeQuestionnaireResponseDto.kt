@@ -1,4 +1,4 @@
-package com.devkot.teammates.data.dto
+package com.devkot.teammates.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 import com.devkot.teammates.domain.model.response.LikeQuestionnaireResponse

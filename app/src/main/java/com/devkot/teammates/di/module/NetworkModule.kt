@@ -2,10 +2,10 @@ package com.devkot.teammates.di.module
 
 import android.util.Log
 import com.devkot.teammates.BuildConfig
-import com.devkot.teammates.data.api.TeammatesAuthApiService
-import com.devkot.teammates.data.api.TeammatesQuestionnairesApiService
-import com.devkot.teammates.data.api.TeammatesUsersApiService
-import com.devkot.teammates.data.interceptor.TokenRefreshInterceptor
+import com.devkot.teammates.data.remote.api.TeammatesAuthApiService
+import com.devkot.teammates.data.remote.api.TeammatesQuestionnairesApiService
+import com.devkot.teammates.data.remote.api.TeammatesUsersApiService
+import com.devkot.teammates.data.remote.interceptor.TokenRefreshInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
