@@ -5,16 +5,20 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import coil.ImageLoader
+import coil.disk.DiskCache
 import com.devkot.teammates.BuildConfig
 import com.devkot.teammates.data.api.TeammatesAuthApiService
 import com.devkot.teammates.data.api.TeammatesQuestionnairesApiService
 import com.devkot.teammates.data.api.TeammatesUsersApiService
 import com.devkot.teammates.data.interceptor.TokenRefreshInterceptor
 import com.devkot.teammates.data.repository.AuthRepositoryImpl
+import com.devkot.teammates.data.repository.ImageRepositoryImpl
 import com.devkot.teammates.data.repository.QuestionnairesRepositoryImpl
 import com.devkot.teammates.data.repository.UserDataRepositoryImpl
 import com.devkot.teammates.data.repository.UsersRepositoryImpl
 import com.devkot.teammates.domain.repository.AuthRepository
+import com.devkot.teammates.domain.repository.ImageRepository
 import com.devkot.teammates.domain.repository.QuestionnairesRepository
 import com.devkot.teammates.domain.repository.UserDataRepository
 import com.devkot.teammates.domain.repository.UsersRepository
@@ -29,6 +33,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -171,5 +176,27 @@ object AppModule {
         @ApplicationContext context: Context
     ): UsersRepository {
         return UsersRepositoryImpl(apiService, context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideImageLoader(@ApplicationContext context: Context): ImageLoader {
+        return ImageLoader.Builder(context)
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(File(context.cacheDir, "image_cache"))
+                    .maxSizeBytes(50 * 1024 * 1024)
+                    .build()
+            }
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideImageRepository(
+        imageLoader: ImageLoader,
+        @ApplicationContext context: Context
+    ): ImageRepository {
+        return ImageRepositoryImpl(context, imageLoader)
     }
 }

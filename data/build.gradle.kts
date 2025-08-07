@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
     implementation(libs.hilt.android)
+    implementation(libs.coil.compose)
     kapt(libs.hilt.compiler)
 
     testImplementation(libs.junit)
