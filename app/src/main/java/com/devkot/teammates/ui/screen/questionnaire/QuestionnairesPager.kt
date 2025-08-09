@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.devkot.teammates.domain.model.Questionnaire
 import com.devkot.teammates.viewmodel.AuthorViewModel
+import androidx.compose.runtime.key
+
 
 
 @Composable
@@ -36,15 +38,17 @@ fun QuestionnairesVerticalPager(
     ) { pageIndex ->
         if (pageIndex < questionnaires.size) {
             val questionnaire = questionnaires[pageIndex]
-            QuestionnaireItem(
-                navigateToQuestionnaireDetails = {
-                    authorViewModel.updateSelectedQuestionnaire(questionnaire)
-                    authorViewModel.loadAuthor(questionnaire.authorId)
-                    navigateToQuestionnaireDetails()
-                },
-                questionnaire = questionnaire,
-                modifier = modifier,
-            )
+            key(questionnaire.questionnaireId) {
+                QuestionnaireItem(
+                    navigateToQuestionnaireDetails = {
+                        authorViewModel.updateSelectedQuestionnaire(questionnaire)
+                        authorViewModel.loadAuthor(questionnaire.authorId)
+                        navigateToQuestionnaireDetails()
+                    },
+                    questionnaire = questionnaire,
+                    modifier = modifier,
+                )
+            }
         } else lastItem()
     }
 }
