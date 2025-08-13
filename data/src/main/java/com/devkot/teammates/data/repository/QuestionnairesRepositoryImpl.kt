@@ -1,12 +1,15 @@
 package com.devkot.teammates.data.repository
 
 import android.content.Context
-import com.devkot.teammates.data.remote.api.TeammatesQuestionnairesApiService
+import com.devkot.teammates.data.local.database.TeammatesDatabase
+import com.devkot.teammates.data.local.database.toDomain
+import com.devkot.teammates.data.local.database.toDefaultEntity
 import com.devkot.teammates.data.mapper.toDto
+import com.devkot.teammates.data.remote.api.TeammatesQuestionnairesApiService
 import com.devkot.teammates.data.remote.network.NetworkManager
-import com.devkot.teammates.domain.model.requesrt.CreateQuestionnaireRequest
 import com.devkot.teammates.domain.model.Questionnaire
 import com.devkot.teammates.domain.model.enums.Games
+import com.devkot.teammates.domain.model.requesrt.CreateQuestionnaireRequest
 import com.devkot.teammates.domain.repository.QuestionnairesRepository
 import okhttp3.MultipartBody
 import java.io.IOException
@@ -14,8 +17,11 @@ import java.io.IOException
 
 class QuestionnairesRepositoryImpl(
     private val teammatesQuestionnairesApiService: TeammatesQuestionnairesApiService,
+    database: TeammatesDatabase,
     private val context: Context
 ) : QuestionnairesRepository {
+
+    private val questionnaireDao = database.questionnaireDao()
 
     override suspend fun loadQuestionnaires(
         token: String,
@@ -25,12 +31,18 @@ class QuestionnairesRepositoryImpl(
         game: Games?,
         authorId: String?,
         questionnaireId: String?,
-    ): Result<List<Questionnaire>> {
+    ): Result<Pair<List<Questionnaire>, Throwable?>> {
 
-        if (!NetworkManager.isNetworkAvailable(context)) {
-            return Result.failure(IOException("No internet connection"))
-        }
-        return try {
+        suspend fun loadFromCache() = questionnaireDao
+            .getFilteredQuestionnaires(
+                gameName = game?.name,
+                page = page ?: 1,
+                limit = limit ?: 20,
+                authorId = authorId,
+                questionnaireId = questionnaireId
+            ).map { it.toDomain() }
+
+        return runCatching {
             val dtoList = teammatesQuestionnairesApiService.getQuestionnaires(
                 token = "Bearer $token",
                 gameName = game?.name,
@@ -42,12 +54,14 @@ class QuestionnairesRepositoryImpl(
             )
 
             val domainList = dtoList.map { it.toDomain() }
-            Result.success(domainList)
 
-        } catch (e: Exception) {
-            Result.failure(e)
+            questionnaireDao.insertQuestionnaires(domainList.map { it.toDefaultEntity() })
+
+            Pair(domainList, null)
+
+        }.recoverCatching { error ->
+            Pair(loadFromCache(), error)
         }
-
     }
 
     override suspend fun createQuestionnaire(

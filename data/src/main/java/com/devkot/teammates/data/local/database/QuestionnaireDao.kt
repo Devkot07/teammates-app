@@ -1,8 +1,11 @@
 package com.devkot.teammates.data.local.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Upsert
+import com.devkot.teammates.domain.model.Questionnaire
 
 @Dao
 interface QuestionnaireDao {
@@ -26,11 +29,34 @@ interface QuestionnaireDao {
     ): List<QuestionnaireEntity>
 
 
+    @Query("""
+    SELECT * FROM like_questionnaire""")
+    suspend fun getLikedQuestionnaires(): List<QuestionnaireEntity>
 
-    @Upsert(QuestionnaireEntity::class)
-    suspend fun insertQuestionnaires(questionnaire: QuestionnaireEntity)
+
+    @Upsert
+    suspend fun insertQuestionnaire(questionnaire: QuestionnaireEntity)
+
+    @Upsert
+    suspend fun insertLikeQuestionnaire(likeQuestionnaire: LikeQuestionnaireEntity)
+
+    @Upsert
+    suspend fun insertQuestionnaires(questionnaires: List<QuestionnaireEntity>)
+
+    @Upsert
+    suspend fun insertLikeQuestionnaires(likeQuestionnaires: List<LikeQuestionnaireEntity>)
 
 
+    @Delete
+    suspend fun deleteQuestionnaire(questionnaire: QuestionnaireEntity)
 
+    @Delete
+    suspend fun deleteLikeQuestionnaire(questionnaire: LikeQuestionnaireEntity)
+
+    @Transaction
+    suspend fun deleteQuestionnaireCompletely(questionnaire: Questionnaire) {
+        deleteQuestionnaire(questionnaire.toDefaultEntity())
+        deleteLikeQuestionnaire(questionnaire.toLikeEntity())
+    }
 
 }

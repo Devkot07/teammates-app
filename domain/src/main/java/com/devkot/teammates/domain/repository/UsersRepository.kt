@@ -14,7 +14,7 @@ interface UsersRepository {
     suspend fun loadLikedQuestionnaires(
         token: String,
         userId: String,
-    ): Result<List<Questionnaire>>
+    ): Result<Pair<List<Questionnaire>, Throwable?>>
 
     suspend fun loadLikedUsers(
         token: String,

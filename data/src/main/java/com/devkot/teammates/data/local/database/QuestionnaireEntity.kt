@@ -11,59 +11,46 @@ data class QuestionnaireFields(
     @ColumnInfo(name = "game") val game: String,
     @ColumnInfo(name = "description") val description: String,
     @ColumnInfo(name = "author_id") val authorId: String,
-    @PrimaryKey
-    @ColumnInfo(name = "questionnaire_id") val questionnaireId: String,
     @ColumnInfo(name = "image_path") val imagePath: String
 )
 
 @Entity(tableName = "questionnaire")
 data class QuestionnaireEntity(
+    @PrimaryKey
+    @ColumnInfo(name = "questionnaire_id")
+    val questionnaireId: String,
     @Embedded val fields: QuestionnaireFields
 )
 
 @Entity(tableName = "like_questionnaire")
 data class LikeQuestionnaireEntity(
+    @PrimaryKey
+    @ColumnInfo(name = "questionnaire_id")
+    val questionnaireId: String,
     @Embedded val fields: QuestionnaireFields
 )
 
-fun QuestionnaireEntity.toDomain(): Questionnaire = Questionnaire(
-    header = this.fields.header,
-    game = this.fields.game,
-    description = this.fields.description,
-    authorId = this.fields.authorId,
-    questionnaireId = this.fields.questionnaireId,
-    imagePath = this.fields.imagePath
+
+fun QuestionnaireFields.toDomain(id: String) = Questionnaire(
+    header = header,
+    game = game,
+    description = description,
+    authorId = authorId,
+    questionnaireId = id,
+    imagePath = imagePath
 )
 
-fun Questionnaire.toQuestionnaireEntity(): QuestionnaireEntity = QuestionnaireEntity(
-    QuestionnaireFields(
-        header = this.header,
-        game = this.game,
-        description = this.description,
-        authorId = this.authorId,
-        questionnaireId = this.questionnaireId,
-        imagePath = this.imagePath
-    )
+fun Questionnaire.toFields() = QuestionnaireFields(
+    header = header,
+    game = game,
+    description = description,
+    authorId = authorId,
+    imagePath = imagePath
 )
 
-fun LikeQuestionnaireEntity.toDomain(): Questionnaire = Questionnaire(
-    header = this.fields.header,
-    game = this.fields.game,
-    description = this.fields.description,
-    authorId = this.fields.authorId,
-    questionnaireId = this.fields.questionnaireId,
-    imagePath = this.fields.imagePath
-)
+fun QuestionnaireEntity.toDomain() = fields.toDomain(questionnaireId)
+fun LikeQuestionnaireEntity.toDomain() = fields.toDomain(questionnaireId)
 
-fun Questionnaire.toLikeQuestionnaireEntity(): LikeQuestionnaireEntity = LikeQuestionnaireEntity(
-    QuestionnaireFields(
-        header = this.header,
-        game = this.game,
-        description = this.description,
-        authorId = this.authorId,
-        questionnaireId = this.questionnaireId,
-        imagePath = this.imagePath
-    )
-
-)
+fun Questionnaire.toDefaultEntity() = QuestionnaireEntity(questionnaireId, toFields())
+fun Questionnaire.toLikeEntity() = LikeQuestionnaireEntity(questionnaireId, toFields())
 

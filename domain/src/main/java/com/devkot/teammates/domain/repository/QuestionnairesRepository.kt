@@ -15,7 +15,7 @@ interface QuestionnairesRepository {
         game: Games?,
         authorId: String?,
         questionnaireId: String?,
-    ): Result<List<Questionnaire>>
+    ): Result<Pair<List<Questionnaire>, Throwable?>>
 
     suspend fun createQuestionnaire(
         token: String,
