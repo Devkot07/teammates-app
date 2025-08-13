@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -49,7 +51,7 @@ fun LikedQuestionnairesScreen(
             onRefresh = { questionnairesViewModel.refreshLikedQuestionnairesScreen() }
         ) {
             when (questionnairesViewModel.likedQuestionnairesState.collectAsState().value) {
-                ContentState.LOADED ->
+                ContentState.LOADED -> {
                     QuestionnairesVerticalPager(
                         questionnaires = likedQuestionnaires,
                         pagerState = pagerState,
@@ -71,8 +73,18 @@ fun LikedQuestionnairesScreen(
                         },
                         modifier = Modifier.fillMaxSize()
                     )
+                }
 
-                ContentState.LOADING, ContentState.INITIAL, ContentState.ERROR -> LoadingItemWithText()
+                ContentState.LOADING, ContentState.INITIAL, ContentState.ERROR -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LoadingItemWithText()
+                    }
+                }
             }
         }
     }

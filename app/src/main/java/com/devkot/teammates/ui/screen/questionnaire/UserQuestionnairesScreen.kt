@@ -1,6 +1,7 @@
 package com.devkot.teammates.ui.screen.questionnaire
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,7 +58,7 @@ fun UserQuestionnairesScreen(
             onRefresh = { questionnairesViewModel.refreshUserQuestionnairesScreen() }
         ) {
             when (questionnairesViewModel.userQuestionnairesState.collectAsState().value) {
-                ContentState.LOADED ->
+                ContentState.LOADED -> {
                     QuestionnairesVerticalPager(
                         questionnaires = userQuestionnaires,
                         pagerState = pagerState,
@@ -64,8 +67,18 @@ fun UserQuestionnairesScreen(
                         lastItem = { CreateButton(navigateToQuestionnaireCreate) },
                         modifier = Modifier.fillMaxSize()
                     )
+                }
 
-                ContentState.LOADING, ContentState.INITIAL, ContentState.ERROR -> LoadingItemWithText()
+                ContentState.LOADING, ContentState.INITIAL, ContentState.ERROR -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LoadingItemWithText()
+                    }
+                }
             }
         }
     }
