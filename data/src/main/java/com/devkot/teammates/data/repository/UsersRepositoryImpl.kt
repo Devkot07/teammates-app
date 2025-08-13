@@ -1,0 +1,237 @@
+package com.devkot.teammates.data.repository
+
+import android.content.Context
+import com.devkot.teammates.data.local.database.TeammatesDatabase
+import com.devkot.teammates.data.local.database.toDomain
+import com.devkot.teammates.data.local.database.toLikeEntity
+import com.devkot.teammates.data.remote.api.TeammatesUsersApiService
+import com.devkot.teammates.data.remote.dto.LikeQuestionnaireRequestDto
+import com.devkot.teammates.data.remote.dto.LikeUserRequestDto
+import com.devkot.teammates.data.mapper.toDto
+import com.devkot.teammates.data.remote.network.NetworkManager
+import com.devkot.teammates.domain.model.response.LikeQuestionnaireResponse
+import com.devkot.teammates.domain.model.response.LikeUserResponse
+import com.devkot.teammates.domain.model.requesrt.LoadAuthorRequest
+import com.devkot.teammates.domain.model.Questionnaire
+import com.devkot.teammates.domain.model.response.UpdateUserProfilePhotoResponse
+import com.devkot.teammates.domain.model.requesrt.UpdateUserProfileRequest
+import com.devkot.teammates.domain.model.User
+import com.devkot.teammates.domain.repository.UsersRepository
+import okhttp3.MultipartBody
+import java.io.IOException
+
+
+class UsersRepositoryImpl(
+    private val teammatesUsersApiService: TeammatesUsersApiService,
+    database: TeammatesDatabase,
+    private val context: Context
+) : UsersRepository {
+
+    private val questionnaireDao = database.questionnaireDao()
+
+    override suspend fun loadLikedQuestionnaires(
+        token: String,
+        userId: String,
+    ): Result<Pair<List<Questionnaire>, Throwable?>>{
+
+        suspend fun loadFromCache() = questionnaireDao.getLikedQuestionnaires().map { it.toDomain() }
+
+        return try {
+            val dtoList = teammatesUsersApiService.loadLikedQuestionnaires(
+                token = "Bearer $token",
+                userId = userId
+            )
+
+            val domainList = dtoList.map { it.toDomain() }
+
+           questionnaireDao.insertLikeQuestionnaires(domainList.map { it.toLikeEntity() })
+
+            Result.success(Pair(domainList, null))
+
+        } catch (e: Exception) {
+            val cachedQuestionnaires = try { loadFromCache() } catch (_: Exception) { emptyList() }
+
+            Result.success(Pair(cachedQuestionnaires, e))
+        }
+
+    }
+
+    override suspend fun loadLikedUsers(token: String, userId: String): Result<List<User>> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            val dtoList = teammatesUsersApiService.loadLikedUsers(
+                token = "Bearer $token",
+                userId = userId
+            )
+
+            val domainList = dtoList.map { it.toDomain() }
+            Result.success(domainList)
+
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+
+    override suspend fun likeQuestionnaire(
+        token: String,
+        userId: String,
+        likedQuestionnaireId: String
+    ): Result<LikeQuestionnaireResponse> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesUsersApiService.likeQuestionnaire(
+                    token = "Bearer $token",
+                    userId = userId,
+                    request = LikeQuestionnaireRequestDto(userId, likedQuestionnaireId)
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+
+    override suspend fun unlikeQuestionnaire(
+        token: String,
+        userId: String,
+        unlikedQuestionnaireId: String
+    ): Result<LikeQuestionnaireResponse> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesUsersApiService.unlikeQuestionnaire(
+                    token = "Bearer $token",
+                    userId = userId,
+                    request = LikeQuestionnaireRequestDto(userId, unlikedQuestionnaireId)
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun likeUser(
+        token: String,
+        userId: String,
+        likedUserId: String
+    ): Result<LikeUserResponse> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesUsersApiService.likeUser(
+                    token = "Bearer $token",
+                    userId = userId,
+                    request = LikeUserRequestDto(userId, likedUserId)
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+
+    override suspend fun unlikeUser(
+        token: String,
+        userId: String,
+        unlikedUserId: String
+    ): Result<LikeUserResponse> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesUsersApiService.unlikeUser(
+                    token = "Bearer $token",
+                    userId = userId,
+                    request = LikeUserRequestDto(userId, unlikedUserId)
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun loadAuthorProfile(
+        token: String,
+        userId: String,
+        request: LoadAuthorRequest
+    ): Result<User> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesUsersApiService.loadAuthorProfile(
+                    token = "Bearer $token",
+                    userId = userId,
+                    publicId = request.authorId
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+
+    override suspend fun updateUserProfile(
+        token: String,
+        userId: String,
+        request: UpdateUserProfileRequest
+    ): Result<User> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesUsersApiService.updateUserProfile(
+                    token = "Bearer $token",
+                    userId = userId,
+                    request = request.toDto()
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+
+    override suspend fun updateUserProfilePhoto(
+        token: String,
+        userId: String,
+        image: MultipartBody.Part
+    ): Result<UpdateUserProfilePhotoResponse> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesUsersApiService.updateUserProfilePhoto(
+                    token = "Bearer $token",
+                    userId = userId,
+                    image = image
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+}

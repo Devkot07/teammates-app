@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.data"
+    namespace = "com.devkot.teammates.data"
     compileSdk = 35
 
     defaultConfig {
@@ -46,7 +46,15 @@ dependencies {
     //Data Storage
     implementation(libs.androidx.datastore.preferences)
 
+    //Room
+    implementation(libs.androidx.room.runtime)
+    //noinspection KaptUsageInsteadOfKsp
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
     implementation(libs.hilt.android)
+    implementation(libs.coil.compose)
     kapt(libs.hilt.compiler)
 
     testImplementation(libs.junit)

@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.pezont.teammates"
+    namespace = "com.devkot.teammates"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.pezont.teammates"
+        applicationId = "com.devkot.teammates"
         minSdk = 30
         //noinspection OldTargetApi
         targetSdk = 34

@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.pezont.teammates.domain"
+    namespace = "com.devkot.teammates.domain"
     compileSdk = 35
 
     defaultConfig {
@@ -45,7 +45,6 @@ dependencies {
 
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.exifinterface)
-    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
