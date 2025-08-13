@@ -25,6 +25,7 @@ import com.devkot.teammates.utils.ErrorHandler
 import com.devkot.teammates.utils.toMessageRes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -101,7 +102,7 @@ class QuestionnairesViewModel @Inject constructor(
         ).onSuccess { result ->
             Log.d(TAG, result.toString())
             if (page == 1) {
-                stateManager.updateQuestionnaires(result)
+                stateManager.updateQuestionnaires(result.shuffled())
             } else {
                 stateManager.updateQuestionnaires(questionnaires.value + result)
             }
@@ -143,6 +144,7 @@ class QuestionnairesViewModel @Inject constructor(
     }
 
     private suspend fun loadLikedQuestionnaires() {
+        stateManager.updateLikedQuestionnairesState(ContentState.LOADING)
         loadLikedQuestionnairesUseCase().onSuccess { result ->
             Log.d(TAG, result.toString())
             stateManager.updateLikedQuestionnaires(result)
@@ -241,6 +243,7 @@ class QuestionnairesViewModel @Inject constructor(
         viewModelScope.launch {
             _isRefreshingQuestionnaires.value = true
             loadQuestionnaires()
+            delay(100)
             _isRefreshingQuestionnaires.value = false
         }
     }
@@ -249,6 +252,7 @@ class QuestionnairesViewModel @Inject constructor(
         viewModelScope.launch {
             _isRefreshingUserQuestionnaires.value = true
             loadUserQuestionnaires()
+            delay(100)
             _isRefreshingUserQuestionnaires.value = false
         }
     }
@@ -257,6 +261,7 @@ class QuestionnairesViewModel @Inject constructor(
         viewModelScope.launch {
             _isRefreshingLikedQuestionnaires.value = true
             loadLikedQuestionnaires()
+            delay(100)
             _isRefreshingLikedQuestionnaires.value = false
         }
     }
