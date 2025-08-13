@@ -2,6 +2,7 @@ package com.devkot.teammates.di.module
 
 import android.content.Context
 import coil.ImageLoader
+import com.devkot.teammates.data.local.database.TeammatesDatabase
 import com.devkot.teammates.data.remote.api.TeammatesAuthApiService
 import com.devkot.teammates.data.remote.api.TeammatesQuestionnairesApiService
 import com.devkot.teammates.data.remote.api.TeammatesUsersApiService
@@ -37,18 +38,20 @@ object RepositoryModule {
     @Singleton
     fun provideQuestionnairesRepository(
         apiService: TeammatesQuestionnairesApiService,
+        database: TeammatesDatabase,
         @ApplicationContext context: Context
     ): QuestionnairesRepository {
-        return QuestionnairesRepositoryImpl(apiService, context)
+        return QuestionnairesRepositoryImpl(apiService, database, context)
     }
 
     @Provides
     @Singleton
     fun provideUsersRepository(
         apiService: TeammatesUsersApiService,
+        database: TeammatesDatabase,
         @ApplicationContext context: Context
     ): UsersRepository {
-        return UsersRepositoryImpl(apiService, context)
+        return UsersRepositoryImpl(apiService, database, context)
     }
 
     @Provides

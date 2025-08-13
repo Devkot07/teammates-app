@@ -1,6 +1,9 @@
 package com.devkot.teammates.data.repository
 
 import android.content.Context
+import com.devkot.teammates.data.local.database.TeammatesDatabase
+import com.devkot.teammates.data.local.database.toDomain
+import com.devkot.teammates.data.local.database.toLikeEntity
 import com.devkot.teammates.data.remote.api.TeammatesUsersApiService
 import com.devkot.teammates.data.remote.dto.LikeQuestionnaireRequestDto
 import com.devkot.teammates.data.remote.dto.LikeUserRequestDto
@@ -20,17 +23,19 @@ import java.io.IOException
 
 class UsersRepositoryImpl(
     private val teammatesUsersApiService: TeammatesUsersApiService,
+    database: TeammatesDatabase,
     private val context: Context
 ) : UsersRepository {
+
+    private val questionnaireDao = database.questionnaireDao()
 
     override suspend fun loadLikedQuestionnaires(
         token: String,
         userId: String,
-    ): Result<List<Questionnaire>> {
+    ): Result<Pair<List<Questionnaire>, Throwable?>>{
 
-        if (!NetworkManager.isNetworkAvailable(context)) {
-            return Result.failure(IOException("No internet connection"))
-        }
+        suspend fun loadFromCache() = questionnaireDao.getLikedQuestionnaires().map { it.toDomain() }
+
         return try {
             val dtoList = teammatesUsersApiService.loadLikedQuestionnaires(
                 token = "Bearer $token",
@@ -38,10 +43,15 @@ class UsersRepositoryImpl(
             )
 
             val domainList = dtoList.map { it.toDomain() }
-            Result.success(domainList)
+
+           questionnaireDao.insertLikeQuestionnaires(domainList.map { it.toLikeEntity() })
+
+            Result.success(Pair(domainList, null))
 
         } catch (e: Exception) {
-            Result.failure(e)
+            val cachedQuestionnaires = try { loadFromCache() } catch (_: Exception) { emptyList() }
+
+            Result.success(Pair(cachedQuestionnaires, e))
         }
 
     }

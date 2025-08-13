@@ -16,7 +16,7 @@ class LoadQuestionnairesUseCase @Inject constructor(
         limit: Int = 10,
         game: Games?,
         authorId: String?
-    ): Result<List<Questionnaire>> {
+    ): Result<Pair<List<Questionnaire>, Throwable?>> {
         return runCatching {
 
             val user = userDataRepository.user.first()

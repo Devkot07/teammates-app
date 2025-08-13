@@ -76,7 +76,7 @@ class AuthorViewModel @Inject constructor(
                         game = null,
                         limit = 100,
                         authorId = author.publicId
-                    ).onSuccess { authorQuestionnaires ->
+                    ).onSuccess { (authorQuestionnaires, _) ->
 
                         stateManager.updateSelectedAuthorQuestionnaires(authorQuestionnaires)
                         stateManager.updateAuthorState(ContentState.LOADED)

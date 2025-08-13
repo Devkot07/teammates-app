@@ -10,7 +10,7 @@ class LoadLikedQuestionnairesUseCase @Inject constructor(
     private val usersRepository: UsersRepository,
     private val userDataRepository: UserDataRepository
 ) {
-    suspend operator fun invoke(): Result<List<Questionnaire>> {
+    suspend operator fun invoke(): Result<Pair<List<Questionnaire>, Throwable?>> {
         return runCatching {
 
             val user = userDataRepository.user.first()

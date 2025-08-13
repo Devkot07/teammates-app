@@ -99,13 +99,14 @@ class QuestionnairesViewModel @Inject constructor(
     private suspend fun loadQuestionnaires(game: Games? = null, page: Int = 1) {
         loadQuestionnairesUseCase(
             page = page, game = game, authorId = null
-        ).onSuccess { result ->
+        ).onSuccess { (result, throwable) ->
             Log.d(TAG, result.toString())
             if (page == 1) {
                 stateManager.updateQuestionnaires(result.shuffled())
             } else {
                 stateManager.updateQuestionnaires(questionnaires.value + result)
             }
+            throwable?.let { errorHandler.handleError(it) }
         }.onFailure { throwable ->
             Log.e(TAG, throwable.toString())
             errorHandler.handleError(throwable)
@@ -131,10 +132,11 @@ class QuestionnairesViewModel @Inject constructor(
 
     suspend fun loadUserQuestionnaires() {
         stateManager.updateUserQuestionnairesState(ContentState.LOADING)
-        loadUserQuestionnairesUseCase(game = null).onSuccess { result ->
+        loadUserQuestionnairesUseCase(game = null).onSuccess { (result, throwable) ->
             Log.d(TAG, result.toString())
             stateManager.updateUserQuestionnaires(result)
             stateManager.updateUserQuestionnairesState(ContentState.LOADED)
+            throwable?.let { errorHandler.handleError(it) }
 
         }.onFailure { throwable ->
             Log.e(TAG, throwable.toString())
@@ -145,10 +147,11 @@ class QuestionnairesViewModel @Inject constructor(
 
     private suspend fun loadLikedQuestionnaires() {
         stateManager.updateLikedQuestionnairesState(ContentState.LOADING)
-        loadLikedQuestionnairesUseCase().onSuccess { result ->
+        loadLikedQuestionnairesUseCase().onSuccess { (result, throwable) ->
             Log.d(TAG, result.toString())
             stateManager.updateLikedQuestionnaires(result)
             stateManager.updateLikedQuestionnairesState(ContentState.LOADED)
+            throwable?.let { errorHandler.handleError(it) }
         }.onFailure { throwable ->
             Log.e(TAG, throwable.toString())
             stateManager.updateLikedQuestionnairesState(ContentState.ERROR)
