@@ -139,6 +139,8 @@ fun UserProfilePreview() {
                 "Bob",
                 "111-111-111-111",
                 "bob@longcorp.com",
+                "",
+                "",
             ),
             {},
             PaddingValues()
