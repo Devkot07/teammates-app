@@ -16,9 +16,11 @@ import com.devkot.teammates.domain.usecase.CreateQuestionnaireUseCase
 import com.devkot.teammates.domain.usecase.LikeQuestionnaireUseCase
 import com.devkot.teammates.domain.usecase.LoadLikedQuestionnairesUseCase
 import com.devkot.teammates.domain.usecase.LoadQuestionnairesUseCase
+import com.devkot.teammates.domain.usecase.LoadSelectedQuestionnaireUseCase
 import com.devkot.teammates.domain.usecase.LoadUserQuestionnairesUseCase
 import com.devkot.teammates.domain.usecase.PrepareImageForUploadUseCase
 import com.devkot.teammates.domain.usecase.UnlikeQuestionnaireUseCase
+import com.devkot.teammates.domain.usecase.UpdateQuestionnaireUseCase
 import com.devkot.teammates.ui.snackbar.SnackbarController
 import com.devkot.teammates.ui.snackbar.SnackbarEvent
 import com.devkot.teammates.utils.ErrorHandler
@@ -43,11 +45,15 @@ class QuestionnairesViewModel @Inject constructor(
     private val loadQuestionnairesUseCase: LoadQuestionnairesUseCase,
     private val loadUserQuestionnairesUseCase: LoadUserQuestionnairesUseCase,
 
+    private val loadSelectedQuestionnaireUseCase: LoadSelectedQuestionnaireUseCase,
+
     private val loadLikedQuestionnairesUseCase: LoadLikedQuestionnairesUseCase,
     private val likeQuestionnaireUseCase: LikeQuestionnaireUseCase,
     private val unlikeQuestionnaireUseCase: UnlikeQuestionnaireUseCase,
 
     val createNewQuestionnaireUseCase: CreateQuestionnaireUseCase,
+    val updateQuestionnaireUseCase: UpdateQuestionnaireUseCase,
+
     val prepareImageForUploadUseCase: PrepareImageForUploadUseCase,
 
 
@@ -81,6 +87,9 @@ class QuestionnairesViewModel @Inject constructor(
     private val _isRefreshingUserQuestionnaires = MutableStateFlow(false)
     val isRefreshingUserQuestionnaires: StateFlow<Boolean> = _isRefreshingUserQuestionnaires.asStateFlow()
 
+    private val _isRefreshingSelectedQuestionnaire = MutableStateFlow(false)
+    val isRefreshingSelectedQuestionnaire: StateFlow<Boolean> = _isRefreshingSelectedQuestionnaire.asStateFlow()
+
     private val _isLoadingMoreQuestionnaires = MutableStateFlow(false)
     private val isLoadingMoreQuestionnaires: StateFlow<Boolean> = _isLoadingMoreQuestionnaires.asStateFlow()
 
@@ -106,6 +115,20 @@ class QuestionnairesViewModel @Inject constructor(
             } else {
                 stateManager.updateQuestionnaires(questionnaires.value + result)
             }
+            throwable?.let { errorHandler.handleError(it) }
+        }.onFailure { throwable ->
+            Log.e(TAG, throwable.toString())
+            errorHandler.handleError(throwable)
+        }
+
+    }
+
+    private suspend fun loadSelectedQuestionnaire() {
+        loadSelectedQuestionnaireUseCase(
+            questionnaireId = stateManager.selectedQuestionnaire.value.questionnaireId
+        ).onSuccess { (result, throwable) ->
+            Log.d(TAG, result.toString())
+            stateManager.updateQuestionnaire(result.first())
             throwable?.let { errorHandler.handleError(it) }
         }.onFailure { throwable ->
             Log.e(TAG, throwable.toString())
@@ -242,6 +265,49 @@ class QuestionnairesViewModel @Inject constructor(
         }
     }
 
+    fun updateQuestionnaire(
+        header: String,
+        description: String,
+        selectedGame: Games?,
+        questionnaireId: String,
+        uri: Uri?,
+        context: Context,
+    ) {
+        viewModelScope.launch {
+            val validationResult = createNewQuestionnaireUseCase.validateQuestionnaireForm(
+                header,
+                description,
+                selectedGame
+            )
+
+            when (validationResult) {
+                is ValidationResult.Error -> {
+                    val messageRes = validationResult.errorCode.toMessageRes()
+                    SnackbarController.sendEvent(SnackbarEvent(messageRes))
+                }
+
+                ValidationResult.Success -> {
+                    stateManager.updateSelectedQuestionnaireState(ContentState.LOADING)
+                    updateQuestionnaireUseCase(
+                        header = header,
+                        selectedGame = selectedGame!!,
+                        description = description,
+                        questionnaireId = questionnaireId,
+                        image = prepareImageForUploadUseCase(uri, context)
+                    ).onSuccess { result ->
+                        stateManager.updateQuestionnaire(result)
+                        stateManager.updateSelectedQuestionnaireState(ContentState.LOADED)
+                        SnackbarController.sendEvent(SnackbarEvent(R.string.questionnaire_updated_successfully))
+                        _questionnaireUiEvent.tryEmit(QuestionnaireUiEvent.QuestionnaireUpdated)
+                    }.onFailure { throwable ->
+                        stateManager.updateSelectedQuestionnaireState(ContentState.ERROR)
+                        errorHandler.handleError(throwable)
+                    }
+                }
+            }
+        }
+    }
+
     fun refreshHomeScreen() {
         viewModelScope.launch {
             _isRefreshingQuestionnaires.value = true
@@ -269,8 +335,24 @@ class QuestionnairesViewModel @Inject constructor(
         }
     }
 
+
+    fun refreshSelectedQuestionnaire() {
+        viewModelScope.launch {
+            _isRefreshingSelectedQuestionnaire.value = true
+            stateManager.updateSelectedQuestionnaireState(ContentState.LOADING)
+            loadSelectedQuestionnaire()
+            delay(100)
+            _isRefreshingSelectedQuestionnaire.value = false
+            stateManager.updateSelectedQuestionnaireState(ContentState.LOADED)
+
+        }
+    }
+
     fun resetSelectedQuestionnaireState() {
-        stateManager.updateSelectedQuestionnaireState(ContentState.INITIAL)
+        viewModelScope.launch {
+            delay(1000)
+            stateManager.updateSelectedQuestionnaireState(ContentState.INITIAL)
+        }
     }
 
     companion object {
@@ -281,6 +363,7 @@ class QuestionnairesViewModel @Inject constructor(
 
 sealed class QuestionnaireUiEvent {
     data object QuestionnaireCreated : QuestionnaireUiEvent()
+    data object QuestionnaireUpdated: QuestionnaireUiEvent()
     data object QuestionnaireLiked : QuestionnaireUiEvent()
     data object QuestionnaireUnliked : QuestionnaireUiEvent()
 }

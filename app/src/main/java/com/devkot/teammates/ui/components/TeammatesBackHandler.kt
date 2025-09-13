@@ -37,6 +37,8 @@ fun TeammatesBackHandler(
 
             Destinations.UserQuestionnaires.route -> navController.navigateUp()
             Destinations.UserProfileEdit.route -> navController.navigateUp()
+            Destinations.QuestionnaireDetails.route -> navController.navigateUp()
+            Destinations.QuestionnaireEdit.route -> navController.navigateUp()
             else -> {}
         }
     }

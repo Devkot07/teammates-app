@@ -26,4 +26,21 @@ interface QuestionnairesRepository {
         image: MultipartBody.Part?
     ): Result<Questionnaire>
 
+
+    suspend fun updateQuestionnaire(
+        token: String,
+        header: String,
+        game: Games,
+        description: String,
+        authorId: String,
+        questionnaireId: String,
+        image: MultipartBody.Part?
+    ): Result<Questionnaire>
+
+//    suspend fun deleteQuestionnaires(
+//        token: String,
+//        userId: String,
+//        questionnaireId: String?,
+//    ): Result<String>
+
 }

@@ -114,6 +114,14 @@ fun TeammatesNavGraph(
 
             QuestionnaireUiEvent.QuestionnaireLiked -> {}
             QuestionnaireUiEvent.QuestionnaireUnliked -> {}
+            QuestionnaireUiEvent.QuestionnaireUpdated -> {
+                coroutineScope.launch {
+                    questionnairesViewModel.loadUserQuestionnaires()
+                    navController.navigate(Destinations.QuestionnaireDetails.route) {
+                        popUpTo(Destinations.Home.route) { inclusive = false }
+                    }
+                }
+            }
         }
     }
 
@@ -374,9 +382,35 @@ fun TeammatesNavGraph(
                     else
                         navController.navigate(Destinations.AuthorProfile.route)
                 },
+
                 topBar = {
+                    val isUserQuestionnaire =
+                        userQuestionnaires.any { it.questionnaireId == selectedQuestionnaire.questionnaireId }
+                    var showDropDownMenu by remember { mutableStateOf(false) }
+                    val items = listOf(
+                        DropdownItem(
+                            text = stringResource(R.string.edit_questionnaire),
+                            icon = Icons.Filled.ModeEditOutline,
+                            onClick = {
+                                navController.navigate(Destinations.QuestionnaireEdit.route)
+                                showDropDownMenu = false
+                            }
+                        ),
+                    )
                     TeammatesTopAppBar(
                         title = stringResource(Destinations.QuestionnaireDetails.titleRes),
+                        actions = {
+                            if (isUserQuestionnaire) {
+                                IconButton(onClick = { showDropDownMenu = !showDropDownMenu }) {
+                                    Icon(Dots, contentDescription = null)
+                                }
+                                TeammatesDropdownMenu(
+                                    expanded = showDropDownMenu,
+                                    items = items,
+                                    onDismissRequest = { showDropDownMenu = false },
+                                )
+                            }
+                        },
                         canNavigateBack = true,
                         navigateUp = {
                             questionnairesViewModel.resetSelectedQuestionnaireState()

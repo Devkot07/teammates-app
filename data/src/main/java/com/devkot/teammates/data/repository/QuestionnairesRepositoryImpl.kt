@@ -81,7 +81,42 @@ class QuestionnairesRepositoryImpl(
                 teammatesQuestionnairesApiService.createQuestionnaire(
                     token = "Bearer $token",
                     userId = authorId,
-                    request = CreateQuestionnaireRequest(
+                    request = QuestionnaireInRequest(
+                        header,
+                        game.nameOfGame,
+                        description,
+                        authorId
+                    ).toDto(),
+                    image = image
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+
+    override suspend fun updateQuestionnaire(
+        token: String,
+        header: String,
+        game: Games,
+        description: String,
+        authorId: String,
+        questionnaireId: String,
+        image: MultipartBody.Part?
+    ): Result<Questionnaire> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesQuestionnairesApiService.updateQuestionnaire(
+                    token = "Bearer $token",
+                    userId = authorId,
+                    questionnaireId = questionnaireId,
+                    questionnaireIdQuery = questionnaireId,
+                    request = QuestionnaireInRequest(
                         header,
                         game.nameOfGame,
                         description,

@@ -14,6 +14,7 @@ sealed class Destinations(
     data object LikedQuestionnaires : Destinations("liked_questionnaires", R.string.favorites)
     data object QuestionnaireCreate : Destinations("create_questionnaire", R.string.create_questionnaire)
     data object QuestionnaireDetails : Destinations("questionnaires_details", R.string.questionnaire)
+    data object QuestionnaireEdit : Destinations("questionnaire_edit", R.string.edit_questionnaire)
     data object UserQuestionnaires : Destinations("user_questionnaires", R.string.user_questionnaires)
     data object UserProfile : Destinations("user_profile", R.string.profile)
     data object UserProfileEdit : Destinations("user_profile_edit", R.string.profile)

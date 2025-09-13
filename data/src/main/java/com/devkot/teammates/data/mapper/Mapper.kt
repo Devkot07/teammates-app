@@ -1,10 +1,10 @@
 package com.devkot.teammates.data.mapper
 
-import com.devkot.teammates.data.remote.dto.CreateQuestionnaireRequestDto
+import com.devkot.teammates.data.remote.dto.QuestionnaireInRequestDto
 import com.devkot.teammates.data.remote.dto.LoginRequestDto
 import com.devkot.teammates.data.remote.dto.UpdateTokenRequestDto
 import com.devkot.teammates.data.remote.dto.UpdateUserProfileRequestDto
-import com.devkot.teammates.domain.model.requesrt.CreateQuestionnaireRequest
+import com.devkot.teammates.domain.model.requesrt.QuestionnaireInRequest
 import com.devkot.teammates.domain.model.requesrt.LoginRequest
 import com.devkot.teammates.domain.model.requesrt.UpdateTokenRequest
 import com.devkot.teammates.domain.model.requesrt.UpdateUserProfileRequest
@@ -19,8 +19,8 @@ fun UpdateTokenRequest.toDto(): UpdateTokenRequestDto =
         refreshToken = this.refreshToken
     )
 
-fun CreateQuestionnaireRequest.toDto(): CreateQuestionnaireRequestDto =
-    CreateQuestionnaireRequestDto(
+fun QuestionnaireInRequest.toDto(): QuestionnaireInRequestDto =
+    QuestionnaireInRequestDto(
         header = this.header,
         game = this.game,
         description = this.description,

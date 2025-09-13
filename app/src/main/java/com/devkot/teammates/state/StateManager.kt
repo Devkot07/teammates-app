@@ -94,6 +94,15 @@ class StateManager @Inject constructor() {
         _likedAuthors.value = likedAuthors
     }
 
+    fun updateQuestionnaire(questionnaire: Questionnaire) {
+        _likedQuestionnaires.value = _likedQuestionnaires.value.map {
+            if (it.questionnaireId == questionnaire.questionnaireId) questionnaire else it
+        }
+        _userQuestionnaires.value = _userQuestionnaires.value.map {
+            if (it.questionnaireId == questionnaire.questionnaireId) questionnaire else it
+        }
+        _selectedQuestionnaire.value = questionnaire
+    }
 
     fun updateAuthState(authState: AuthState) {
         _authState.value = authState
