@@ -1,8 +1,7 @@
 package com.devkot.teammates.ui.components
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdsClick
 import androidx.compose.material3.Icon
@@ -31,14 +30,14 @@ fun TeammatesButton(
         modifier = modifier,
         enabled = enabled,
         shape = ShapeDefaults.Small,
-        contentPadding = PaddingValues(horizontal = 12.dp)
+        contentPadding = PaddingValues(horizontal = 8.dp)
     ) {
         imageVector?.let {
             Icon(imageVector = it, contentDescription = null)
-            if (text != null) Spacer(modifier = Modifier.width(8.dp))
         }
         text?.let {
             Text(
+                modifier = Modifier.padding(horizontal = 4.dp),
                 text = it,
                 style = MaterialTheme.typography.bodyLarge
             )

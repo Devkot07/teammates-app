@@ -47,7 +47,8 @@ fun TeammatesDropdownMenu(
                 width = 1.dp,
                 shape = ShapeDefaults.Small,
                 color = MaterialTheme.colorScheme.outline,
-            )
+            ),
+        shape = ShapeDefaults.Small
     ) {
         items.forEach { item ->
             DropdownMenuItem(

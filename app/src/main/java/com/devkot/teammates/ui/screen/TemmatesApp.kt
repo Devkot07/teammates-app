@@ -1,6 +1,13 @@
 package com.devkot.teammates.ui.screen
 
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -115,7 +123,33 @@ fun TeammatesApp() {
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
 
         bottomBar = {
-            if (shouldShowBottomBar) {
+            AnimatedVisibility(
+                visible = shouldShowBottomBar,
+                enter = fadeIn(
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        easing = FastOutSlowInEasing
+                    )
+                ) + expandVertically(
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = FastOutSlowInEasing,
+                    ),
+                    expandFrom = Alignment.Bottom
+                ),
+                exit = fadeOut(
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        easing = FastOutSlowInEasing
+                    )
+                )  + shrinkVertically(
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = FastOutSlowInEasing
+                    ),
+                    shrinkTowards = Alignment.Bottom
+                )
+            ) {
                 TeammatesBottomNavigationBar(
                     currentTab = currentTab,
                     onTabPressed = { contentType ->

@@ -42,11 +42,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.devkot.teammates.R
 import com.devkot.teammates.domain.model.enums.ContentState
@@ -55,6 +53,7 @@ import com.devkot.teammates.domain.model.form.QuestionnaireForm
 import com.devkot.teammates.ui.components.GamesDropdownMenu
 import com.devkot.teammates.ui.components.LoadingItemWithText
 import com.devkot.teammates.ui.components.TeammatesButton
+import com.devkot.teammates.ui.components.TeammatesImage
 import com.devkot.teammates.viewmodel.QuestionnairesViewModel
 
 
@@ -121,12 +120,10 @@ fun QuestionnaireCreateScreen(
 
 
                 selectedImageUri?.let {
-                    AsyncImage(
+                    TeammatesImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(selectedImageUri)
-                            .placeholder(R.drawable.ic_loading_image)
                             .build(),
-                        error = painterResource(R.drawable.ic_broken_image),
                         contentDescription = "Profile Picture",
                         modifier = Modifier
                             .padding(32.dp)

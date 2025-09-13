@@ -1,7 +1,14 @@
 package com.devkot.teammates.ui.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ModeEditOutline
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,12 +22,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.devkot.teammates.R
 import com.devkot.teammates.domain.model.enums.AuthState
 import com.devkot.teammates.domain.model.enums.BottomNavItem
 import com.devkot.teammates.ui.ObserveAsEvents
 import com.devkot.teammates.ui.ObserveState
+import com.devkot.teammates.ui.components.Dots
+import com.devkot.teammates.ui.components.DropdownItem
 import com.devkot.teammates.ui.components.LoadingItemWithText
 import com.devkot.teammates.ui.components.TeammatesBackHandler
+import com.devkot.teammates.ui.components.TeammatesDropdownMenu
 import com.devkot.teammates.ui.components.TeammatesTopAppBar
 import com.devkot.teammates.ui.screen.LoginScreen
 import com.devkot.teammates.ui.screen.TeammatesHomeScreen
@@ -28,6 +39,7 @@ import com.devkot.teammates.ui.screen.author.AuthorProfileScreen
 import com.devkot.teammates.ui.screen.questionnaire.LikedQuestionnairesScreen
 import com.devkot.teammates.ui.screen.questionnaire.QuestionnaireCreateScreen
 import com.devkot.teammates.ui.screen.questionnaire.QuestionnaireDetailsScreen
+import com.devkot.teammates.ui.screen.questionnaire.QuestionnaireEditScreen
 import com.devkot.teammates.ui.screen.questionnaire.UserQuestionnairesScreen
 import com.devkot.teammates.ui.screen.user.UserProfileEditScreen
 import com.devkot.teammates.ui.screen.user.UserProfileScreen
@@ -160,8 +172,46 @@ fun TeammatesNavGraph(
         },
 
         modifier = Modifier.padding(paddingValues),
+        enterTransition = {
+            fadeIn(
+                animationSpec = tween(
+                    durationMillis = 300,
+                    delayMillis = 300
+                )
+            )
+        },
+        exitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) },
+        popEnterTransition = {
+            fadeIn(
+                animationSpec = tween(
+                    durationMillis = 300,
+                    delayMillis = 300
+                )
+            )
+        },
+        popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) }
     ) {
-        composable(Destinations.Loading.route) {
+        composable(
+            Destinations.Loading.route,
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        delayMillis = 500
+                    )
+                )
+            },
+            exitTransition = { fadeOut(animationSpec = tween(durationMillis = 100)) },
+            popEnterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        delayMillis = 500
+                    )
+                )
+            },
+            popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 100)) }
+        ) {
             LoadingItemWithText()
         }
 
@@ -192,8 +242,6 @@ fun TeammatesNavGraph(
                 navController = navController,
                 context = context
             )
-
-
         }
 
         composable(Destinations.LikedQuestionnaires.route) {
@@ -337,7 +385,32 @@ fun TeammatesNavGraph(
                     )
                 }
             )
+            TeammatesBackHandler(
+                currentRoute = currentRoute,
+                onTabChange = { currentTab = it },
+                navController = navController,
+                context = context,
+                onBack = { questionnairesViewModel.resetSelectedQuestionnaireState() }
+            )
+
         }
+
+        composable(Destinations.QuestionnaireEdit.route) {
+            QuestionnaireEditScreen(
+                questionnaire = selectedQuestionnaire,
+                questionnairesViewModel = questionnairesViewModel,
+                navigateUp = { navController.navigateUp() }
+
+            )
+            TeammatesBackHandler(
+                currentRoute = currentRoute,
+                onTabChange = { currentTab = it },
+                navController = navController,
+                context = context
+            )
+
+        }
+
         composable(Destinations.AuthorProfile.route) {
             AuthorProfileScreen(
                 authorViewModel = authorViewModel,
