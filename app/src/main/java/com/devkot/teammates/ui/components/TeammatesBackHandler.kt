@@ -14,7 +14,8 @@ fun TeammatesBackHandler(
     currentRoute: String?,
     onTabChange: (BottomNavItem) -> Unit,
     navController: NavController,
-    context: Context
+    context: Context,
+    onBack: () -> Unit = { }
 ) {
     val homeRoute = Destinations.Home.route
     val bottomNavigationTabs = listOf(
@@ -24,6 +25,7 @@ fun TeammatesBackHandler(
     )
 
     BackHandler {
+        onBack()
         when (currentRoute) {
             homeRoute -> context.findActivity()?.finish()
             in bottomNavigationTabs -> {
