@@ -9,7 +9,7 @@ import com.devkot.teammates.data.remote.api.TeammatesQuestionnairesApiService
 import com.devkot.teammates.data.remote.network.NetworkManager
 import com.devkot.teammates.domain.model.Questionnaire
 import com.devkot.teammates.domain.model.enums.Games
-import com.devkot.teammates.domain.model.requesrt.CreateQuestionnaireRequest
+import com.devkot.teammates.domain.model.requesrt.QuestionnaireInRequest
 import com.devkot.teammates.domain.repository.QuestionnairesRepository
 import okhttp3.MultipartBody
 import java.io.IOException
