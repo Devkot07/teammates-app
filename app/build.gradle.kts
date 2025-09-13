@@ -1,4 +1,19 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.io.FileInputStream
+import java.util.Properties
+
+
+fun getLocalProperty(propertyName: String, defaultValue: String = ""): String {
+    val localPropertiesFile = rootProject.file("local.properties")
+    return try {
+        if (localPropertiesFile.exists()) {
+            val properties = Properties()
+            properties.load(FileInputStream(localPropertiesFile))
+            properties.getProperty(propertyName) ?: defaultValue
+        } else defaultValue
+    } catch (e: Exception) {
+        defaultValue
+    }
+}
 
 plugins {
     alias(libs.plugins.android.application)
@@ -24,11 +39,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
-        buildConfigField("String", "BASE_URL", gradleLocalProperties(rootDir, providers).getProperty("BASE_URL"))
-        buildConfigField("String", "PORT_1", gradleLocalProperties(rootDir, providers).getProperty("PORT_1"))
-        buildConfigField("String", "PORT_2", gradleLocalProperties(rootDir, providers).getProperty("PORT_2"))
-        buildConfigField("String", "PORT_3", gradleLocalProperties(rootDir, providers).getProperty("PORT_3"))
-        buildConfigField("String", "END_URL", gradleLocalProperties(rootDir, providers).getProperty("END_URL"))
+        buildConfigField("String", "BASE_URL", getLocalProperty("BASE_URL"))
+        buildConfigField("String", "PORT_1", getLocalProperty("PORT_1"))
+        buildConfigField("String", "PORT_2", getLocalProperty("PORT_2"))
+        buildConfigField("String", "PORT_3", getLocalProperty("PORT_3"))
+        buildConfigField("String", "END_URL", getLocalProperty("END_URL"))
     }
 
     buildTypes {
