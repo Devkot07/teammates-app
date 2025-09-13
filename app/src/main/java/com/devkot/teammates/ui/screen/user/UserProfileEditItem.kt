@@ -92,7 +92,7 @@ fun UserProfileEditItem(
 
     val model: Any =
         if (selectedImageUri != null) ImageRequest.Builder(LocalContext.current)
-            .data(selectedImageUri).placeholder(R.drawable.ic_loading_image).build()
+            .data(selectedImageUri).build()
         else user.imagePath.replace(
             "http://localhost:8200",
             "${BuildConfig.BASE_URL}${BuildConfig.PORT_3}${BuildConfig.END_URL}"
