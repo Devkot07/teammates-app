@@ -208,7 +208,7 @@ class QuestionnairesViewModel @Inject constructor(
                 unlikedQuestionnaireId = unlikedQuestionnaire.questionnaireId
             ).onSuccess { result ->
                 Log.d(TAG, result.toString())
-                val likedQuestionnaires = likedQuestionnaires.value.minus(unlikedQuestionnaire)
+                val likedQuestionnaires = likedQuestionnaires.value.filter { it.questionnaireId != unlikedQuestionnaire.questionnaireId }
                 stateManager.updateLikedQuestionnaires(likedQuestionnaires = likedQuestionnaires)
                 stateManager.updateSelectedQuestionnaireState(ContentState.LOADED)
                 _questionnaireUiEvent.tryEmit(QuestionnaireUiEvent.QuestionnaireUnliked)

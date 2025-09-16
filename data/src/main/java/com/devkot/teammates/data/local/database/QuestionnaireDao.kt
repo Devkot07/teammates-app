@@ -23,9 +23,9 @@ interface QuestionnaireDao {
     suspend fun getFilteredQuestionnaires(
         page: Int = 1,
         limit: Int = 10,
-        gameName: String?,
-        authorId: String?,
-        questionnaireId: String?
+        gameName: String? = null,
+        authorId: String? = null,
+        questionnaireId: String? = null
     ): List<QuestionnaireEntity>
 
 

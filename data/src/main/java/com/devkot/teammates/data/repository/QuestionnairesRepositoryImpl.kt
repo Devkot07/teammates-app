@@ -115,7 +115,6 @@ class QuestionnairesRepositoryImpl(
                     token = "Bearer $token",
                     userId = authorId,
                     questionnaireId = questionnaireId,
-                    questionnaireIdQuery = questionnaireId,
                     request = QuestionnaireInRequest(
                         header,
                         game.nameOfGame,

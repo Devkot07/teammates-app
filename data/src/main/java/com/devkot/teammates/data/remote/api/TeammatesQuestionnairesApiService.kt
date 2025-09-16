@@ -42,7 +42,6 @@ interface TeammatesQuestionnairesApiService {
         @Header("accept") accept: String = "application/json",
         @Header("Authorization") token: String,
         @Path("questionnaire_id") questionnaireId: String,
-        @Query("questionnaire_id") questionnaireIdQuery: String,
         @Query("user_id") userId: String,
         @Part("questionnaire_in") request: QuestionnaireInRequestDto,
         @Part image: MultipartBody.Part? = null

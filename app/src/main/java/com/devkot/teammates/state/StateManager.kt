@@ -95,6 +95,9 @@ class StateManager @Inject constructor() {
     }
 
     fun updateQuestionnaire(questionnaire: Questionnaire) {
+        _questionnaires.value = _questionnaires.value.map {
+            if (it.questionnaireId == questionnaire.questionnaireId) questionnaire else it
+        }
         _likedQuestionnaires.value = _likedQuestionnaires.value.map {
             if (it.questionnaireId == questionnaire.questionnaireId) questionnaire else it
         }
