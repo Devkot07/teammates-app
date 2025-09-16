@@ -122,6 +122,12 @@ fun TeammatesNavGraph(
                     }
                 }
             }
+            QuestionnaireUiEvent.QuestionnaireDeleted -> {
+                coroutineScope.launch {
+                    questionnairesViewModel.loadUserQuestionnaires()
+                    navController.navigateUp()
+                }
+            }
         }
     }
 
@@ -374,6 +380,7 @@ fun TeammatesNavGraph(
             QuestionnaireDetailsScreen(
                 author = selectedAuthor,
                 questionnaire = selectedQuestionnaire,
+                userQuestionnaires = userQuestionnaires,
                 likedQuestionnaires = likedQuestionnaires,
                 questionnairesViewModel = questionnairesViewModel,
                 navigateToAuthorProfile = {
@@ -382,42 +389,12 @@ fun TeammatesNavGraph(
                     else
                         navController.navigate(Destinations.AuthorProfile.route)
                 },
+                navigateToQuestionnaireEdit = {
+                    navController.navigate(Destinations.QuestionnaireEdit.route)
+                },
+                navigateUp = { navController.navigateUp() }
 
-                topBar = {
-                    val isUserQuestionnaire =
-                        userQuestionnaires.any { it.questionnaireId == selectedQuestionnaire.questionnaireId }
-                    var showDropDownMenu by remember { mutableStateOf(false) }
-                    val items = listOf(
-                        DropdownItem(
-                            text = stringResource(R.string.edit_questionnaire),
-                            icon = Icons.Filled.ModeEditOutline,
-                            onClick = {
-                                navController.navigate(Destinations.QuestionnaireEdit.route)
-                                showDropDownMenu = false
-                            }
-                        ),
-                    )
-                    TeammatesTopAppBar(
-                        title = stringResource(Destinations.QuestionnaireDetails.titleRes),
-                        actions = {
-                            if (isUserQuestionnaire) {
-                                IconButton(onClick = { showDropDownMenu = !showDropDownMenu }) {
-                                    Icon(Dots, contentDescription = null)
-                                }
-                                TeammatesDropdownMenu(
-                                    expanded = showDropDownMenu,
-                                    items = items,
-                                    onDismissRequest = { showDropDownMenu = false },
-                                )
-                            }
-                        },
-                        canNavigateBack = true,
-                        navigateUp = {
-                            questionnairesViewModel.resetSelectedQuestionnaireState()
-                            navController.navigateUp()
-                        },
-                    )
-                }
+
             )
             TeammatesBackHandler(
                 currentRoute = currentRoute,

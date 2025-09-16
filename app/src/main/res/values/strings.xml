@@ -63,4 +63,6 @@
     <string name="edit_questionnaire">Edit questionnaire</string>
     <string name="confirm_the_action">Confirm the action</string>
     <string name="questionnaire_updated_successfully">Questionnaire updated successfully</string>
+    <string name="delete_questionnaire">Delete questionnaire</string>
+    <string name="questionnaire_deleted_successfully">Questionnaire deleted successfully</string>
 </resources>

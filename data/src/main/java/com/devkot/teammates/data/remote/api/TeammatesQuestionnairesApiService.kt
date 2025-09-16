@@ -1,8 +1,9 @@
 package com.devkot.teammates.data.remote.api
 
-import com.devkot.teammates.data.remote.dto.QuestionnaireInRequestDto
 import com.devkot.teammates.data.remote.dto.QuestionnaireDto
+import com.devkot.teammates.data.remote.dto.QuestionnaireInRequestDto
 import okhttp3.MultipartBody
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -46,5 +47,13 @@ interface TeammatesQuestionnairesApiService {
         @Part("questionnaire_in") request: QuestionnaireInRequestDto,
         @Part image: MultipartBody.Part? = null
     ): QuestionnaireDto
+
+    @DELETE("questionnaire/{questionnaire_id}")
+    suspend fun deleteQuestionnaire(
+        @Header("accept") accept: String = "application/json",
+        @Header("Authorization") token: String,
+        @Path("questionnaire_id") questionnaireId: String,
+        @Query("user_id") userId: String,
+    )
 
 }

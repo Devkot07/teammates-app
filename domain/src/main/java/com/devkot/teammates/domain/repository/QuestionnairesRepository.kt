@@ -1,7 +1,7 @@
 package com.devkot.teammates.domain.repository
 
-import com.devkot.teammates.domain.model.enums.Games
 import com.devkot.teammates.domain.model.Questionnaire
+import com.devkot.teammates.domain.model.enums.Games
 import okhttp3.MultipartBody
 
 
@@ -37,10 +37,10 @@ interface QuestionnairesRepository {
         image: MultipartBody.Part?
     ): Result<Questionnaire>
 
-//    suspend fun deleteQuestionnaires(
-//        token: String,
-//        userId: String,
-//        questionnaireId: String?,
-//    ): Result<String>
+    suspend fun deleteQuestionnaires(
+        token: String,
+        userId: String,
+        questionnaireId: String
+    ): Result<Unit>
 
 }

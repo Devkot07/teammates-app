@@ -13,6 +13,7 @@ import com.devkot.teammates.domain.model.enums.ContentState
 import com.devkot.teammates.domain.model.enums.Games
 import com.devkot.teammates.state.StateManager
 import com.devkot.teammates.domain.usecase.CreateQuestionnaireUseCase
+import com.devkot.teammates.domain.usecase.DeleteQuestionnaireUseCase
 import com.devkot.teammates.domain.usecase.LikeQuestionnaireUseCase
 import com.devkot.teammates.domain.usecase.LoadLikedQuestionnairesUseCase
 import com.devkot.teammates.domain.usecase.LoadQuestionnairesUseCase
@@ -53,6 +54,7 @@ class QuestionnairesViewModel @Inject constructor(
 
     val createNewQuestionnaireUseCase: CreateQuestionnaireUseCase,
     val updateQuestionnaireUseCase: UpdateQuestionnaireUseCase,
+    val deleteQuestionnaireUseCase: DeleteQuestionnaireUseCase,
 
     val prepareImageForUploadUseCase: PrepareImageForUploadUseCase,
 
@@ -124,11 +126,19 @@ class QuestionnairesViewModel @Inject constructor(
     }
 
     private suspend fun loadSelectedQuestionnaire() {
+        stateManager.updateSelectedQuestionnaireState(ContentState.LOADING)
         loadSelectedQuestionnaireUseCase(
             questionnaireId = stateManager.selectedQuestionnaire.value.questionnaireId
         ).onSuccess { (result, throwable) ->
             Log.d(TAG, result.toString())
-            stateManager.updateQuestionnaire(result.first())
+            val questionnaire = result.firstOrNull()
+            if (questionnaire == null) {
+                stateManager.deleteQuestionnaire(stateManager.selectedQuestionnaire.value.questionnaireId)
+                stateManager.updateSelectedQuestionnaireState(ContentState.ERROR)
+            } else {
+                stateManager.updateQuestionnaire(questionnaire)
+                stateManager.updateSelectedQuestionnaireState(ContentState.LOADED)
+            }
             throwable?.let { errorHandler.handleError(it) }
         }.onFailure { throwable ->
             Log.e(TAG, throwable.toString())
@@ -308,6 +318,23 @@ class QuestionnairesViewModel @Inject constructor(
         }
     }
 
+    fun deleteQuestionnaire(questionnaireId: String) {
+        viewModelScope.launch {
+
+            stateManager.updateSelectedQuestionnaireState(ContentState.LOADING)
+            deleteQuestionnaireUseCase(questionnaireId = questionnaireId).onSuccess {
+                stateManager.deleteQuestionnaire(questionnaireId)
+                stateManager.updateSelectedQuestionnaireState(ContentState.INITIAL)
+                SnackbarController.sendEvent(SnackbarEvent(R.string.questionnaire_deleted_successfully))
+                _questionnaireUiEvent.tryEmit(QuestionnaireUiEvent.QuestionnaireDeleted)
+            }.onFailure { throwable ->
+                stateManager.updateSelectedQuestionnaireState(ContentState.ERROR)
+                errorHandler.handleError(throwable)
+            }
+        }
+            
+    }
+
     fun refreshHomeScreen() {
         viewModelScope.launch {
             _isRefreshingQuestionnaires.value = true
@@ -319,6 +346,7 @@ class QuestionnairesViewModel @Inject constructor(
 
     fun refreshUserQuestionnairesScreen() {
         viewModelScope.launch {
+            stateManager.updateSelectedQuestionnaireState(ContentState.INITIAL)
             _isRefreshingUserQuestionnaires.value = true
             loadUserQuestionnaires()
             delay(100)
@@ -339,12 +367,10 @@ class QuestionnairesViewModel @Inject constructor(
     fun refreshSelectedQuestionnaire() {
         viewModelScope.launch {
             _isRefreshingSelectedQuestionnaire.value = true
-            stateManager.updateSelectedQuestionnaireState(ContentState.LOADING)
             loadSelectedQuestionnaire()
+            loadLikedQuestionnaires()
             delay(100)
             _isRefreshingSelectedQuestionnaire.value = false
-            stateManager.updateSelectedQuestionnaireState(ContentState.LOADED)
-
         }
     }
 
@@ -363,7 +389,8 @@ class QuestionnairesViewModel @Inject constructor(
 
 sealed class QuestionnaireUiEvent {
     data object QuestionnaireCreated : QuestionnaireUiEvent()
-    data object QuestionnaireUpdated: QuestionnaireUiEvent()
+    data object QuestionnaireUpdated : QuestionnaireUiEvent()
+    data object QuestionnaireDeleted : QuestionnaireUiEvent()
     data object QuestionnaireLiked : QuestionnaireUiEvent()
     data object QuestionnaireUnliked : QuestionnaireUiEvent()
 }

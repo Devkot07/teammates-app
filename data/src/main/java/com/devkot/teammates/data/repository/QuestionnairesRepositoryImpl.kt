@@ -129,4 +129,27 @@ class QuestionnairesRepositoryImpl(
         }
 
     }
+
+    override suspend fun deleteQuestionnaires(
+        token: String,
+        userId: String,
+        questionnaireId: String
+    ): Result<Unit> {
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesQuestionnairesApiService.deleteQuestionnaire(
+                    token = "Bearer $token",
+                    questionnaireId = questionnaireId,
+                    userId = userId,
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
 }

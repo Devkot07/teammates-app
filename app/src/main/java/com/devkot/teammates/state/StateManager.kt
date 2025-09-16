@@ -107,6 +107,13 @@ class StateManager @Inject constructor() {
         _selectedQuestionnaire.value = questionnaire
     }
 
+    fun deleteQuestionnaire(questionnaireId: String) {
+        _questionnaires.value = _questionnaires.value.filter { (it.questionnaireId != questionnaireId) }
+        _likedQuestionnaires.value = _likedQuestionnaires.value.filter { (it.questionnaireId != questionnaireId) }
+        _userQuestionnaires.value = _userQuestionnaires.value.filter { (it.questionnaireId != questionnaireId) }
+        _selectedQuestionnaire.value = Questionnaire()
+    }
+
     fun updateAuthState(authState: AuthState) {
         _authState.value = authState
     }
