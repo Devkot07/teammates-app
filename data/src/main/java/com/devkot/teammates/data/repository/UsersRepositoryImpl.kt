@@ -32,7 +32,7 @@ class UsersRepositoryImpl(
     override suspend fun loadLikedQuestionnaires(
         token: String,
         userId: String,
-    ): Result<Pair<List<Questionnaire>, Throwable?>>{
+    ): Result<Pair<List<Questionnaire>, Throwable?>> {
 
         suspend fun loadFromCache() = questionnaireDao.getLikedQuestionnaires().map { it.toDomain() }
 
@@ -44,7 +44,7 @@ class UsersRepositoryImpl(
 
             val domainList = dtoList.map { it.toDomain() }
 
-           questionnaireDao.insertLikeQuestionnaires(domainList.map { it.toLikeEntity() })
+            questionnaireDao.insertLikeQuestionnaires(domainList.map { it.toLikeEntity() })
 
             Result.success(Pair(domainList, null))
 
@@ -79,20 +79,24 @@ class UsersRepositoryImpl(
     override suspend fun likeQuestionnaire(
         token: String,
         userId: String,
-        likedQuestionnaireId: String
+        questionnaire: Questionnaire
     ): Result<LikeQuestionnaireResponse> {
 
         if (!NetworkManager.isNetworkAvailable(context)) {
             return Result.failure(IOException("No internet connection"))
         }
         return try {
-            Result.success(
-                teammatesUsersApiService.likeQuestionnaire(
-                    token = "Bearer $token",
-                    userId = userId,
-                    request = LikeQuestionnaireRequestDto(userId, likedQuestionnaireId)
-                ).toDomain()
-            )
+            val response = teammatesUsersApiService.likeQuestionnaire(
+                token = "Bearer $token",
+                userId = userId,
+                request = LikeQuestionnaireRequestDto(userId, questionnaire.questionnaireId)
+            ).toDomain()
+
+            if (questionnaire.questionnaireId == response.likedQuestionnaireId) {
+                questionnaireDao.insertLikeQuestionnaire(questionnaire.toLikeEntity())
+            }
+
+            Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -102,20 +106,25 @@ class UsersRepositoryImpl(
     override suspend fun unlikeQuestionnaire(
         token: String,
         userId: String,
-        unlikedQuestionnaireId: String
+        questionnaire: Questionnaire
     ): Result<LikeQuestionnaireResponse> {
 
         if (!NetworkManager.isNetworkAvailable(context)) {
             return Result.failure(IOException("No internet connection"))
         }
         return try {
-            Result.success(
-                teammatesUsersApiService.unlikeQuestionnaire(
-                    token = "Bearer $token",
-                    userId = userId,
-                    request = LikeQuestionnaireRequestDto(userId, unlikedQuestionnaireId)
-                ).toDomain()
-            )
+
+            val response = teammatesUsersApiService.unlikeQuestionnaire(
+                token = "Bearer $token",
+                userId = userId,
+                request = LikeQuestionnaireRequestDto(userId, questionnaire.questionnaireId)
+            ).toDomain()
+
+            if (questionnaire.questionnaireId == response.likedQuestionnaireId) {
+                questionnaireDao.deleteLikeQuestionnaire(questionnaire.toLikeEntity())
+            }
+
+            Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }

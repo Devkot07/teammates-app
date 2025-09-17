@@ -196,7 +196,7 @@ class QuestionnairesViewModel @Inject constructor(
         viewModelScope.launch {
             stateManager.updateSelectedQuestionnaireState(ContentState.LOADING)
             likeQuestionnaireUseCase(
-                likedQuestionnaireId = likedQuestionnaire.questionnaireId
+                questionnaire = likedQuestionnaire
             ).onSuccess { result ->
                 Log.d(TAG, result.toString())
                 val likedQuestionnaires = likedQuestionnaires.value.plus(likedQuestionnaire)
@@ -206,7 +206,9 @@ class QuestionnairesViewModel @Inject constructor(
             }.onFailure { throwable ->
                 Log.e(TAG, throwable.toString())
                 stateManager.updateSelectedQuestionnaireState(ContentState.ERROR)
+                loadLikedQuestionnaires()
                 errorHandler.handleError(throwable)
+                stateManager.updateSelectedQuestionnaireState(ContentState.INITIAL)
             }
         }
     }
@@ -215,7 +217,7 @@ class QuestionnairesViewModel @Inject constructor(
         viewModelScope.launch {
             stateManager.updateSelectedQuestionnaireState(ContentState.LOADING)
             unlikeQuestionnaireUseCase(
-                unlikedQuestionnaireId = unlikedQuestionnaire.questionnaireId
+                questionnaire = unlikedQuestionnaire
             ).onSuccess { result ->
                 Log.d(TAG, result.toString())
                 val likedQuestionnaires = likedQuestionnaires.value.filter { it.questionnaireId != unlikedQuestionnaire.questionnaireId }
@@ -225,7 +227,9 @@ class QuestionnairesViewModel @Inject constructor(
             }.onFailure { throwable ->
                 Log.e(TAG, throwable.toString())
                 stateManager.updateSelectedQuestionnaireState(ContentState.ERROR)
+                loadLikedQuestionnaires()
                 errorHandler.handleError(throwable)
+                stateManager.updateSelectedQuestionnaireState(ContentState.INITIAL)
             }
         }
     }

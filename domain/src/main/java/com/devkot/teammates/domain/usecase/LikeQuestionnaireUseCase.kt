@@ -1,5 +1,6 @@
 package com.devkot.teammates.domain.usecase
 
+import com.devkot.teammates.domain.model.Questionnaire
 import com.devkot.teammates.domain.model.response.LikeQuestionnaireResponse
 import com.devkot.teammates.domain.repository.UserDataRepository
 import com.devkot.teammates.domain.repository.UsersRepository
@@ -10,7 +11,7 @@ class LikeQuestionnaireUseCase @Inject constructor(
     private val usersRepository: UsersRepository,
     private val userDataRepository: UserDataRepository
 ) {
-    suspend operator fun invoke(likedQuestionnaireId: String): Result<LikeQuestionnaireResponse> {
+    suspend operator fun invoke(questionnaire: Questionnaire): Result<LikeQuestionnaireResponse> {
         return runCatching {
 
             val user = userDataRepository.user.first()
@@ -18,7 +19,7 @@ class LikeQuestionnaireUseCase @Inject constructor(
             usersRepository.likeQuestionnaire(
                 token = userDataRepository.accessToken.first(),
                 userId = user.publicId,
-                likedQuestionnaireId = likedQuestionnaireId
+                questionnaire = questionnaire
             ).getOrThrow()
         }
     }

@@ -24,13 +24,13 @@ interface UsersRepository {
     suspend fun likeQuestionnaire(
         token: String,
         userId: String,
-        likedQuestionnaireId: String
+        questionnaire: Questionnaire
     ): Result<LikeQuestionnaireResponse>
 
     suspend fun unlikeQuestionnaire(
         token: String,
         userId: String,
-        unlikedQuestionnaireId: String
+        questionnaire: Questionnaire
     ): Result<LikeQuestionnaireResponse>
 
     suspend fun likeUser(
