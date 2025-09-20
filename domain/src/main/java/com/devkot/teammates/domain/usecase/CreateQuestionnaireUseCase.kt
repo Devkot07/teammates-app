@@ -24,7 +24,6 @@ class CreateQuestionnaireUseCase @Inject constructor(
             val user = userDataRepository.user()
 
             questionnairesRepository.createQuestionnaire(
-                token = userDataRepository.accessToken(),
                 header = header,
                 game = selectedGame,
                 description = description,

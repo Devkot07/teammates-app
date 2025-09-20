@@ -109,7 +109,7 @@ class QuestionnairesViewModel @Inject constructor(
 
     private suspend fun loadQuestionnaires(game: Games? = null, page: Int = 1) {
         loadQuestionnairesUseCase(
-            page = page, game = game, authorId = null
+            page = page, game = game
         ).onSuccess { (result, throwable) ->
             Log.d(TAG, result.toString())
             if (page == 1) {

@@ -15,7 +15,6 @@ class LoadSelectedQuestionnaireUseCase @Inject constructor(
             val user = userDataRepository.user()
 
             questionnairesRepository.loadQuestionnaires(
-                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 page = null,
                 limit = null,

@@ -23,7 +23,6 @@ class UpdateQuestionnaireUseCase @Inject constructor(
             val user = userDataRepository.user()
 
             questionnairesRepository.updateQuestionnaire(
-                token = userDataRepository.accessToken(),
                 header = header,
                 game = selectedGame,
                 description = description,

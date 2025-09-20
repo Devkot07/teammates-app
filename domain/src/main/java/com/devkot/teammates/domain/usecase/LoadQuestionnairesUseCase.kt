@@ -14,14 +14,13 @@ class LoadQuestionnairesUseCase @Inject constructor(
         page: Int = 1,
         limit: Int = 10,
         game: Games?,
-        authorId: String?
+        authorId: String? = null
     ): Result<Pair<List<Questionnaire>, Throwable?>> {
         return runCatching {
 
             val user = userDataRepository.user()
 
             questionnairesRepository.loadQuestionnaires(
-                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 page = page,
                 limit = limit,

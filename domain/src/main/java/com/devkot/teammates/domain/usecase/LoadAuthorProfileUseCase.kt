@@ -16,9 +16,8 @@ class LoadAuthorProfileUseCase @Inject constructor(
             val user = userDataRepository.user()
 
             usersRepository.loadAuthorProfile(
-                token = userDataRepository.accessToken(),
                 userId = user.publicId,
-                LoadAuthorRequest(authorId = authorId)
+                request = LoadAuthorRequest(authorId = authorId)
             ).getOrThrow()
         }
     }

@@ -24,7 +24,6 @@ class QuestionnairesRepositoryImpl(
     private val questionnaireDao = database.questionnaireDao()
 
     override suspend fun loadQuestionnaires(
-        token: String,
         userId: String,
         page: Int?,
         limit: Int?,
@@ -44,7 +43,6 @@ class QuestionnairesRepositoryImpl(
 
         return runCatching {
             val dtoList = teammatesQuestionnairesApiService.getQuestionnaires(
-                token = "Bearer $token",
                 gameName = game?.name,
                 userId = userId,
                 page = page,
@@ -65,7 +63,6 @@ class QuestionnairesRepositoryImpl(
     }
 
     override suspend fun createQuestionnaire(
-        token: String,
         header: String,
         game: Games,
         description: String,
@@ -79,7 +76,6 @@ class QuestionnairesRepositoryImpl(
         return try {
             Result.success(
                 teammatesQuestionnairesApiService.createQuestionnaire(
-                    token = "Bearer $token",
                     userId = authorId,
                     request = QuestionnaireInRequest(
                         header,
@@ -97,7 +93,6 @@ class QuestionnairesRepositoryImpl(
     }
 
     override suspend fun updateQuestionnaire(
-        token: String,
         header: String,
         game: Games,
         description: String,
@@ -112,7 +107,6 @@ class QuestionnairesRepositoryImpl(
         return try {
             Result.success(
                 teammatesQuestionnairesApiService.updateQuestionnaire(
-                    token = "Bearer $token",
                     userId = authorId,
                     questionnaireId = questionnaireId,
                     request = QuestionnaireInRequest(
@@ -131,7 +125,6 @@ class QuestionnairesRepositoryImpl(
     }
 
     override suspend fun deleteQuestionnaires(
-        token: String,
         userId: String,
         questionnaireId: String
     ): Result<Unit> {
@@ -141,7 +134,6 @@ class QuestionnairesRepositoryImpl(
         return try {
             Result.success(
                 teammatesQuestionnairesApiService.deleteQuestionnaire(
-                    token = "Bearer $token",
                     questionnaireId = questionnaireId,
                     userId = userId,
                 )

@@ -15,7 +15,6 @@ class LikeAuthorUseCase @Inject constructor(
             val user = userDataRepository.user()
 
             usersRepository.likeUser(
-                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 likedUserId = likedUserId
             ).getOrThrow()

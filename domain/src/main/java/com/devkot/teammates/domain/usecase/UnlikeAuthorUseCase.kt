@@ -15,7 +15,6 @@ class UnlikeAuthorUseCase @Inject constructor(
             val user = userDataRepository.user()
 
             usersRepository.unlikeUser(
-                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 unlikedUserId = unlikedUserId
             ).getOrThrow()

@@ -20,9 +20,8 @@ class UpdateUserProfileUseCase @Inject constructor(
             val user = userDataRepository.user()
 
             val response = usersRepository.updateUserProfile(
-                token = userDataRepository.accessToken(),
                 userId = user.publicId,
-                UpdateUserProfileRequest(
+                request = UpdateUserProfileRequest(
                     nickname = nickname,
                     publicId = user.publicId,
                     description = description,
@@ -62,7 +61,6 @@ class UpdateUserProfileUseCase @Inject constructor(
             val user = userDataRepository.user()
 
             val response = usersRepository.updateUserProfilePhoto(
-                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 image = image
             ).getOrThrow()

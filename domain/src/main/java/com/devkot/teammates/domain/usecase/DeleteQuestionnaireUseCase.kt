@@ -16,7 +16,6 @@ class DeleteQuestionnaireUseCase @Inject constructor(
             val user = userDataRepository.user()
 
             questionnairesRepository.deleteQuestionnaires(
-                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 questionnaireId = questionnaireId,
 

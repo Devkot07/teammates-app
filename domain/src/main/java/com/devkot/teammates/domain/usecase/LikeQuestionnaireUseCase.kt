@@ -16,7 +16,6 @@ class LikeQuestionnaireUseCase @Inject constructor(
             val user = userDataRepository.user()
 
             usersRepository.likeQuestionnaire(
-                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 questionnaire = questionnaire
             ).getOrThrow()

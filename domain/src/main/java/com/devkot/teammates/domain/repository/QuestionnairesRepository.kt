@@ -8,7 +8,6 @@ import okhttp3.MultipartBody
 interface QuestionnairesRepository {
 
     suspend fun loadQuestionnaires(
-        token: String,
         userId: String,
         page: Int?,
         limit: Int?,
@@ -18,7 +17,6 @@ interface QuestionnairesRepository {
     ): Result<Pair<List<Questionnaire>, Throwable?>>
 
     suspend fun createQuestionnaire(
-        token: String,
         header: String,
         game: Games,
         description: String,
@@ -28,7 +26,6 @@ interface QuestionnairesRepository {
 
 
     suspend fun updateQuestionnaire(
-        token: String,
         header: String,
         game: Games,
         description: String,
@@ -38,7 +35,6 @@ interface QuestionnairesRepository {
     ): Result<Questionnaire>
 
     suspend fun deleteQuestionnaires(
-        token: String,
         userId: String,
         questionnaireId: String
     ): Result<Unit>

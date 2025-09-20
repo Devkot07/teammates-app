@@ -16,7 +16,6 @@ class UnlikeQuestionnaireUseCase @Inject constructor(
             val user = userDataRepository.user()
 
             usersRepository.unlikeQuestionnaire(
-                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 questionnaire = questionnaire
             ).getOrThrow()
