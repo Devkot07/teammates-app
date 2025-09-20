@@ -34,7 +34,6 @@ class CreateQuestionnaireUseCase @Inject constructor(
         }
     }
 
-    //TODO potential problems
     fun validateQuestionnaireForm(
         header: String,
         description: String,

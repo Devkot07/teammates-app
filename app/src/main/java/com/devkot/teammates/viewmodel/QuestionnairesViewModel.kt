@@ -239,9 +239,7 @@ class QuestionnairesViewModel @Inject constructor(
         description: String,
         selectedGame: Games?,
         uri: Uri?,
-        context: Context,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
+        context: Context
     ) {
         viewModelScope.launch {
             val validationResult = createNewQuestionnaireUseCase.validateQuestionnaireForm(
@@ -254,7 +252,6 @@ class QuestionnairesViewModel @Inject constructor(
                 is ValidationResult.Error -> {
                     val messageRes = validationResult.errorCode.toMessageRes()
                     SnackbarController.sendEvent(SnackbarEvent(messageRes))
-                    onError()
                 }
 
                 ValidationResult.Success -> {
@@ -268,11 +265,10 @@ class QuestionnairesViewModel @Inject constructor(
                         stateManager.updateNewQuestionnaireState(ContentState.LOADED)
                         SnackbarController.sendEvent(SnackbarEvent(R.string.questionnaire_created_successfully))
                         _questionnaireUiEvent.tryEmit(QuestionnaireUiEvent.QuestionnaireCreated)
-                        onSuccess()
                     }.onFailure { throwable ->
                         stateManager.updateNewQuestionnaireState(ContentState.ERROR)
                         errorHandler.handleError(throwable)
-                        onError()
+                        stateManager.updateNewQuestionnaireState(ContentState.INITIAL)
                     }
                 }
             }
@@ -383,6 +379,10 @@ class QuestionnairesViewModel @Inject constructor(
             delay(1000)
             stateManager.updateSelectedQuestionnaireState(ContentState.INITIAL)
         }
+    }
+
+    fun resetNewQuestionnaireState() {
+        stateManager.updateNewQuestionnaireState(ContentState.INITIAL)
     }
 
     companion object {

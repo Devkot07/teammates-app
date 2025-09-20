@@ -40,7 +40,6 @@ class UpdateUserProfileUseCase @Inject constructor(
         }
     }
 
-    //TODO validate
     fun validateUserProfileForm(
         nickname: String,
         description: String?,
