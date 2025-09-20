@@ -3,7 +3,6 @@ package com.devkot.teammates.domain.usecase
 import com.devkot.teammates.domain.model.User
 import com.devkot.teammates.domain.repository.UserDataRepository
 import com.devkot.teammates.domain.repository.UsersRepository
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class LoadLikedAuthorsUseCase @Inject constructor(
@@ -13,10 +12,10 @@ class LoadLikedAuthorsUseCase @Inject constructor(
     suspend operator fun invoke(): Result<List<User>> {
         return runCatching {
 
-            val user = userDataRepository.user.first()
+            val user = userDataRepository.user()
 
             usersRepository.loadLikedUsers(
-                token = userDataRepository.accessToken.first(),
+                token = userDataRepository.accessToken(),
                 userId = user.publicId,
             ).getOrThrow()
         }

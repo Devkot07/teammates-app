@@ -4,7 +4,6 @@ import com.devkot.teammates.domain.model.Questionnaire
 import com.devkot.teammates.domain.model.response.LikeQuestionnaireResponse
 import com.devkot.teammates.domain.repository.UserDataRepository
 import com.devkot.teammates.domain.repository.UsersRepository
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class LikeQuestionnaireUseCase @Inject constructor(
@@ -14,10 +13,10 @@ class LikeQuestionnaireUseCase @Inject constructor(
     suspend operator fun invoke(questionnaire: Questionnaire): Result<LikeQuestionnaireResponse> {
         return runCatching {
 
-            val user = userDataRepository.user.first()
+            val user = userDataRepository.user()
 
             usersRepository.likeQuestionnaire(
-                token = userDataRepository.accessToken.first(),
+                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 questionnaire = questionnaire
             ).getOrThrow()

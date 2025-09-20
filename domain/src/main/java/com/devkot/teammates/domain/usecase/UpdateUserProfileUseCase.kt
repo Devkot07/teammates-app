@@ -1,13 +1,12 @@
 package com.devkot.teammates.domain.usecase
 
-import com.devkot.teammates.domain.model.response.UpdateUserProfilePhotoResponse
-import com.devkot.teammates.domain.model.requesrt.UpdateUserProfileRequest
 import com.devkot.teammates.domain.model.User
 import com.devkot.teammates.domain.model.ValidationError
 import com.devkot.teammates.domain.model.ValidationResult
+import com.devkot.teammates.domain.model.requesrt.UpdateUserProfileRequest
+import com.devkot.teammates.domain.model.response.UpdateUserProfilePhotoResponse
 import com.devkot.teammates.domain.repository.UserDataRepository
 import com.devkot.teammates.domain.repository.UsersRepository
-import kotlinx.coroutines.flow.first
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
@@ -18,10 +17,10 @@ class UpdateUserProfileUseCase @Inject constructor(
     suspend operator fun invoke(nickname: String, description: String): Result<User> {
         return runCatching {
 
-            val user = userDataRepository.user.first()
+            val user = userDataRepository.user()
 
             val response = usersRepository.updateUserProfile(
-                token = userDataRepository.accessToken.first(),
+                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 UpdateUserProfileRequest(
                     nickname = nickname,
@@ -61,10 +60,10 @@ class UpdateUserProfileUseCase @Inject constructor(
     suspend fun updateUserAvatar(image: MultipartBody.Part): Result<UpdateUserProfilePhotoResponse> {
         return runCatching {
 
-            val user = userDataRepository.user.first()
+            val user = userDataRepository.user()
 
             val response = usersRepository.updateUserProfilePhoto(
-                token = userDataRepository.accessToken.first(),
+                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 image = image
             ).getOrThrow()

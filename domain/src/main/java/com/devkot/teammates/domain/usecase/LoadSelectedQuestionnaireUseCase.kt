@@ -3,7 +3,6 @@ package com.devkot.teammates.domain.usecase
 import com.devkot.teammates.domain.model.Questionnaire
 import com.devkot.teammates.domain.repository.QuestionnairesRepository
 import com.devkot.teammates.domain.repository.UserDataRepository
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class LoadSelectedQuestionnaireUseCase @Inject constructor(
@@ -13,10 +12,10 @@ class LoadSelectedQuestionnaireUseCase @Inject constructor(
     suspend operator fun invoke(questionnaireId: String): Result<Pair<List<Questionnaire>, Throwable?>> {
         return runCatching {
 
-            val user = userDataRepository.user.first()
+            val user = userDataRepository.user()
 
             questionnairesRepository.loadQuestionnaires(
-                token = userDataRepository.accessToken.first(),
+                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 page = null,
                 limit = null,

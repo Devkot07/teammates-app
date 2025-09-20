@@ -18,7 +18,6 @@ import com.devkot.teammates.utils.ErrorHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,7 +48,7 @@ class AuthViewModel @Inject constructor(
     private suspend fun checkAuthentication() {
         stateManager.updateAuthState(AuthState.LOADING)
         runCatching {
-            checkAuthenticationUseCase().first()
+            checkAuthenticationUseCase()
         }.onSuccess { authenticated ->
             val newAuthState =
                 if (authenticated) AuthState.AUTHENTICATED else AuthState.UNAUTHENTICATED

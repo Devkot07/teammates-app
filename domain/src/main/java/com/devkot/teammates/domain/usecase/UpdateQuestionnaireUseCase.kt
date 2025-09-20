@@ -4,7 +4,6 @@ import com.devkot.teammates.domain.model.Questionnaire
 import com.devkot.teammates.domain.model.enums.Games
 import com.devkot.teammates.domain.repository.QuestionnairesRepository
 import com.devkot.teammates.domain.repository.UserDataRepository
-import kotlinx.coroutines.flow.first
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
@@ -21,10 +20,10 @@ class UpdateQuestionnaireUseCase @Inject constructor(
     ): Result<Questionnaire> {
         return runCatching {
 
-            val user = userDataRepository.user.first()
+            val user = userDataRepository.user()
 
             questionnairesRepository.updateQuestionnaire(
-                token = userDataRepository.accessToken.first(),
+                token = userDataRepository.accessToken(),
                 header = header,
                 game = selectedGame,
                 description = description,

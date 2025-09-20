@@ -2,7 +2,6 @@ package com.devkot.teammates.domain.usecase
 
 import com.devkot.teammates.domain.repository.QuestionnairesRepository
 import com.devkot.teammates.domain.repository.UserDataRepository
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class DeleteQuestionnaireUseCase @Inject constructor(
@@ -14,10 +13,10 @@ class DeleteQuestionnaireUseCase @Inject constructor(
     ): Result<Unit> {
         return runCatching {
 
-            val user = userDataRepository.user.first()
+            val user = userDataRepository.user()
 
             questionnairesRepository.deleteQuestionnaires(
-                token = userDataRepository.accessToken.first(),
+                token = userDataRepository.accessToken(),
                 userId = user.publicId,
                 questionnaireId = questionnaireId,
 

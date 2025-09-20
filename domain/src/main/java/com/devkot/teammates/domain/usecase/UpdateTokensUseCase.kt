@@ -4,7 +4,6 @@ import android.util.Log
 import com.devkot.teammates.domain.model.requesrt.UpdateTokenRequest
 import com.devkot.teammates.domain.repository.AuthRepository
 import com.devkot.teammates.domain.repository.UserDataRepository
-import kotlinx.coroutines.flow.first
 import java.time.Instant
 import javax.inject.Inject
 
@@ -13,8 +12,8 @@ class UpdateTokensUseCase @Inject constructor(
     private val userDataRepository: UserDataRepository
 ) {
     suspend operator fun invoke(): Result<Unit> = runCatching {
-        val refreshToken = userDataRepository.refreshToken.first()
-        val publicId = userDataRepository.user.first().publicId
+        val refreshToken = userDataRepository.refreshToken()
+        val publicId = userDataRepository.user().publicId
         Log.d("UpdateTokensUseCase", "Tokens updated successfully. Saving new tokens")
 
         val response =

@@ -4,7 +4,6 @@ import android.util.Log
 import com.devkot.teammates.domain.repository.UserDataRepository
 import com.devkot.teammates.domain.usecase.UpdateTokensUseCase
 import dagger.Lazy
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -40,7 +39,7 @@ class TokenRefreshInterceptor @Inject constructor(
             }
 
             if (refreshed) {
-                val newToken = runBlocking { userDataRepository.accessToken.first() }
+                val newToken = runBlocking { userDataRepository.accessToken() }
                 Log.d(TAG, "New token retrieved. Retrying request with refreshed token.")
 
                 val newRequest = originalRequest.newBuilder()
