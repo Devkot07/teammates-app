@@ -5,6 +5,7 @@ hiltAndroidGradlePlugin = "2.55"
 hiltCompiler = "2.55"
 hiltNavigationCompose = "1.2.0"
 kotlin = "2.1.0"
+kotlin = "2.2.20"
 
 # AndroidX
 lifecycleLivedataKtx = "2.9.2"
