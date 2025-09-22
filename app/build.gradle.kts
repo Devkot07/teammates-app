@@ -10,7 +10,7 @@ fun getLocalProperty(propertyName: String, defaultValue: String = ""): String {
             properties.load(FileInputStream(localPropertiesFile))
             properties.getProperty(propertyName) ?: defaultValue
         } else defaultValue
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         defaultValue
     }
 }
@@ -26,7 +26,7 @@ plugins {
 
 android {
     namespace = "com.devkot.teammates"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.devkot.teammates"

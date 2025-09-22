@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import androidx.exifinterface.media.ExifInterface
 import android.graphics.Matrix
 import android.net.Uri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -14,19 +16,19 @@ import javax.inject.Inject
 
 class PrepareImageForUploadUseCase @Inject constructor(){
 
-    operator fun invoke(
+    suspend operator fun invoke(
         uri: Uri?,
         context: Context,
         name: String = "image"
-    ): MultipartBody.Part? {
+    ): MultipartBody.Part? = withContext(Dispatchers.IO) {
         val contentResolver = context.contentResolver
-        val inputStream = uri?.let { contentResolver.openInputStream(it) } ?: return null
+        val inputStream = uri?.let { contentResolver.openInputStream(it) } ?: return@withContext null
 
         val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 }
         val originalBitmap = BitmapFactory.decodeStream(inputStream, null, options)
         inputStream.close()
 
-        if (originalBitmap == null) return null
+        if (originalBitmap == null) return@withContext null
 
         val correctedBitmap = correctImageOrientation(uri, originalBitmap, context)
 
@@ -40,8 +42,7 @@ class PrepareImageForUploadUseCase @Inject constructor(){
         val byteArray = byteArrayOutputStream.toByteArray()
 
         val mediaType = "image/webp".toMediaTypeOrNull()
-        val requestBody = byteArray.toRequestBody(mediaType)
-        return MultipartBody.Part.createFormData(name, "$name.webp", requestBody)
+        MultipartBody.Part.createFormData(name, "$name.webp", byteArray.toRequestBody(mediaType))
     }
 
     private fun correctImageOrientation(uri: Uri, bitmap: Bitmap, context: Context): Bitmap {
@@ -68,7 +69,7 @@ class PrepareImageForUploadUseCase @Inject constructor(){
                 val matrix = Matrix().apply { postRotate(rotationDegrees) }
                 Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             bitmap
         }
     }
