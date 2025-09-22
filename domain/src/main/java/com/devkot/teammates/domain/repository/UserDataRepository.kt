@@ -1,14 +1,14 @@
 package com.devkot.teammates.domain.repository
 
 import com.devkot.teammates.domain.model.User
-import kotlinx.coroutines.flow.Flow
 
 
 interface UserDataRepository {
-    val user: Flow<User>
-    val accessToken: Flow<String>
-    val refreshToken: Flow<String>
-    val refreshTokenExpirationTime: Flow<Long>
+    suspend fun user(): User
+    suspend fun accessToken(): String
+    suspend fun refreshToken(): String
+
+    suspend fun refreshTokenExpirationTime(): Long
 
     suspend fun saveUser(user: User)
     suspend fun saveAccessToken(newAccessToken: String)

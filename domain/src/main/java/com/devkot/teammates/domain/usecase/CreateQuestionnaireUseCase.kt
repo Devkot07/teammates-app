@@ -6,7 +6,6 @@ import com.devkot.teammates.domain.model.ValidationResult
 import com.devkot.teammates.domain.model.enums.Games
 import com.devkot.teammates.domain.repository.QuestionnairesRepository
 import com.devkot.teammates.domain.repository.UserDataRepository
-import kotlinx.coroutines.flow.first
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
@@ -22,10 +21,9 @@ class CreateQuestionnaireUseCase @Inject constructor(
     ): Result<Questionnaire> {
         return runCatching {
 
-            val user = userDataRepository.user.first()
+            val user = userDataRepository.user()
 
             questionnairesRepository.createQuestionnaire(
-                token = userDataRepository.accessToken.first(),
                 header = header,
                 game = selectedGame,
                 description = description,
@@ -35,7 +33,6 @@ class CreateQuestionnaireUseCase @Inject constructor(
         }
     }
 
-    //TODO potential problems
     fun validateQuestionnaireForm(
         header: String,
         description: String,

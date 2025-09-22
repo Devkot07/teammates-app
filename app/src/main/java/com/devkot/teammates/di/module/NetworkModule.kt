@@ -5,6 +5,7 @@ import com.devkot.teammates.BuildConfig
 import com.devkot.teammates.data.remote.api.TeammatesAuthApiService
 import com.devkot.teammates.data.remote.api.TeammatesQuestionnairesApiService
 import com.devkot.teammates.data.remote.api.TeammatesUsersApiService
+import com.devkot.teammates.data.remote.interceptor.AuthHeaderInterceptor
 import com.devkot.teammates.data.remote.interceptor.TokenRefreshInterceptor
 import dagger.Module
 import dagger.Provides
@@ -64,10 +65,12 @@ object NetworkModule {
     @RegularClient
     fun provideRegularOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
+        authHeaderInterceptor: AuthHeaderInterceptor,
         tokenRefreshInterceptor: TokenRefreshInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(authHeaderInterceptor)
             .addInterceptor(tokenRefreshInterceptor)
             .followRedirects(false)
             .followSslRedirects(false)

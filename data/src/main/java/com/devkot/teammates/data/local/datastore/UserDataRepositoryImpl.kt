@@ -8,8 +8,8 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.devkot.teammates.domain.model.User
 import com.devkot.teammates.domain.repository.UserDataRepository
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
@@ -30,27 +30,8 @@ class UserDataRepositoryImpl @Inject constructor(
 
     }
 
-    override val refreshToken: Flow<String> = dataStore.data
-        .catch {
-            if (it is IOException) {
-                emit(emptyPreferences())
-            } else {
-                throw it
-            }
-        }
-        .map { data -> data[REFRESH_TOKEN] ?: "0" }
 
-    override val accessToken: Flow<String> = dataStore.data
-        .catch { exception ->
-            if (exception is IOException) {
-                emit(emptyPreferences())
-            } else {
-                throw exception
-            }
-        }
-        .map { preferences -> preferences[ACCESS_TOKEN] ?: "0" }
-
-    override val user: Flow<User> = dataStore.data
+    override suspend fun user() : User = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
                 emit(emptyPreferences())
@@ -72,9 +53,9 @@ class UserDataRepositoryImpl @Inject constructor(
                 description = userDescription,
                 imagePath = userImagePath
             )
-        }
+        }.first()
 
-    override val refreshTokenExpirationTime: Flow<Long> = dataStore.data
+    override suspend fun accessToken(): String = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
                 emit(emptyPreferences())
@@ -82,8 +63,37 @@ class UserDataRepositoryImpl @Inject constructor(
                 throw exception
             }
         }
-        .map { preferences -> preferences[REFRESH_TOKEN_EXPIRATION_TIME] ?: 0L }
+        .map { preferences -> preferences[ACCESS_TOKEN] ?: "0" }.first()
 
+    override suspend fun refreshToken(): String = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences -> preferences[REFRESH_TOKEN] ?: "" }.first()
+
+    override suspend fun refreshTokenExpirationTime(): Long = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences -> preferences[REFRESH_TOKEN_EXPIRATION_TIME] ?: 0L }.first()
+
+    override suspend fun saveUser(user: User) {
+        dataStore.edit { data ->
+            data[USER_NICKNAME] = user.nickname
+            data[USER_PUBLIC_ID] = user.publicId
+            data[USER_EMAIL] = user.email
+            data[USER_DESCRIPTION] = user.description
+            data[USER_IMAGE_PATH] = user.imagePath
+        }
+    }
 
     override suspend fun saveAccessToken(newAccessToken: String) {
         dataStore.edit { data ->
@@ -97,15 +107,6 @@ class UserDataRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveUser(user: User) {
-        dataStore.edit { data ->
-            data[USER_NICKNAME] = user.nickname
-            data[USER_PUBLIC_ID] = user.publicId
-            data[USER_EMAIL] = user.email
-            data[USER_DESCRIPTION] = user.description
-            data[USER_IMAGE_PATH] = user.imagePath
-        }
-    }
 
     override suspend fun updateUserProfile(
         nickname: String?,

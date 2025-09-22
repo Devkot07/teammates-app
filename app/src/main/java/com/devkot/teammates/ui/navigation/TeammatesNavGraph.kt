@@ -5,10 +5,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ModeEditOutline
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,16 +18,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.devkot.teammates.R
 import com.devkot.teammates.domain.model.enums.AuthState
 import com.devkot.teammates.domain.model.enums.BottomNavItem
 import com.devkot.teammates.ui.ObserveAsEvents
 import com.devkot.teammates.ui.ObserveState
-import com.devkot.teammates.ui.components.Dots
-import com.devkot.teammates.ui.components.DropdownItem
 import com.devkot.teammates.ui.components.LoadingItemWithText
 import com.devkot.teammates.ui.components.TeammatesBackHandler
-import com.devkot.teammates.ui.components.TeammatesDropdownMenu
 import com.devkot.teammates.ui.components.TeammatesTopAppBar
 import com.devkot.teammates.ui.screen.LoginScreen
 import com.devkot.teammates.ui.screen.TeammatesHomeScreen
@@ -114,6 +106,20 @@ fun TeammatesNavGraph(
 
             QuestionnaireUiEvent.QuestionnaireLiked -> {}
             QuestionnaireUiEvent.QuestionnaireUnliked -> {}
+            QuestionnaireUiEvent.QuestionnaireUpdated -> {
+                coroutineScope.launch {
+                    questionnairesViewModel.loadUserQuestionnaires()
+                    navController.navigate(Destinations.QuestionnaireDetails.route) {
+                        popUpTo(Destinations.Home.route) { inclusive = false }
+                    }
+                }
+            }
+            QuestionnaireUiEvent.QuestionnaireDeleted -> {
+                coroutineScope.launch {
+                    questionnairesViewModel.loadUserQuestionnaires()
+                    navController.navigateUp()
+                }
+            }
         }
     }
 
@@ -366,6 +372,7 @@ fun TeammatesNavGraph(
             QuestionnaireDetailsScreen(
                 author = selectedAuthor,
                 questionnaire = selectedQuestionnaire,
+                userQuestionnaires = userQuestionnaires,
                 likedQuestionnaires = likedQuestionnaires,
                 questionnairesViewModel = questionnairesViewModel,
                 navigateToAuthorProfile = {
@@ -374,16 +381,12 @@ fun TeammatesNavGraph(
                     else
                         navController.navigate(Destinations.AuthorProfile.route)
                 },
-                topBar = {
-                    TeammatesTopAppBar(
-                        title = stringResource(Destinations.QuestionnaireDetails.titleRes),
-                        canNavigateBack = true,
-                        navigateUp = {
-                            questionnairesViewModel.resetSelectedQuestionnaireState()
-                            navController.navigateUp()
-                        },
-                    )
-                }
+                navigateToQuestionnaireEdit = {
+                    navController.navigate(Destinations.QuestionnaireEdit.route)
+                },
+                navigateUp = { navController.navigateUp() }
+
+
             )
             TeammatesBackHandler(
                 currentRoute = currentRoute,

@@ -1,6 +1,6 @@
 package com.devkot.teammates.domain.model.requesrt
 
-data class CreateQuestionnaireRequest(
+data class QuestionnaireInRequest(
     val header: String,
     val game: String,
     val description: String,

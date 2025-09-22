@@ -30,21 +30,19 @@ class UsersRepositoryImpl(
     private val questionnaireDao = database.questionnaireDao()
 
     override suspend fun loadLikedQuestionnaires(
-        token: String,
         userId: String,
-    ): Result<Pair<List<Questionnaire>, Throwable?>>{
+    ): Result<Pair<List<Questionnaire>, Throwable?>> {
 
         suspend fun loadFromCache() = questionnaireDao.getLikedQuestionnaires().map { it.toDomain() }
 
         return try {
             val dtoList = teammatesUsersApiService.loadLikedQuestionnaires(
-                token = "Bearer $token",
                 userId = userId
             )
 
             val domainList = dtoList.map { it.toDomain() }
 
-           questionnaireDao.insertLikeQuestionnaires(domainList.map { it.toLikeEntity() })
+            questionnaireDao.insertLikeQuestionnaires(domainList.map { it.toLikeEntity() })
 
             Result.success(Pair(domainList, null))
 
@@ -56,14 +54,13 @@ class UsersRepositoryImpl(
 
     }
 
-    override suspend fun loadLikedUsers(token: String, userId: String): Result<List<User>> {
+    override suspend fun loadLikedUsers(userId: String): Result<List<User>> {
 
         if (!NetworkManager.isNetworkAvailable(context)) {
             return Result.failure(IOException("No internet connection"))
         }
         return try {
             val dtoList = teammatesUsersApiService.loadLikedUsers(
-                token = "Bearer $token",
                 userId = userId
             )
 
@@ -77,22 +74,24 @@ class UsersRepositoryImpl(
     }
 
     override suspend fun likeQuestionnaire(
-        token: String,
         userId: String,
-        likedQuestionnaireId: String
+        questionnaire: Questionnaire
     ): Result<LikeQuestionnaireResponse> {
 
         if (!NetworkManager.isNetworkAvailable(context)) {
             return Result.failure(IOException("No internet connection"))
         }
         return try {
-            Result.success(
-                teammatesUsersApiService.likeQuestionnaire(
-                    token = "Bearer $token",
-                    userId = userId,
-                    request = LikeQuestionnaireRequestDto(userId, likedQuestionnaireId)
-                ).toDomain()
-            )
+            val response = teammatesUsersApiService.likeQuestionnaire(
+                userId = userId,
+                request = LikeQuestionnaireRequestDto(userId, questionnaire.questionnaireId)
+            ).toDomain()
+
+            if (questionnaire.questionnaireId == response.likedQuestionnaireId) {
+                questionnaireDao.insertLikeQuestionnaire(questionnaire.toLikeEntity())
+            }
+
+            Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -100,29 +99,31 @@ class UsersRepositoryImpl(
     }
 
     override suspend fun unlikeQuestionnaire(
-        token: String,
         userId: String,
-        unlikedQuestionnaireId: String
+        questionnaire: Questionnaire
     ): Result<LikeQuestionnaireResponse> {
 
         if (!NetworkManager.isNetworkAvailable(context)) {
             return Result.failure(IOException("No internet connection"))
         }
         return try {
-            Result.success(
-                teammatesUsersApiService.unlikeQuestionnaire(
-                    token = "Bearer $token",
-                    userId = userId,
-                    request = LikeQuestionnaireRequestDto(userId, unlikedQuestionnaireId)
-                ).toDomain()
-            )
+
+            val response = teammatesUsersApiService.unlikeQuestionnaire(
+                userId = userId,
+                request = LikeQuestionnaireRequestDto(userId, questionnaire.questionnaireId)
+            ).toDomain()
+
+            if (questionnaire.questionnaireId == response.likedQuestionnaireId) {
+                questionnaireDao.deleteLikeQuestionnaire(questionnaire.toLikeEntity())
+            }
+
+            Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
     override suspend fun likeUser(
-        token: String,
         userId: String,
         likedUserId: String
     ): Result<LikeUserResponse> {
@@ -133,7 +134,6 @@ class UsersRepositoryImpl(
         return try {
             Result.success(
                 teammatesUsersApiService.likeUser(
-                    token = "Bearer $token",
                     userId = userId,
                     request = LikeUserRequestDto(userId, likedUserId)
                 ).toDomain()
@@ -145,7 +145,6 @@ class UsersRepositoryImpl(
     }
 
     override suspend fun unlikeUser(
-        token: String,
         userId: String,
         unlikedUserId: String
     ): Result<LikeUserResponse> {
@@ -156,7 +155,6 @@ class UsersRepositoryImpl(
         return try {
             Result.success(
                 teammatesUsersApiService.unlikeUser(
-                    token = "Bearer $token",
                     userId = userId,
                     request = LikeUserRequestDto(userId, unlikedUserId)
                 ).toDomain()
@@ -167,7 +165,6 @@ class UsersRepositoryImpl(
     }
 
     override suspend fun loadAuthorProfile(
-        token: String,
         userId: String,
         request: LoadAuthorRequest
     ): Result<User> {
@@ -178,7 +175,6 @@ class UsersRepositoryImpl(
         return try {
             Result.success(
                 teammatesUsersApiService.loadAuthorProfile(
-                    token = "Bearer $token",
                     userId = userId,
                     publicId = request.authorId
                 ).toDomain()
@@ -190,7 +186,6 @@ class UsersRepositoryImpl(
     }
 
     override suspend fun updateUserProfile(
-        token: String,
         userId: String,
         request: UpdateUserProfileRequest
     ): Result<User> {
@@ -201,7 +196,6 @@ class UsersRepositoryImpl(
         return try {
             Result.success(
                 teammatesUsersApiService.updateUserProfile(
-                    token = "Bearer $token",
                     userId = userId,
                     request = request.toDto()
                 ).toDomain()
@@ -213,7 +207,6 @@ class UsersRepositoryImpl(
     }
 
     override suspend fun updateUserProfilePhoto(
-        token: String,
         userId: String,
         image: MultipartBody.Part
     ): Result<UpdateUserProfilePhotoResponse> {
@@ -224,7 +217,6 @@ class UsersRepositoryImpl(
         return try {
             Result.success(
                 teammatesUsersApiService.updateUserProfilePhoto(
-                    token = "Bearer $token",
                     userId = userId,
                     image = image
                 ).toDomain()

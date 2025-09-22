@@ -71,171 +71,176 @@ fun QuestionnaireCreateScreen(
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val imagePickerLauncher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?> = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri: Uri? ->
-            selectedImageUri = uri
-        }
-    )
+    val imagePickerLauncher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?> =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia(),
+            onResult = { uri: Uri? ->
+                selectedImageUri = uri
+            }
+        )
+
+    val newQuestionnaireState by questionnairesViewModel.newQuestionnaireState.collectAsState()
+
+    if (newQuestionnaireState == ContentState.LOADED) {
+        selectedImageUri = null
+        questionnaireForm = QuestionnaireForm("", "", null)
+        questionnairesViewModel.resetNewQuestionnaireState()
+    }
 
     Scaffold(
         topBar = topBar,
         bottomBar = bottomBar,
     ) { innerPadding ->
 
-
-        when (questionnairesViewModel.newQuestionnaireState.collectAsState().value)  {
-            ContentState.LOADED, ContentState.INITIAL ->
+        when (newQuestionnaireState) {
+            ContentState.LOADED, ContentState.INITIAL -> {
                 Column(
-                modifier = modifier
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 32.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = modifier
+                        .verticalScroll(rememberScrollState())
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(horizontal = 32.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
 
                 ) {
-                if (selectedImageUri == null) {
-                    TeammatesButton(
-                        text = "Select Image",
-                        onClick = {
-                            imagePickerLauncher.launch(
-                                PickVisualMediaRequest(
-                                    mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
-                                )
-                            )
-                        },
-                        modifier = Modifier.wrapContentWidth()
-                    )
-                } else {
-                    TeammatesButton(
-                        text = "Delete Image",
-                        onClick = {
-                            selectedImageUri = null
-                        },
-                        modifier = Modifier.wrapContentWidth()
-                    )
-                }
-
-
-                selectedImageUri?.let {
-                    TeammatesImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(selectedImageUri)
-                            .build(),
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .padding(32.dp)
-                            .aspectRatio(1f)
-                            .clip(ShapeDefaults.Medium)
-                            .widthIn(400.dp)
-                            .border(2.dp, Color.Gray, ShapeDefaults.Medium),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                OutlinedTextField(
-                    value = questionnaireForm.header,
-                    onValueChange = { data ->
-                        questionnaireForm = questionnaireForm.copy(header = data)
-                    },
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            focusManager.moveFocus(FocusDirection.Down)
-                        }
-                    ),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    label = { Text(stringResource(R.string.header)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = ShapeDefaults.Small
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-
-                OutlinedTextField(
-                    value = questionnaireForm.description,
-                    onValueChange = { data ->
-                        questionnaireForm = questionnaireForm.copy(description = data)
-                    },
-                    keyboardActions = KeyboardActions(
-                        onDone = { focusManager.clearFocus() }
-                    ),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    label = { Text(stringResource(R.string.description)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = ShapeDefaults.Small
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-
-                    ) {
-                        val buttonText = if (isDropdownExpanded) {
-                            stringResource(R.string.close)
-                        } else {
-                            questionnaireForm.selectedGame?.nameOfGame
-                                ?: stringResource(R.string.select_game)
-                        }
-
+                    if (selectedImageUri == null) {
                         TeammatesButton(
-                            onClick = { isDropdownExpanded = !isDropdownExpanded },
-                            text = buttonText,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                        )
-
-                        Spacer(Modifier.height(16.dp))
-
-
-                        GamesDropdownMenu(
-                            expanded = isDropdownExpanded,
-                            games = Games.entries,
-                            onGameSelected = { selected ->
-                                isDropdownExpanded = false
-                                questionnaireForm.selectedGame = selected
+                            text = "Select Image",
+                            onClick = {
+                                imagePickerLauncher.launch(
+                                    PickVisualMediaRequest(
+                                        mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                                    )
+                                )
                             },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentSize(Alignment.TopStart)
+                            modifier = Modifier.wrapContentWidth()
+                        )
+                    } else {
+                        TeammatesButton(
+                            text = "Delete Image",
+                            onClick = {
+                                selectedImageUri = null
+                            },
+                            modifier = Modifier.wrapContentWidth()
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(24.dp))
-                    TeammatesButton(
-                        enabled = (questionnaireForm.header.isNotEmpty() && questionnaireForm.description.isNotEmpty() && questionnaireForm.selectedGame != null),
-                        onClick = {
-                            questionnairesViewModel.createNewQuestionnaire(
-                                questionnaireForm.header,
-                                questionnaireForm.description,
-                                questionnaireForm.selectedGame,
-                                selectedImageUri,
-                                context = context,
-                                onSuccess = {
-                                    selectedImageUri = null
-                                    questionnaireForm = QuestionnaireForm("", "", null)
-                                },
-                                onError = {}
 
-                            )
+                    selectedImageUri?.let {
+                        TeammatesImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(selectedImageUri)
+                                .build(),
+                            contentDescription = "Profile Picture",
+                            modifier = Modifier
+                                .padding(32.dp)
+                                .aspectRatio(1f)
+                                .clip(ShapeDefaults.Medium)
+                                .widthIn(400.dp)
+                                .border(2.dp, Color.Gray, ShapeDefaults.Medium),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    OutlinedTextField(
+                        value = questionnaireForm.header,
+                        onValueChange = { data ->
+                            questionnaireForm = questionnaireForm.copy(header = data.trim())
                         },
-                        text = stringResource(R.string.create),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .height(56.dp)
+                        keyboardActions = KeyboardActions(
+                            onNext = {
+                                focusManager.moveFocus(FocusDirection.Down)
+                            }
+                        ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        label = { Text(stringResource(R.string.header)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = ShapeDefaults.Small
                     )
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    OutlinedTextField(
+                        value = questionnaireForm.description,
+                        onValueChange = { data ->
+                            questionnaireForm = questionnaireForm.copy(description = data.trim())
+                        },
+                        keyboardActions = KeyboardActions(
+                            onDone = { focusManager.clearFocus() }
+                        ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        label = { Text(stringResource(R.string.description)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = ShapeDefaults.Small
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.Top,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+
+                        ) {
+                            val buttonText = if (isDropdownExpanded) {
+                                stringResource(R.string.close)
+                            } else {
+                                questionnaireForm.selectedGame?.nameOfGame
+                                    ?: stringResource(R.string.select_game)
+                            }
+
+                            TeammatesButton(
+                                onClick = { isDropdownExpanded = !isDropdownExpanded },
+                                text = buttonText,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                            )
+
+                            Spacer(Modifier.height(16.dp))
+
+
+                            GamesDropdownMenu(
+                                expanded = isDropdownExpanded,
+                                games = Games.entries,
+                                onGameSelected = { selected ->
+                                    isDropdownExpanded = false
+                                    questionnaireForm.selectedGame = selected
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentSize(Alignment.TopStart)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(24.dp))
+                        TeammatesButton(
+                            enabled = (questionnaireForm.header.isNotEmpty() &&
+                                    questionnaireForm.description.isNotEmpty() &&
+                                    questionnaireForm.selectedGame != null),
+                            onClick = {
+                                questionnairesViewModel.createNewQuestionnaire(
+                                    questionnaireForm.header,
+                                    questionnaireForm.description,
+                                    questionnaireForm.selectedGame,
+                                    selectedImageUri,
+                                    context
+                                )
+                            },
+                            text = stringResource(R.string.create),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .height(56.dp)
+                        )
+                    }
                 }
             }
             ContentState.LOADING, ContentState.ERROR -> LoadingItemWithText()

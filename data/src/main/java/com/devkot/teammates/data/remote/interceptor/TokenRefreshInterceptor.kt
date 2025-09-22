@@ -4,8 +4,9 @@ import android.util.Log
 import com.devkot.teammates.domain.repository.UserDataRepository
 import com.devkot.teammates.domain.usecase.UpdateTokensUseCase
 import dagger.Lazy
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
@@ -24,23 +25,35 @@ class TokenRefreshInterceptor @Inject constructor(
         val response = chain.proceed(originalRequest)
 
         if (response.code == 401 && hasAuthHeader) {
-
-            Log.w(TAG, "Received 401 Unauthorized. Attempting token refresh.")
             response.close()
 
             val refreshed = runBlocking {
-                try {
-                    val result = updateTokensUseCase.get().invoke()
-                    Log.d(TAG, "Token refresh result: $result")
-                    result.isSuccess
-                } catch (e: Exception) {
-                    Log.e(TAG, "Token refresh failed with exception: ${e.message}", e)
-                    false
+                mutex.withLock {
+                    try {
+                        val currentToken = userDataRepository.accessToken()
+                        val stillUnauthorized =
+                            currentToken == originalRequest.header("Authorization")
+                                ?.removePrefix("Bearer ")
+
+                        if (stillUnauthorized) {
+                            Log.w(TAG, "Refreshing tokens...")
+                            updateTokensUseCase.get().invoke().isSuccess
+                        } else {
+                            Log.d(
+                                TAG,
+                                "Token already refreshed by another request, skipping refresh."
+                            )
+                            true
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Token refresh failed", e)
+                        false
+                    }
                 }
             }
 
             if (refreshed) {
-                val newToken = runBlocking { userDataRepository.accessToken.first() }
+                val newToken = runBlocking { userDataRepository.accessToken() }
                 Log.d(TAG, "New token retrieved. Retrying request with refreshed token.")
 
                 val newRequest = originalRequest.newBuilder()
@@ -51,7 +64,7 @@ class TokenRefreshInterceptor @Inject constructor(
                 return chain.proceed(newRequest)
             } else {
                 Log.e(TAG, "Token refresh failed (possibly expired refresh token)")
-                return chain.proceed(originalRequest)
+                return response
             }
         }
         return response
@@ -60,5 +73,6 @@ class TokenRefreshInterceptor @Inject constructor(
 
     companion object {
         private const val TAG = "TokenRefreshInterceptor"
+        private val mutex = Mutex()
     }
 }

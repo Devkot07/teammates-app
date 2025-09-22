@@ -2,7 +2,7 @@ package com.devkot.teammates.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class CreateQuestionnaireRequestDto(
+data class QuestionnaireInRequestDto(
     @SerializedName("header")
     val header: String,
     @SerializedName("game")

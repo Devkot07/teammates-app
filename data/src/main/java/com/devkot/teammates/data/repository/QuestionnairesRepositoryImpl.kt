@@ -9,7 +9,7 @@ import com.devkot.teammates.data.remote.api.TeammatesQuestionnairesApiService
 import com.devkot.teammates.data.remote.network.NetworkManager
 import com.devkot.teammates.domain.model.Questionnaire
 import com.devkot.teammates.domain.model.enums.Games
-import com.devkot.teammates.domain.model.requesrt.CreateQuestionnaireRequest
+import com.devkot.teammates.domain.model.requesrt.QuestionnaireInRequest
 import com.devkot.teammates.domain.repository.QuestionnairesRepository
 import okhttp3.MultipartBody
 import java.io.IOException
@@ -24,7 +24,6 @@ class QuestionnairesRepositoryImpl(
     private val questionnaireDao = database.questionnaireDao()
 
     override suspend fun loadQuestionnaires(
-        token: String,
         userId: String,
         page: Int?,
         limit: Int?,
@@ -44,7 +43,6 @@ class QuestionnairesRepositoryImpl(
 
         return runCatching {
             val dtoList = teammatesQuestionnairesApiService.getQuestionnaires(
-                token = "Bearer $token",
                 gameName = game?.name,
                 userId = userId,
                 page = page,
@@ -65,7 +63,6 @@ class QuestionnairesRepositoryImpl(
     }
 
     override suspend fun createQuestionnaire(
-        token: String,
         header: String,
         game: Games,
         description: String,
@@ -79,9 +76,8 @@ class QuestionnairesRepositoryImpl(
         return try {
             Result.success(
                 teammatesQuestionnairesApiService.createQuestionnaire(
-                    token = "Bearer $token",
                     userId = authorId,
-                    request = CreateQuestionnaireRequest(
+                    request = QuestionnaireInRequest(
                         header,
                         game.nameOfGame,
                         description,
@@ -95,4 +91,57 @@ class QuestionnairesRepositoryImpl(
         }
 
     }
+
+    override suspend fun updateQuestionnaire(
+        header: String,
+        game: Games,
+        description: String,
+        authorId: String,
+        questionnaireId: String,
+        image: MultipartBody.Part?
+    ): Result<Questionnaire> {
+
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesQuestionnairesApiService.updateQuestionnaire(
+                    userId = authorId,
+                    questionnaireId = questionnaireId,
+                    request = QuestionnaireInRequest(
+                        header,
+                        game.nameOfGame,
+                        description,
+                        authorId
+                    ).toDto(),
+                    image = image
+                ).toDomain()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+
+    override suspend fun deleteQuestionnaires(
+        userId: String,
+        questionnaireId: String
+    ): Result<Unit> {
+        if (!NetworkManager.isNetworkAvailable(context)) {
+            return Result.failure(IOException("No internet connection"))
+        }
+        return try {
+            Result.success(
+                teammatesQuestionnairesApiService.deleteQuestionnaire(
+                    questionnaireId = questionnaireId,
+                    userId = userId,
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
 }

@@ -4,27 +4,31 @@ import com.devkot.teammates.domain.model.Questionnaire
 import com.devkot.teammates.domain.model.enums.Games
 import com.devkot.teammates.domain.repository.QuestionnairesRepository
 import com.devkot.teammates.domain.repository.UserDataRepository
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
-class LoadUserQuestionnairesUseCase @Inject constructor(
+class UpdateQuestionnaireUseCase @Inject constructor(
     private val questionnairesRepository: QuestionnairesRepository,
     private val userDataRepository: UserDataRepository
 ) {
     suspend operator fun invoke(
-        limit: Int = 100,
-        game: Games?
-    ): Result<Pair<List<Questionnaire>, Throwable?>> {
+        header: String,
+        description: String,
+        selectedGame: Games,
+        questionnaireId: String,
+        image: MultipartBody.Part?
+    ): Result<Questionnaire> {
         return runCatching {
 
             val user = userDataRepository.user()
 
-            questionnairesRepository.loadQuestionnaires(
-                userId = user.publicId,
-                page = null,
-                limit = limit,
-                game = game,
+            questionnairesRepository.updateQuestionnaire(
+                header = header,
+                game = selectedGame,
+                description = description,
                 authorId = user.publicId,
-                questionnaireId = null
+                questionnaireId = questionnaireId,
+                image = image,
             ).getOrThrow()
         }
     }
