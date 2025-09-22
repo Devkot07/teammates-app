@@ -10,7 +10,7 @@ fun getLocalProperty(propertyName: String, defaultValue: String = ""): String {
             properties.load(FileInputStream(localPropertiesFile))
             properties.getProperty(propertyName) ?: defaultValue
         } else defaultValue
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         defaultValue
     }
 }
@@ -21,12 +21,12 @@ plugins {
     alias(libs.plugins.relay)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.dagger.hilt)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.devkot.teammates"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.devkot.teammates"
@@ -61,8 +61,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        jvmToolchain(17)
     }
 
     buildFeatures {
@@ -112,7 +112,7 @@ dependencies {
     // Dagger Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
 
     // Testing
