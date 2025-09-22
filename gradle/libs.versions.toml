@@ -4,8 +4,8 @@ hiltAndroid = "2.55"
 hiltAndroidGradlePlugin = "2.55"
 hiltCompiler = "2.55"
 hiltNavigationCompose = "1.2.0"
-kotlin = "2.1.0"
 kotlin = "2.2.20"
+ksp = "2.2.20-2.0.3"
 
 # AndroidX
 lifecycleLivedataKtx = "2.9.2"
@@ -83,4 +83,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 relay = { id = "com.google.relay", version.ref = "relay" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 dagger-hilt = { id = "dagger.hilt.android.plugin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

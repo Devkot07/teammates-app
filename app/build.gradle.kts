@@ -21,7 +21,7 @@ plugins {
     alias(libs.plugins.relay)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.dagger.hilt)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -112,7 +112,7 @@ dependencies {
     // Dagger Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
 
     // Testing

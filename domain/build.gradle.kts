@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.dagger.hilt)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
 
 }
 
@@ -41,7 +41,7 @@ dependencies {
 
     // Dagger Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.exifinterface)
